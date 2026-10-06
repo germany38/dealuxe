@@ -1,0 +1,118 @@
+[build]
+  # Installs dependencies first when the build starts without node_modules
+  # (a CLI `netlify deploy` build runs straight from the source tree, with no
+  # install step, so `vite` and `@netlify/blobs` were missing). A normal CI
+  # build already has them, so there the guard is a no-op. `npx` resolves the
+  # local vite binary whether or not node_modules/.bin is on PATH.
+  command = "(test -x node_modules/.bin/vite || npm ci --include=dev --no-audit --no-fund) && node scripts/sync-sources.mjs && npx --no-install vite build"
+  publish = "dist/client"
+
+[dev]
+  command = "npm run dev"
+  targetPort = 3000
+  port = 8888
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# The on-demand translation endpoint reads the page body from disk rather than
+# accepting it from the browser, so the DeepL quota can only be spent on this
+# site's own pages. Synced posts are written before functions are bundled, so
+# they are included too.
+[functions.translate]
+  included_files = ["src/data/blog/posts/*.json", "src/data/jobs/posts/*.json", "src/data/sweeps/posts/*.json"]
+
+[build.environment]
+  STRIPE_PUBLISHABLE_KEY = "pk_live_51ThxmWREvSQNqJ2fnKKEDbnPmP4O3sEcSUcNwFuHOC8PLLCdzE1DPHVy3YRAhqzs4nMOwYIkH2cyZVvf1SCJKbrE00k2aMW4Tt"
+
+# Journal cover art and inline post images come from third-party hosts: the
+# Medium and Tumblr CDNs (images that shipped with the imported posts), iStock
+# (licensed covers assigned in src/lib/journalCovers.ts) and Unsplash (the
+# curated fallback pool). Allow the Netlify Image CDN to resize and re-encode
+# them so posts do not ship full-resolution third-party images.
+#
+# Wikimedia Commons is deliberately absent: the Image CDN's fetcher is rate
+# limited by upload.wikimedia.org, so the licensed portraits in
+# src/lib/journalPortraits.ts are checked into public/ instead of hotlinked.
+[images]
+  remote_images = [
+    "https://maps\\.seatics\\.com/.*",
+    "https://ecdn\\.teacherspayteachers\\.com/.*",
+    "https://static\\.tomaticket\\.es/.*",
+    "https://media\\.stubcloudstatic\\.com/.*",
+    "https://i\\.ebayimg\\.com/.*",
+    "https://cdn-images-1\\.medium\\.com/.*",
+    "https://miro\\.medium\\.com/.*",
+    "https://64\\.media\\.tumblr\\.com/.*",
+    "https://\\d+\\.media\\.tumblr\\.com/.*",
+    "https://images\\.unsplash\\.com/.*",
+    "https://substackcdn\\.com/.*",
+    "https://substack-post-media\\.s3\\.amazonaws\\.com/.*",
+    "https://media\\.istockphoto\\.com/.*",
+    "https://media\\.gettyimages\\.com/.*",
+    # Storefront product photos (CORT Furniture Outlet; Nouhaus, Moment and SAME LOS ANGELES on Shopify; Moment;
+    # KIND; LightInTheBox; Beauty Forever; VEGAS.com; NOVICA; MEL Science on Cloudinary; Coursera on CloudFront)
+    "https://cdn\\.cort\\.com/.*",
+    "https://cdn\\.shopify\\.com/.*",
+    "https://www\\.kindsnacks\\.com/.*",
+    "https://image\\.shopmoment\\.com/.*",
+    "https://litb-cgis\\.rightinthebox\\.com/.*",
+    "https://www\\.beautyforever\\.com/.*",
+    "https://media\\.beautyforever\\.com/.*",
+    "https://www\\.vegas\\.com/.*",
+    "https://images2\\.novica\\.net/.*",
+    "https://res\\.cloudinary\\.com/mel-science/.*",
+    "https://d3njjcbhbojbot\\.cloudfront\\.net/.*",
+    "https://www\\.dhresource\\.com/.*",
+    "https://cdn\\.humblebundle\\.com/.*",
+    "https://cdnp0\\.stackassets\\.com/.*",
+    "https://cdnp3\\.stackassets\\.com/.*",
+    "https://cdnp2\\.stackassets\\.com/.*",
+    "https://cdnp1\\.stackassets\\.com/.*",
+    "https://shop\\.samsonite\\.com/.*",
+    "https://cdn11\\.bigcommerce\\.com/.*",
+    "https://feeds\\.frgimages\\.com/.*",
+    "https://goldclubdirect\\.com/.*",
+    "https://indielee\\.com/.*",
+    "https://prod-discovery\\.edx-cdn\\.org/.*",
+    "https://freshq-prd\\.s3\\.amazonaws\\.com/.*",
+    "https://img\\.joomcdn\\.net/.*",
+    "https://img\\.kwcdn\\.com/.*",
+    "https://img-eu\\.kwcdn\\.com/.*",
+    "https://g-images\\.voghion\\.com/.*",
+    "https://images\\.voghion\\.com/.*",
+    "https://cbu01\\.alicdn\\.com/.*",
+    "https://shop\\.americantourister\\.com/.*",
+    "https://d28hgpri8am2if\\.cloudfront\\.net/.*",
+    "https://dm61q01mhxuli\\.cloudfront\\.net/.*",
+    "https://dollardays\\.imgix\\.net/.*",
+    "https://media\\.accobrands\\.com/.*",
+    "https://www\\.ustgear\\.com/.*",
+    "https://cdn-prod\\.scalefast\\.com/.*",
+    "https://img\\.gkbcdn\\.com/.*",
+    "https://www\\.laifentech\\.com/.*",
+    "https://shopping\\.googleusercontent\\.com/.*",
+    "https://djtmfp1rz1oc5\\.cloudfront\\.net/.*",
+    "https://www\\.lac\\.com\\.ph/.*",
+    "https://www\\.lac\\.com\\.tw/.*",
+    "https://www\\.meatyourmaker\\.com/.*",
+    "https://s4\\.thcdn\\.com/.*",
+    "https://www\\.gourmetgiftbaskets\\.com/.*",
+    "https://www\\.cheesecake\\.com/.*",
+    "https://www\\.strawberries\\.com/.*",
+    "https://media\\.gadventures\\.com/.*",
+    "https://www\\.ubigi\\.com/.*",
+  ]
+
+# Hashed build output never changes under a given URL,
+# so browsers may keep it for a year and repeat views skip the network.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/journal/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
