@@ -1,13 +1,4 @@
 User-agent: *
 Allow: /
-# Affiliate redirects (reveal-deal) and member APIs: not pages, and a crawl of
-# them would count as clicks. /.netlify/images/ stays crawlable for image search.
-Disallow: /.netlify/functions/
-# Sorted and searched views canonicalise to their bare path and multiply without
-# limit; filters and pagination stay crawlable because they lead to real pages.
-Disallow: /*?sort=
-Disallow: /*&sort=
-Disallow: /*?q=
-Disallow: /*&q=
 
 Sitemap: https://dealuxapp.com/sitemap.xml
