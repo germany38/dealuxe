@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event tickets | Dealux Tickets</title>
+<meta name="description" content="Compare ticket prices and dates across TicketNetwork, TicketLiquidator and StubHub.">
+<link rel="canonical" href="https://dealuxapp.com/tickets/">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/assets/dealux.css">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/app.js" defer></script>
+</head>
+<body data-page="tickets">
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="logo" href="/">DEALUX</a>
+    <nav class="main-nav">
+      <a href="/shop/">Shop</a><a href="/brands/">Brands</a><a href="/journal/">Journal</a><a href="/jobs/">Jobs</a><a href="/tickets/">Tickets</a>
+    </nav>
+    <form class="header-search" action="/shop/" method="get" role="search">
+      <input type="search" name="q" placeholder="Search 100k+ products" aria-label="Search products">
+    </form>
+  </div>
+</header>
+<main class="wrap">
+<div class="post-layout">
+<article class="post" id="ev">
+  <a class="muted" href="/tickets/">← All events</a>
+  <h1 id="ev-name">Loading…</h1>
+  <p class="muted" id="ev-place"></p>
+  <div id="ev-dates"></div>
+</article>
+</div>
+<script>
+(function(){var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var slugify=function(s){return s.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')};
+var now=new Date(),today=now.getFullYear()*10000+(now.getMonth()+1)*100+now.getDate();
+var fmt=function(n){var d=new Date(Math.floor(n/10000),Math.floor(n/100)%100-1,n%100);return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})};
+var usd=function(c){return c?'$'+(c/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):''};
+var CATS={concerts:'Concerts',sports:'Sports',theatre:'Theatre',other:'Other'};
+var m=location.pathname.match(/\/tickets\/(?:[^\/]*-)?([a-z0-9]+)\/?$/),id=new URLSearchParams(location.search).get('id')||(m&&m[1]!=='show'?m[1]:'');
+var h=5381;for(var i=0;i<id.length;i++)h=((h*33)^id.charCodeAt(i))>>>0;
+var name=document.getElementById('ev-name'),place=document.getElementById('ev-place'),box=document.getElementById('ev-dates');
+function ended(){name.textContent='This event has ended';box.innerHTML='<p>Tickets for this event are no longer available.</p><p><a class="btn btn-gold" href="/tickets/">Browse upcoming events →</a></p>'}
+if(!id)return ended();
+fetch('/data/tickets/'+(h%512)+'.json').then(function(r){return r.json()}).then(function(s){var e=s[id];if(!e)return ended();
+// Date row: [YYYYMMDD, time, priceFromCents, TicketNetwork, TicketLiquidator, StubHub]
+var dates=e.d.filter(function(d){return d[0]>=today});
+name.textContent=e.n;document.title=e.n+' Tickets — Dealux Tickets';
+place.textContent=[e.v,[e.c,e.s].filter(Boolean).join(', '),CATS[e.k]||e.k].filter(Boolean).join(' · ');
+if(!dates.length)return ended();
+var btn=function(u,l){return u?'<a class="btn btn-gold" style="margin:4px 8px 4px 0" href="'+esc(u)+'" target="_blank" rel="nofollow sponsored noopener">'+l+' →</a>':''};
+box.innerHTML=(e.i?'<p><img src="'+esc(e.i)+'" alt="" referrerpolicy="no-referrer" loading="lazy" style="max-width:100%;max-height:320px;border-radius:12px"></p>':'')+'<h2>'+dates.length+' upcoming date'+(dates.length>1?'s':'')+'</h2>'+dates.map(function(d){var t=d[1]?' · '+d[1].slice(0,5):'';return '<div class="card" style="padding:14px;margin:0 0 10px"><b>'+fmt(d[0])+t+'</b>'+(d[2]?' <span class="muted">· from '+usd(d[2])+'</span>':'')+'<div style="margin-top:8px">'+btn(d[3],'TicketNetwork')+btn(d[4],'TicketLiquidator')+btn(d[5],'StubHub')+'</div></div>'}).join('');
+}).catch(ended);})();
+</script>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p>© 2026 Dealux. Some links are affiliate links; we may earn a commission at no cost to you.</p>
+  </div>
+</footer>
+</body>
+</html>

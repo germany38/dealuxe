@@ -1,32 +1,9 @@
-plugins = []
-headers = []
-redirects = []
-
-[database]
-
-  [database.migrations]
-  path = "/opt/build/repo/netlify/database/migrations"
-
 [build]
-publish = "/opt/build/repo/dist"
-publishOrigin = "config"
-commandOrigin = "config"
-command = "npm run build"
+  publish = "."
+  command = ""
 
-  [build.environment]
-
-  [build.processing]
-
-    [build.processing.css]
-
-    [build.processing.html]
-
-    [build.processing.images]
-
-    [build.processing.js]
-
-  [build.services]
-
-[functions]
-
-  [functions."*"]
+# Old /tickets/<event-slug-id> URLs render through the static event page.
+[[redirects]]
+  from = "/tickets/*"
+  to = "/tickets/show/index.html"
+  status = 200

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event Tickets — Concerts, Sports &amp; Theatre | Dealux Tickets</title>
+<meta name="description" content="Compare tickets for concerts, sports and theatre across TicketNetwork, TicketLiquidator and StubHub. Search by event, venue or city.">
+<link rel="canonical" href="https://dealuxapp.com/tickets/">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/assets/dealux.css">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/app.js" defer></script>
+</head>
+<body data-page="tickets">
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="logo" href="/">DEALUX</a>
+    <nav class="main-nav">
+      <a href="/shop/">Shop</a><a href="/brands/">Brands</a><a href="/journal/">Journal</a><a href="/jobs/">Jobs</a><a href="/tickets/">Tickets</a>
+    </nav>
+    <form class="header-search" action="/shop/" method="get" role="search">
+      <input type="search" name="q" placeholder="Search 100k+ products" aria-label="Search products">
+    </form>
+  </div>
+</header>
+<main class="wrap">
+<section class="hero">
+  <h1>Event <span class="gold">tickets</span></h1>
+  <p class="muted">Concerts, sports and theatre, compared across TicketNetwork, TicketLiquidator and StubHub. <a href="/entradas/" lang="es">Entradas en España (Tomaticket) →</a></p>
+  <form class="hero-search" id="tk-form" onsubmit="return false"><input type="search" id="tk-q" placeholder="Search events, venues or cities"><select id="tk-cat" style="margin-left:8px"><option value="">All categories</option><option value="concerts">Concerts</option><option value="sports">Sports</option><option value="theatre">Theatre</option><option value="other">Other</option></select></form>
+</section>
+<p class="muted" id="tk-count">Loading events…</p>
+<div class="grid" id="tk-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"></div>
+<p style="text-align:center;margin:24px 0"><button class="btn btn-gold hidden" id="tk-more">Load more events</button></p>
+<script>
+(function(){var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var slugify=function(s){return s.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')};
+var now=new Date(),today=now.getFullYear()*10000+(now.getMonth()+1)*100+now.getDate();
+var fmt=function(n){var d=new Date(Math.floor(n/10000),Math.floor(n/100)%100-1,n%100);return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})};
+var usd=function(c){return c?'$'+(c/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):''};
+var CATS={concerts:'Concerts',sports:'Sports',theatre:'Theatre',other:'Other'};
+var q=document.getElementById('tk-q'),cat=document.getElementById('tk-cat'),list=document.getElementById('tk-list'),count=document.getElementById('tk-count'),more=document.getElementById('tk-more');
+var p=new URLSearchParams(location.search);q.value=p.get('q')||'';cat.value=p.get('category')||'';var all=[],items=[],shown=0;
+// Row: [id, name, venue, city, state, category, firstDate, lastDate, minPriceCents, dateCount]
+function card(r){var next=r[6]>=today?r[6]:0;return '<a class="card" style="display:block;padding:16px;text-decoration:none" href="/tickets/'+(slugify(r[1])||'event')+'-'+r[0]+'"><span class="eyebrow">'+esc(CATS[r[5]]||r[5])+'</span><h3 style="margin:6px 0">'+esc(r[1])+'</h3><p class="muted" style="margin:0 0 6px">'+esc([r[2],[r[3],r[4]].filter(Boolean).join(', ')].filter(Boolean).join(' · '))+'</p><p style="margin:0">'+(next?fmt(next):'Through '+fmt(r[7]))+(r[9]>1?' · '+r[9]+' dates':'')+(r[8]?' · from '+usd(r[8]):'')+'</p></a>'}
+function page(){list.insertAdjacentHTML('beforeend',items.slice(shown,shown+24).map(card).join(''));shown+=24;more.classList.toggle('hidden',shown>=items.length)}
+function run(){var w=slugify(q.value).split('-').filter(Boolean),c=cat.value;items=all.filter(function(r){if(r[7]<today)return false;if(c&&r[5]!==c)return false;if(!w.length)return true;var t=slugify(r[1]+' '+r[2]+' '+r[3]+' '+r[4]);return w.every(function(x){return t.indexOf(x)>-1})});
+list.innerHTML='';shown=0;count.textContent=items.length.toLocaleString()+' upcoming events';page()}
+more.onclick=page;q.oninput=function(){clearTimeout(run.t);run.t=setTimeout(run,200)};cat.onchange=run;
+fetch('/data/tickets/index.json').then(function(r){return r.json()}).then(function(d){all=d;run()});})();
+</script>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p>© 2026 Dealux. Some links are affiliate links; we may earn a commission at no cost to you.</p>
+  </div>
+</footer>
+</body>
+</html>
