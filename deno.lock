@@ -1,0 +1,15 @@
+{
+  "version": "5",
+  "remote": {
+    "https://deno.land/x/htmlrewriter@v1.0.0/pkg/htmlrewriter.js": "43bdda5837229406789950aa018272c36d4ec0d3d72a293b374d10b1d6352520",
+    "https://deno.land/x/htmlrewriter@v1.0.0/src/index.ts": "94690fe1bdf2cbab2becf6c13206a7412e1b4028aed0bce40adbf3b24d87e2aa"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@netlify/blobs@10",
+        "npm:pdf-lib@^1.17.1"
+      ]
+    }
+  }
+}

@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://dealuxapp.com/sitemap.xml
+Sitemap: https://dealuxapp.com/sitemap-exclusive.xml
