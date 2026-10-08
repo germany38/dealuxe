@@ -1,0 +1,3 @@
+# Paid PDFs are only delivered by the download function after a verified Stripe payment.
+# (netlify.toml also forces a 404 for these on Netlify; this rule covers hosts that read _redirects only.)
+/exclusive-files/*  /exclusive/  302
