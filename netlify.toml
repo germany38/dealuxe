@@ -7,3 +7,13 @@
   from = "/tickets/*"
   to = "/tickets/show/index.html"
   status = 200
+
+# Paid PDFs ship with the download function only; block direct public access.
+[functions]
+  included_files = ["exclusive-files/**"]
+
+[[redirects]]
+  from = "/exclusive-files/*"
+  to = "/404.html"
+  status = 404
+  force = true

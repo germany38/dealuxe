@@ -1,0 +1,33 @@
+.ex-hero{padding:32px 0 16px}
+.ex-hero h1{margin:6px 0 8px}
+.ex-search{width:100%;max-width:560px;padding:12px 14px;border:1px solid #d6d6d6;border-radius:10px;font-size:16px;margin:12px 0}
+.ex-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.ex-chip{border:1px solid #d6d6d6;background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+.ex-chip.active{background:#111;color:#fff;border-color:#111}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin:16px 0 40px}
+.ex-grid>.ex-card{content-visibility:auto;contain-intrinsic-size:auto 190px}
+.ex-card{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s}
+.ex-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.ex-card h3{margin:2px 0;font-size:16px}
+.ex-card p{font-size:13px;margin:0;flex:1}
+.ex-badge{align-self:flex-start;font-size:11px;letter-spacing:.04em;text-transform:uppercase;background:#f4ead2;color:#7a5a12;border-radius:6px;padding:2px 8px}
+.ex-meta{font-size:12px;color:#666}
+.ex-item{display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:32px;margin:20px 0 32px;align-items:start}
+.ex-cover{aspect-ratio:3/4;border-radius:14px;background:linear-gradient(150deg,#111 0%,#3a2d0c 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:24px;box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.ex-cover span{font-size:12px;letter-spacing:.2em;color:#d4af37}
+.ex-cover strong{font-size:22px;line-height:1.25}
+.ex-cover em{font-style:normal;font-size:13px;color:#d4af37}
+.ex-info h1{margin:6px 0 4px}
+.ex-price{font-size:26px;font-weight:700;margin:6px 0 12px}
+.ex-price span{font-size:14px;font-weight:400}
+.ex-facts{padding-left:18px;margin:12px 0 20px;line-height:1.7}
+.ex-buy{font-size:17px;padding:14px 22px}
+.ex-note{font-size:13px;margin-top:10px}
+.ex-success{max-width:620px;margin:48px auto;text-align:center}
+.ex-success .btn{font-size:17px;padding:14px 22px;margin:12px 0}
+.hidden{display:none!important}
+@media (max-width:700px){.ex-item{grid-template-columns:1fr}.ex-cover{max-width:260px}}
+.ex-widgets{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:0 0 32px}
+.ex-widgets .card{display:flex;flex-direction:column;gap:8px}
+.ex-widgets .card img[width="200"]{max-width:200px;height:auto}
+.ex-widgets .btn{align-self:flex-start}
