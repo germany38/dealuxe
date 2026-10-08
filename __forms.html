@@ -12,3 +12,37 @@
 <script src="/temu-promo.js"></script>
   </body>
 </html>
+// NATIVE DEALUX SECURE STRIPE DOWNLOAD TRIGGER
+(function() {
+  function checkForStripeDownload() {
+    // 1. Instantly pull the secure Stripe transaction token out of the URL bar
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+
+    // Only run if the customer is sitting on your success page route path
+    if (sessionId && window.location.pathname.includes('/success')) {
+      // Remove any error boxes if they exist on the static screen layout frame
+      const errorBoxes = document.querySelectorAll('.error, [class*="error"]');
+      errorBoxes.forEach(box => box.style.display = 'none');
+
+      // Update the subtext status block visually for the customer
+      const descriptionText = document.querySelector('p');
+      if (descriptionText) {
+        descriptionText.innerHTML = "✨ Secure checkout verified! Your file download is starting automatically now... 📥";
+      }
+
+      // 2. Route the browser directly to your serverless worker file stream
+      const secureDownloadUrl = `https://dealuxapp.com{sessionId}`;
+      
+      // 3. Instantly pop open the matching file download window
+      window.location.href = secureDownloadUrl;
+    }
+  }
+
+  // Execute the download check instantly when the browser loads the asset page
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkForStripeDownload);
+  } else {
+    checkForStripeDownload();
+  }
+})();
