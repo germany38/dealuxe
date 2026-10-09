@@ -95,3 +95,9 @@ a.card:hover { border-color: var(--gold); }
   .filter-bar { flex-direction: column; }
   .filter-bar select { max-width: none; }
 }
+.post-body .lead { font-size: 1.15rem; color: var(--muted); }
+.post-body .cta-box { background: var(--panel); border: 1px solid var(--gold); border-radius: 14px; padding: 1.6rem 1.4rem; margin: 2rem 0; text-align: center; box-shadow: 0 0 0 4px rgba(212,168,83,.08); }
+.post-body .cta-box h3 { margin: 0 0 .5rem; color: var(--gold-hi); }
+.post-body .cta-box p { margin: 0 0 1rem; color: var(--text); }
+.post-body a.cta-button { display: inline-block; background: linear-gradient(90deg, var(--color-gold-600, #b8862b), var(--gold)); color: #17130a; font-weight: 700; text-decoration: none; padding: .9rem 1.6rem; border-radius: 10px; box-shadow: 0 4px 14px rgba(212,168,83,.35); transition: transform .15s, box-shadow .15s; }
+.post-body a.cta-button:hover, .post-body a.cta-button:focus-visible { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,168,83,.5); color: #17130a; }
