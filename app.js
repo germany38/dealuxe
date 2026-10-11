@@ -144,7 +144,7 @@
     var bf = $('[data-brand-filter]');
     var rows = $$('.brand-list li');
     var filterBrands = function () {
-      var q = bf.q.value.trim().toLowerCase(), c = bf.category.value, n = 0;
+      var q = bf.q.value.trim().toLowerCase(), c = bf.category ? bf.category.value : '', n = 0;
       rows.forEach(function (li) {
         var ok = (!q || li.getAttribute('data-name').indexOf(q) !== -1) && (!c || li.getAttribute('data-category') === c);
         li.hidden = !ok; if (ok) n++;
