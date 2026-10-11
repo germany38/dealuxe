@@ -11,7 +11,14 @@
         p, li { font-size: 0.95em; color: #444; }
         .last-updated { font-style: italic; color: #777; margin-bottom: 30px; }
         .box { background: #fff5eb; border: 1px solid #ff6600; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .partner-strip { margin: 0 -20px 20px; padding: 6px 0; background: #1c1b22; border-radius: 0 0 8px 8px; }
+        .partner-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+        .partner-row + .partner-row { margin-top: 6px; }
+        .partner-tile { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 84px; height: 28px; padding: 3px 8px; box-sizing: border-box; background: #fff; border-radius: 6px; border: 1px solid transparent; overflow: hidden; }
+        .partner-tile:hover, .partner-tile:focus-visible { border-color: #d4a853; }
+        .partner-tile img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
     </style>
+    <script src="/assets/app.js" defer></script>
 </head>
 <body>
 
