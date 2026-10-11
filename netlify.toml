@@ -17,3 +17,9 @@
   to = "/404.html"
   status = 404
   force = true
+
+# Always revalidate the shared site script/stylesheet so new deploys show up immediately.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
