@@ -52,6 +52,7 @@ def page(title, desc, canonical, body, extra_head=""):
 <link rel="icon" href="/favicon.ico">
 <link rel="stylesheet" href="/assets/dealux.css">
 <link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/app.js" defer></script>
 <link rel="stylesheet" href="/exclusive/exclusive.css">
 {extra_head}</head>
 <body data-page="exclusive">

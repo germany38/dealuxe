@@ -10,6 +10,69 @@
   var params = new URLSearchParams(location.search);
   var page = document.body.getAttribute('data-page');
 
+  // ---- Partner logos: compact strip under the header on every page, plus
+  // a larger block on the homepage. Each logo sits in its own tile so
+  // neighbouring links can't be mis-clicked. ----
+  var PARTNERS = [
+    [['ItaliaRail', 'https://ujhjj.com/c/ca326rdm5vc0d22003ddef1cea9751/', 'italiarail.svg'],
+     ['Vagamo', 'https://rthsu.com/c/0lyhuakd0ec0d22003dd6ac117ee14/', 'vagamo.svg'],
+     ['Answear Ukraine', 'https://hxbok.com/c/h29o15jdr6c0d22003dda76d99edd2/', 'answear.svg'],
+     ['Touch Ukraine', 'https://wbbsv.com/c/ynys1f2mjpc0d22003dd0e81904d8b/', 'touch.svg'],
+     ['Intertop Ukraine', 'https://dkfrh.com/c/aaj1enr23tc0d22003ddb9f189b651/', 'intertop.svg'],
+     ['Repjegy Hungary', 'https://zallj.com/c/o5xydq5rnpc0d22003dd3fe229b7dc/', 'repjegy.svg']],
+    [['Whirlpool Mexico', 'https://rzekl.com/c/hkjqq2fi8qc0d22003dd82ed2bb6aa/', 'whirlpool.svg'],
+     ['Budinok Igrashok', 'https://gndrz.com/c/1xuxd52d9oc0d22003dd2165fe5e9d/', 'budinok-igrashok.svg'],
+     ['Redmagic', 'https://yyczo.com/c/qmttmvxh1uc0d22003dd56637026d8/', 'redmagic.svg'],
+     ['Eurowings', 'https://codeaven.com/c/zrwntqeht4c0d22003dd3cffcf918a/', 'eurowings.svg'],
+     ['Alibaba', 'https://rzekl.com/c/pm1aev55clc0d22003dd219aa26f6f/', 'alibaba.png'],
+     ['Square', 'https://rcpsj.com/c/xmbwxznk57c0d22003ddc1c4731730/', 'square.svg']],
+    [['Notta AI', 'https://ypetp.com/c/7gbdp8tyguc0d22003ddf50bb56640/', 'notta.svg'],
+     ['Kicks Crew', 'https://dkfrh.com/c/mecn64hou7c0d22003dd1910db6aa6/', 'kickscrew.svg'],
+     ['Geekbuying', 'https://bywiola.com/c/78tuvzaw8kc0d22003dd0267b86f6e/', 'geekbuying.svg'],
+     ['Shopee Mexico', 'https://zallj.com/c/qy94wfbelwc0d22003dd6e79f7c2cd/', 'shopee.svg'],
+     ['Italo Jewelry', 'https://ad.admitad.com/c/l926tcw2smc0d22003dd87e51e1a66/', 'italo-jewelry.png'],
+     ['iCases Ukraine', 'https://ypetp.com/c/wqd2fqy91hc0d22003dd58f5722f30/', 'icases.svg']],
+    [['Sunsky', 'https://dorinebeaumont.com/c/7npkd4cs1ic0d22003dd869a299fda/', 'sunsky.png'],
+     ['DocHub', 'https://lsuix.com/c/fsbaa03yh2c0d22003dd6dd72211ce/', 'dochub.svg'],
+     ['PriceTravel MX', 'https://ogsib.com/c/z4cgp2zr4dc0d22003dd309f617b02/', 'pricetravel.svg'],
+     ['Samsonite MX', 'https://xmknb.com/c/cj6zaw6m9pc0d22003dda68f2598b9/', 'samsonite.svg'],
+     ['TravelKing PL', 'https://vxrlm.com/c/dquwu4q32hc0d22003dd7eaf385c59/', 'travelking.svg'],
+     ['ChicMe', 'https://rzekl.com/c/gf807z8tarc0d22003dd312b8f391a/', 'chicme.png']],
+    [['TTGO E-bike', 'https://dkfrh.com/c/nz4081dh12c0d22003ddd0a9902774/', 'ttgo.svg'],
+     ['HyperHost', 'https://rcpsj.com/c/4y24lnxl7fc0d22003dd7f67b8171e/', 'hyperhost.svg'],
+     ['Govee', 'https://rthsu.com/c/yzzx0gmxy0c0d22003dd3791d3d079/', 'govee.png'],
+     ['Hidemyname VPN', 'https://codeaven.com/c/d6ig17yj38c0d22003ddcfba9fca8a/', 'hidemyname.svg'],
+     ['DelSol Woolworth MX', 'https://rthsu.com/c/d59il9migtc0d22003dd20bedc2379/', 'delsol-woolworth.svg'],
+     ['Nubia', 'https://ziejy.com/c/lh3bbik9lyc0d22003dde62ca5e32f/', 'nubia.svg']],
+    [['NordPass', 'https://rkdro.com/c/mx19yq7dtcc0d22003dd410fff306a/', 'nordpass.svg'],
+     ['Vegas.com', 'https://naiawork.com/c/7z8rbci6j9c0d22003dd2a35947101/', 'vegas.svg'],
+     ['Homestyler', 'https://cafxq.com/c/swlngq9rrzc0d22003dd28a65238d7/', 'homestyler.svg'],
+     ['TurboVPN', 'https://grfpr.com/c/exe221unkpc0d22003ddddf84d4c0b/', 'turbovpn.png'],
+     ['StyleWe', 'https://codeaven.com/c/r9ybpohdxoc0d22003dd806f4427c0/', 'stylewe.svg'],
+     ['ExpressVPN', 'https://ziejy.com/c/4raik6r0sqc0d22003dd954d043f6e/', 'expressvpn.svg']],
+    [['JustFashionNow', 'https://rzekl.com/c/kmcoj56juvc0d22003dd608cdf386b/', 'justfashionnow.png'],
+     ['Ticombo', 'https://zmgig.com/c/hn23xca4o8c0d22003ddbcf92d8d7a/', 'ticombo.svg'],
+     ['NAGA', 'https://cafxq.com/c/xeokmvvyj1c0d22003dd95dffe8bc5/', 'naga.svg'],
+     ['Noracora', 'https://qwpeg.com/c/of8pqgktr2c0d22003ddc8dbeb8f0d/', 'noracora.png'],
+     ['Gshopper', 'https://bywiola.com/c/nx2yncwth6c0d22003ddd497214fca/', 'gshopper.svg']]
+  ];
+  // Displayed as 4 rows of 10; any extras go into the last row.
+  var ALL_PARTNERS = [].concat.apply([], PARTNERS), PARTNER_ROWS = [];
+  for (var pi = 0; pi < 4; pi++) PARTNER_ROWS.push(ALL_PARTNERS.slice(pi * 10, pi === 3 ? undefined : pi * 10 + 10));
+  function partnerRows() {
+    return PARTNER_ROWS.filter(function (row) { return row.length; }).map(function (row) {
+      return '<div class="partner-row">' + row.map(function (p) {
+        return '<a class="partner-tile" href="' + esc(p[1]) + '" target="_blank" rel="nofollow sponsored noopener" title="' + esc(p[0]) + '">' +
+          '<img src="/assets/partners/' + p[2] + '" alt="' + esc(p[0]) + '" loading="lazy" decoding="async"></a>';
+      }).join('') + '</div>';
+    }).join('');
+  }
+  var siteHeader = $('.site-header');
+  var strip = '<nav class="partner-strip" aria-label="Partner deals"><div class="wrap">' + partnerRows() + '</div></nav>';
+  if (siteHeader) siteHeader.insertAdjacentHTML('afterend', strip);
+  else document.body.insertAdjacentHTML('afterbegin', strip);
+  $$('[data-partner-logos]').forEach(function (el) { el.innerHTML = partnerRows(); });
+
   // ---- 404: forward old /shop/<slug> URLs to the static product page ----
   var legacy = location.pathname.match(/^\/shop\/([^\/]+)\/?$/);
   if (page === 'notfound' && legacy && legacy[1] !== 'product') {
