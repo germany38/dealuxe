@@ -54,11 +54,29 @@
      ['Ticombo', 'https://zmgig.com/c/hn23xca4o8c0d22003ddbcf92d8d7a/', 'ticombo.svg'],
      ['NAGA', 'https://cafxq.com/c/xeokmvvyj1c0d22003dd95dffe8bc5/', 'naga.svg'],
      ['Noracora', 'https://qwpeg.com/c/of8pqgktr2c0d22003ddc8dbeb8f0d/', 'noracora.png'],
-     ['Gshopper', 'https://bywiola.com/c/nx2yncwth6c0d22003ddd497214fca/', 'gshopper.svg']]
+     ['Gshopper', 'https://bywiola.com/c/nx2yncwth6c0d22003ddd497214fca/', 'gshopper.svg']],
+    [['ASAP Tickets', 'https://yknhc.com/c/lv8vbf9a4ec0d22003ddf5f67e30af/', 'asaptickets.svg'],
+     ['Fiverr', 'https://twnfz.com/c/oqcmadzidpc0d22003ddacbbb3152e/', 'fiverr.svg'],
+     ['italki', 'https://xcdus.com/c/cp8w1bohgmc0d22003dd0dfa1a7923/', 'italki.svg'],
+     ['Wondershare', 'https://kjuzv.com/c/8u3trxihmwc0d22003ddef655e4ac9/', 'wondershare.svg'],
+     ['Cheapvuelos', 'https://yknhc.com/c/cmazc4pm8oc0d22003ddce5f810ebf/', 'cheapvuelos.svg'],
+     ['Tiqets', 'https://ad.admitad.com/c/rq0x895xioc0d22003dd0a1126e84f/', 'tiqets.svg']],
+    [['Multilogin', 'https://kpwfp.com/c/jcy22p74gec0d22003dd40e692d5b7/', 'multilogin.svg'],
+     ['Spartoo', 'https://tsygg.com/c/hhw513jc2uc0d22003dd266cbebcee/', 'spartoo.svg'],
+     ['HoraCredit', 'https://rzekl.com/c/hnimhgl6y7c0d22003dd527fa9a677/', 'horacredit.svg'],
+     ['PureVPN', 'https://plrvq.com/c/ayvzzawv40c0d22003dddd63dd688c/', 'purevpn.svg'],
+     ['Corsair', 'https://ntzgd.com/c/hpl2levo9fc0d22003dd45cfa0a3aa/', 'corsair.svg'],
+     ['Thordata', 'https://heqgr.com/c/io8l389mo3c0d22003ddfe5733b304/', 'thordata.svg']],
+    [['Qustodio', 'https://zejcl.com/c/zgsaevrb3ac0d22003dd2411861ed1/', 'qustodio.svg'],
+     ['Camp David', 'https://xqjeo.com/c/t39rzrme55c0d22003dd5474323be3/', 'camp-david.svg'],
+     ['ZenHotels', 'https://qwpeg.com/c/qpi6kwbvr0c0d22003dd2f6f9b0ac2/', 'zenhotels.svg'],
+     ['Skylux Travel', 'https://bednari.com/c/xe662ka26wc0d22003dd7fc733cd6a/', 'skylux.svg'],
+     ['Vodafone CZ', 'https://flcoz.com/c/7v9ajpmwz2c0d22003dd14b1736132/', 'vodafone.svg'],
+     ['PDFFiller', 'https://bednari.com/c/ml1y8ck0k7c0d22003ddab072b2ee3/', 'pdffiller.svg']]
   ];
-  // Displayed as 4 rows of 10; any extras go into the last row.
+  // Displayed in rows of 10; extras start their own row.
   var ALL_PARTNERS = [].concat.apply([], PARTNERS), PARTNER_ROWS = [];
-  for (var pi = 0; pi < 4; pi++) PARTNER_ROWS.push(ALL_PARTNERS.slice(pi * 10, pi === 3 ? undefined : pi * 10 + 10));
+  for (var pi = 0; pi < ALL_PARTNERS.length; pi += 10) PARTNER_ROWS.push(ALL_PARTNERS.slice(pi, pi + 10));
   function partnerRows() {
     return PARTNER_ROWS.filter(function (row) { return row.length; }).map(function (row) {
       return '<div class="partner-row">' + row.map(function (p) {
@@ -72,13 +90,6 @@
   if (siteHeader) siteHeader.insertAdjacentHTML('afterend', strip);
   else document.body.insertAdjacentHTML('afterbegin', strip);
   $$('[data-partner-logos]').forEach(function (el) { el.innerHTML = partnerRows(); });
-
-  // ---- 404: forward old /shop/<slug> URLs to the static product page ----
-  var legacy = location.pathname.match(/^\/shop\/([^\/]+)\/?$/);
-  if (page === 'notfound' && legacy && legacy[1] !== 'product') {
-    location.replace('/shop/product/?p=' + encodeURIComponent(legacy[1]));
-    return;
-  }
 
   // ---- Shared incremental result rendering ----
   function paginate(items, render, container, more, count, label, size, initial) {
@@ -158,7 +169,7 @@
           return q.every(function (w) { return slug.indexOf(w) !== -1; });
         });
         paginate(items, function (slug) {
-          return '<a class="card product-card" href="/shop/product/?p=' + encodeURIComponent(slug) + '"><span class="product-thumb"><img data-img-slug="' + esc(slug) + '" loading="lazy" referrerpolicy="no-referrer" alt=""></span><h3>' + esc(titleCase(slug)) + '</h3><span class="muted">View product →</span></a>';
+          return '<a class="card product-card" href="/shop/' + encodeURIComponent(slug) + '"><span class="product-thumb"><img data-img-slug="' + esc(slug) + '" loading="lazy" referrerpolicy="no-referrer" alt=""></span><h3>' + esc(titleCase(slug)) + '</h3><span class="muted">View product →</span></a>';
         }, results, $('[data-load-more]'), $('[data-result-count]'), 'products', 60);
       });
     };
@@ -168,7 +179,8 @@
   }
 
   if (page === 'product') {
-    var slug = params.get('p') || '';
+    var pathSlug = location.pathname.match(/^\/shop\/([^\/]+)\/?$/);
+    var slug = params.get('p') || (pathSlug && pathSlug[1] !== 'product' ? decodeURIComponent(pathSlug[1]) : '');
     var name = titleCase(slug) || 'Product not found';
     document.title = name + ' — Dealux';
     $('[data-product-name]').textContent = name;
