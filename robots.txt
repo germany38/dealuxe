@@ -26,5 +26,11 @@ Sitemap: https://dealuxapp.com/sitemap-shop-products-12.xml
 Sitemap: https://dealuxapp.com/sitemap-shop-products-13.xml
 Sitemap: https://dealuxapp.com/sitemap-shop-products-14.xml
 Sitemap: https://dealuxapp.com/sitemap-shop-products-15.xml
+Sitemap: https://dealuxapp.com/sitemap-shop-products-16.xml
+Sitemap: https://dealuxapp.com/sitemap-shop-products-17.xml
+Sitemap: https://dealuxapp.com/sitemap-shop-products-18.xml
+Sitemap: https://dealuxapp.com/sitemap-shop-products-19.xml
+Sitemap: https://dealuxapp.com/sitemap-shop-products-20.xml
 Sitemap: https://dealuxapp.com/sitemap-sweepstakes.xml
 Sitemap: https://dealuxapp.com/sitemap-tickets-1.xml
+Sitemap: https://dealuxapp.com/sitemap-deals.xml
