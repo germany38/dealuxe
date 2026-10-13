@@ -33,3 +33,4 @@ Sitemap: https://dealuxapp.com/sitemap-shop-products-19.xml
 Sitemap: https://dealuxapp.com/sitemap-shop-products-20.xml
 Sitemap: https://dealuxapp.com/sitemap-sweepstakes.xml
 Sitemap: https://dealuxapp.com/sitemap-tickets-1.xml
+Sitemap: https://dealuxapp.com/sitemap-deals.xml

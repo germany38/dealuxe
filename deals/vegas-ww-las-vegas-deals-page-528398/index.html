@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vegas WW: Las Vegas Deals Page — Dealux Deals</title>
+<meta name="description" content="Vegas WW deal — Las Vegas Deals Page. ">
+<link rel="canonical" href="https://dealuxapp.com/deals/vegas-ww-las-vegas-deals-page-528398/">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/assets/dealux.css">
+<link rel="stylesheet" href="/assets/site.css?v=20261012b">
+<script src="/assets/app.js?v=20261012c" defer></script>
+</head>
+<body data-page="deals">
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="logo" href="/">DEALUX</a>
+    <nav class="main-nav">
+      <a href="/shop/">Shop</a><a href="/exclusive/">Exclusives</a><a href="/deals/">Deals</a><a href="/brands/">Brands</a><a href="/journal/">Journal</a><a href="/jobs/">Jobs</a><a href="/tickets/">Tickets</a>
+    </nav>
+    <form class="header-search" action="/shop/" method="get" role="search">
+      <input type="search" name="q" placeholder="Search 169k+ products" aria-label="Search products">
+    </form>
+  </div>
+</header>
+<main class="wrap">
+<article class="post deal-page">
+  <a class="muted" href="/deals/">← All deals</a>
+  <span class="eyebrow">Vegas WW · Deal</span>
+  <h1>Las Vegas Deals Page</h1>
+  <p class="deal-discount">10% off</p>
+  
+  <p class="muted">No code needed — the discount applies through the link.</p>
+  <p class="muted">Store: https://www.vegas.com/ · Categories: Tours &amp; Travels</p>
+  <p><a class="btn btn-gold" href="https://naiawork.com/g/3gk6iqasv5c0d22003dd2a35947101/?i=3" target="_blank" rel="nofollow sponsored noopener">Get deal at Vegas WW →</a></p>
+</article>
+</main>
+<script>
+(function () {
+  var f = document.querySelector('[data-deal-filter]'); if (f), cards = [].slice.call(document.querySelectorAll('.deal-card')), out = document.querySelector('[data-result-count]');
+  function run() {
+    var q = f.q.value.trim().toLowerCase(), c = f.category.value, t = f.type.value, n = 0;
+    cards.forEach(function (el) {
+      var ok = (!q || el.getAttribute('data-name').indexOf(q) !== -1) && (!c || el.getAttribute('data-cats').split('|').indexOf(c) !== -1) && (!t || el.getAttribute('data-type') === t);
+      el.hidden = !ok; if (ok) n++;
+    });
+    out.textContent = n + ' deals';
+  }
+  if (f) f.addEventListener('input', run); if (f) f.addEventListener('submit', function (e) { e.preventDefault(); });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.copy-code'); if (!b) return;
+    navigator.clipboard && navigator.clipboard.writeText(b.getAttribute('data-code')).then(function () { b.textContent = 'Copied!'; setTimeout(function () { b.textContent = 'Copy'; }, 1500); });
+  });
+})();
+</script>
+<footer class="site-footer">
+  <div class="wrap">
+    <p>© 2026 Dealux. Some links are affiliate links; we may earn a commission at no cost to you.</p>
+  </div>
+</footer>
+</body>
+</html>
