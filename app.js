@@ -72,11 +72,12 @@
      ['ZenHotels', 'https://qwpeg.com/c/qpi6kwbvr0c0d22003dd2f6f9b0ac2/', 'zenhotels.svg'],
      ['Skylux Travel', 'https://bednari.com/c/xe662ka26wc0d22003dd7fc733cd6a/', 'skylux.svg'],
      ['Vodafone CZ', 'https://flcoz.com/c/7v9ajpmwz2c0d22003dd14b1736132/', 'vodafone.svg'],
-     ['PDFFiller', 'https://bednari.com/c/ml1y8ck0k7c0d22003ddab072b2ee3/', 'pdffiller.svg']]
+     ['PDFFiller', 'https://bednari.com/c/ml1y8ck0k7c0d22003ddab072b2ee3/', 'pdffiller.svg'],
+     ['Chicco', 'https://dorinebeaumont.com/c/407f9c2a7ac0d22003dd1fffad291b/', 'chicco.svg']]
   ];
-  // Displayed in rows of 10; extras start their own row.
+  // Displayed in rows of 12; extras start their own row.
   var ALL_PARTNERS = [].concat.apply([], PARTNERS), PARTNER_ROWS = [];
-  for (var pi = 0; pi < ALL_PARTNERS.length; pi += 10) PARTNER_ROWS.push(ALL_PARTNERS.slice(pi, pi + 10));
+  for (var pi = 0; pi < ALL_PARTNERS.length; pi += 12) PARTNER_ROWS.push(ALL_PARTNERS.slice(pi, pi + 12));
   function partnerRows() {
     return PARTNER_ROWS.filter(function (row) { return row.length; }).map(function (row) {
       return '<div class="partner-row">' + row.map(function (p) {
