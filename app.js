@@ -255,3 +255,75 @@
     if (jf.q.value || jf.topic.value) runJournal();
   }
 })();
+
+// === ZYNTENT INTENT MONETIZATION PIPELINE ===
+document.addEventListener("DOMContentLoaded", () => {
+  // 1. Check if the user clicked through from your LinkedIn campaigns
+  const urlParams = new URLSearchParams(window.location.search);
+  const isLinkedInTraffic = urlParams.get("utm_source") === "linkedin";
+  
+  // 2. Target the main deal/brand search bar on Dealux
+  const dealuxSearchInput = document.querySelector('input[type="search"]');
+
+  async function fetchZyntentOffers(intentQuery) {
+    if (!intentQuery || intentQuery.trim() === "") return;
+
+    try {
+      // Pings your live, ultra-fast Cloudflare Worker edge API
+      const response = await fetch("https://workers.dev", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          queryText: intentQuery,
+          country: "US"
+        })
+      });
+
+      if (!response.ok) return;
+      const data = await response.json();
+
+      // 3. Render matching merchant deals if Zyntent finds commercial intent
+      if (data && data.ads && data.ads.length > 0) {
+        displayNativeCommerceCards(data.ads);
+      }
+    } catch (error) {
+      console.error("Monetization background sync error:", error);
+    }
+  }
+
+  // 4. Trigger instantly for warm LinkedIn traffic or manual user searches
+  if (isLinkedInTraffic) {
+    const targetTopic = urlParams.get("q") || document.title;
+    fetchZyntentOffers(targetTopic);
+  }
+
+  if (dealuxSearchInput) {
+    dealuxSearchInput.addEventListener("change", (e) => fetchZyntentOffers(e.target.value));
+  }
+});
+
+// 5. Dynamic Native Component Renderer
+function displayNativeCommerceCards(adsArray) {
+  // Looks for a placeholder on your page to inject cards into
+  let monetizationGrid = document.getElementById("native-dealux-offers-box");
+  
+  // Fallback: If no placeholder is found, inject it right at the top of your shop/journal articles
+  if (!monetizationGrid) {
+    monetizationGrid = document.createElement("div");
+    monetizationGrid.id = "native-dealux-offers-box";
+    monetizationGrid.style.cssText = "display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 8px;";
+    
+    const mainContent = document.querySelector("main") || document.body;
+    mainContent.insertBefore(monetizationGrid, mainContent.firstChild);
+  }
+
+  monetizationGrid.innerHTML = adsArray.map(ad => `
+    <a href="${ad.click_url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none; color:inherit; display:block; padding:16px; background:#fff; border:1px solid #eee; border-radius:6px; box-shadow:0 2px 4px rgba(0,0,0,0.05); transition:transform 0.2s;">
+      <div style="font-size:11px; text-transform:uppercase; color:#0066cc; font-weight:bold; margin-bottom:4px;">Featured Deal</div>
+      <h4 style="margin:0 0 8px 0; font-size:16px; color:#111;">${ad.title}</h4>
+      <p style="margin:0 0 12px 0; font-size:13px; color:#666;">${ad.description || 'Click to claim this limited-time offer.'}</p>
+      <span style="font-size:13px; color:#0066cc; font-weight:bold;">View Deal →</span>
+    </a>
+  `).join('');
+}
+// === END OF ZYNTENT MONETIZATION PIPELINE ===
