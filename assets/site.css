@@ -120,3 +120,10 @@ a.card:hover { border-color: var(--gold); }
 .partner-block .partner-row + .partner-row { margin-top: .6rem; }
 .partner-block .partner-tile { width: 102px; height: 39px; padding: 6px 10px; }
 @media (max-width: 600px) { .partner-row { grid-template-columns: repeat(5, auto); } .partner-tile { width: 73px; height: 27px; padding: 3px 6px; } .partner-block .partner-tile { width: 96px; height: 36px; } }
+.deal-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.deal-card { display: flex; flex-direction: column; gap: .35rem; }
+.deal-card h3 { margin: 0; }
+.deal-card .btn { margin-top: auto; text-align: center; }
+.deal-discount { margin: 0; font-weight: 700; color: var(--gold); }
+.deal-meta { font-size: .8rem; margin: 0; }
+.copy-code { margin-left: .4rem; padding: .1rem .5rem; font-size: .8rem; border: 1px solid var(--line); border-radius: 4px; background: #fff; cursor: pointer; }
