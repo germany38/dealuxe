@@ -1,3 +1,9 @@
 # Paid PDFs are only delivered by the download function after a verified Stripe payment.
 # (netlify.toml also forces a 404 for these on Netlify; this rule covers hosts that read _redirects only.)
 /exclusive-files/*  /exclusive/  302
+
+# Product and ticket pages have no file per item. dealuxapp.com is currently served by a host
+# that ignores netlify.toml and edge functions, so rewrite them to the shared pages here
+# (both pages read the item from the URL path).
+/shop/:slug     /shop/product/   200
+/tickets/:slug  /tickets/show/   200

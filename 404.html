@@ -9,6 +9,14 @@
 <link rel="icon" href="/favicon.ico">
 <link rel="stylesheet" href="/assets/dealux.css">
 <link rel="stylesheet" href="/assets/site.css?v=20261012b">
+<script>
+// Fallback for hosts that skip the rewrites: send product/ticket URLs to their shared page.
+(function () {
+  var m = location.pathname.match(/^\/(shop|tickets)\/([^\/]+)\/?$/);
+  if (!m || /^(product|show|brand|department|type)$/.test(m[2])) return;
+  location.replace(m[1] === 'shop' ? '/shop/product/?p=' + m[2] : '/tickets/show/?id=' + (m[2].match(/(?:^|-)([a-z0-9]+)$/) || [])[1]);
+})();
+</script>
 <script src="/assets/app.js?v=20261012c" defer></script>
 </head>
 <body data-page="notfound">
