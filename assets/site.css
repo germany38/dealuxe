@@ -131,3 +131,7 @@ a.card:hover { border-color: var(--gold); }
 .dept-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .6rem 0 .2rem; }
 .dept-chips .chip { padding: .3rem .7rem; border: 1px solid rgba(127,127,127,.35); border-radius: 999px; font-size: .82rem; text-decoration: none; color: inherit; }
 .dept-chips .chip:hover, .dept-chips .chip.active { border-color: var(--gold); color: var(--gold); }
+.share-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: .75rem 0 1rem; }
+.share-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; padding: 0 .55rem; border-radius: 8px; border: 1px solid var(--line); color: var(--text); background: var(--panel); font: inherit; font-size: .85rem; cursor: pointer; }
+.share-btn:hover { filter: brightness(1.15); }
+.share-copy { color: var(--gold); }
