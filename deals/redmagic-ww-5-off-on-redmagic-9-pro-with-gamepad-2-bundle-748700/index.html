@@ -109,7 +109,7 @@
 </main>
 <script>
 (function () {
-  var f = document.querySelector('[data-deal-filter]'); if (f), cards = [].slice.call(document.querySelectorAll('.deal-card')), out = document.querySelector('[data-result-count]');
+  var f = document.querySelector('[data-deal-filter]'), cards = [].slice.call(document.querySelectorAll('.deal-card')), out = document.querySelector('[data-result-count]');
   function run() {
     var q = f.q.value.trim().toLowerCase(), c = f.category.value, t = f.type.value, n = 0;
     cards.forEach(function (el) {

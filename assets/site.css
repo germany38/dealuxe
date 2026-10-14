@@ -128,3 +128,6 @@ a.card:hover { border-color: var(--gold); }
 .deal-meta { font-size: .8rem; margin: 0; }
 .copy-code { margin-left: .4rem; padding: .1rem .5rem; font-size: .8rem; border: 1px solid var(--line); border-radius: 4px; background: #fff; cursor: pointer; }
 .deal-card h3 a { color: inherit; text-decoration: none; } .deal-card h3 a:hover { text-decoration: underline; }
+.dept-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .6rem 0 .2rem; }
+.dept-chips .chip { padding: .3rem .7rem; border: 1px solid rgba(127,127,127,.35); border-radius: 999px; font-size: .82rem; text-decoration: none; color: inherit; }
+.dept-chips .chip:hover, .dept-chips .chip.active { border-color: var(--gold); color: var(--gold); }
