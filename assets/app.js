@@ -255,3 +255,47 @@
     if (jf.q.value || jf.topic.value) runJournal();
   }
 })();
+
+// ---- Share bar on every detail page (deal, shop item, exclusive, article, job, ticket) ----
+(function () {
+  'use strict';
+  var h1 = document.querySelector('main h1, h1');
+  var depth = location.pathname.split('/').filter(Boolean).length;
+  if (!h1 || depth < 2 && !/^\/(tickets|entradas)/.test(location.pathname)) return;
+  var u = encodeURIComponent(location.href), t = encodeURIComponent(document.title);
+  var img = document.querySelector('meta[property="og:image"]');
+  var m = encodeURIComponent(img ? img.content : '');
+  var NETS = [
+    ['Facebook', 'facebook', '#1877F2', 'https://www.facebook.com/sharer/sharer.php?u=' + u],
+    ['X', 'x', '#000', 'https://x.com/intent/tweet?url=' + u + '&text=' + t],
+    ['WhatsApp', 'whatsapp', '#25D366', 'https://wa.me/?text=' + t + '%20' + u],
+    ['Telegram', 'telegram', '#26A5E4', 'https://t.me/share/url?url=' + u + '&text=' + t],
+    ['Pinterest', 'pinterest', '#BD081C', 'https://www.pinterest.com/pin/create/button/?url=' + u + '&media=' + m + '&description=' + t],
+    ['LinkedIn', 'linkedin', '#0A66C2', 'https://www.linkedin.com/sharing/share-offsite/?url=' + u],
+    ['Reddit', 'reddit', '#FF4500', 'https://www.reddit.com/submit?url=' + u + '&title=' + t],
+    ['VK', 'vk', '#0077FF', 'https://vk.com/share.php?url=' + u + '&title=' + t],
+    ['LINE', 'line', '#00C300', 'https://social-plugins.line.me/lineit/share?url=' + u],
+    ['KakaoTalk', 'kakaotalk', '#FFCD00', 'https://story.kakao.com/share?url=' + u],
+    ['Snapchat', 'snapchat', '#FFFC00', 'https://www.snapchat.com/scan?attachmentUrl=' + u],
+    ['Instagram', 'instagram', '#E4405F', 'https://www.instagram.com/', 1],
+    ['Discord', 'discord', '#5865F2', 'https://discord.com/channels/@me', 1],
+    ['WeChat', 'wechat', '#07C160', 'https://www.wechat.com/en', 1],
+    ['RedNote', 'xiaohongshu', '#FF2442', 'https://www.xiaohongshu.com/', 1]
+  ];
+  var bar = document.createElement('div');
+  bar.className = 'share-bar';
+  bar.innerHTML = '<span class="eyebrow">Share</span>' +
+    '<button type="button" class="share-btn share-copy" data-copy title="Copy link">🔗 Copy link</button>' +
+    NETS.map(function (n) {
+      return '<a class="share-btn" href="' + n[3] + '" target="_blank" rel="noopener" title="Share on ' + n[0] + '"' +
+        (n[4] ? ' data-copyfirst' : '') + ' style="background:' + n[2] + '"><img src="/assets/share/' + n[1] + '.svg" alt="' + n[0] + '" width="18" height="18"></a>';
+    }).join('');
+  h1.insertAdjacentElement('afterend', bar);
+  var copy = function () { return navigator.clipboard ? navigator.clipboard.writeText(location.href).catch(function () {}) : Promise.resolve(); };
+  bar.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-copy]');
+    if (b) { copy().then(function () { b.textContent = '✓ Link copied'; setTimeout(function () { b.textContent = '🔗 Copy link'; }, 2000); }); return; }
+    // Apps without a web share URL: copy the link first so it can be pasted there.
+    if (e.target.closest('[data-copyfirst]')) copy();
+  });
+})();
