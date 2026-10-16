@@ -5,7 +5,7 @@
 .ex-chip{border:1px solid #d6d6d6;background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
 .ex-chip.active{background:#111;color:#fff;border-color:#111}
 .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin:16px 0 40px}
-.ex-grid>.ex-card{content-visibility:auto;contain-intrinsic-size:auto 190px}
+.ex-grid>.ex-card{content-visibility:auto;contain-intrinsic-size:auto 380px}
 .ex-card{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s}
 .ex-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
 .ex-card h3{margin:2px 0;font-size:16px}
@@ -31,3 +31,12 @@
 .ex-widgets .card{display:flex;flex-direction:column;gap:8px}
 .ex-widgets .card img[width="200"]{max-width:200px;height:auto}
 .ex-widgets .btn{align-self:flex-start}
+/* Protected first-page previews: low-res, frosted and watermarked images, also shielded from drag/save/print. */
+.ex-thumb,.ex-preview{position:relative;display:block;overflow:hidden;background:#f3f3f3;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.ex-thumb{aspect-ratio:4/3;margin:-4px -4px 4px;border-radius:10px;border:1px solid #ececec}
+.ex-thumb img,.ex-preview img{display:block;width:100%;height:100%;object-fit:cover;object-position:top;pointer-events:none}
+.ex-thumb::after,.ex-preview::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(255,255,255,.55))}
+.ex-cover.ex-preview{padding:0;background:#f3f3f3}
+.ex-preview .ex-lock{position:absolute;left:12px;right:12px;bottom:12px;z-index:1;text-align:center;font-size:12px;letter-spacing:.04em;color:#fff;background:rgba(17,17,17,.82);border-radius:999px;padding:7px 12px}
+.ex-preview .ex-lock::before{content:"\1F512  "}
+@media print{.ex-thumb,.ex-preview{visibility:hidden}}

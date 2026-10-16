@@ -91,6 +91,7 @@ def card(it):
     return (
         f'<a class="card ex-card" href="/exclusive/{it["slug"]}/" data-cat="{e(it["cat_slug"])}" '
         f'data-search="{e((it["title"] + " " + it["category"] + " " + it["type"]).lower())}">'
+        f'<span class="ex-thumb"><img src="/exclusive/previews/{it["slug"]}.webp" alt="" width="360" height="466" loading="lazy" decoding="async" draggable="false"></span>'
         f'<span class="ex-badge">{e(it["type"])}</span>'
         f'<h3>{e(it["title"])}</h3>'
         f'<p class="muted">{e(it["description"])}</p>'
@@ -156,7 +157,7 @@ def main():
         }
         body = f"""<a class="muted" href="/exclusive/">← Back to Dealux Exclusives</a>
 <article class="ex-item">
-  <div class="ex-cover" aria-hidden="true"><span>PDF</span><strong>{e(it["title"])}</strong><em>{e(it["type"])}</em></div>
+  <div class="ex-cover ex-preview" oncontextmenu="return false"><img src="/exclusive/previews/{it["slug"]}.webp" alt="Blurred preview of the first page of {e(it["title"])}" width="360" height="466" draggable="false"><span class="ex-lock">Preview · full-quality PDF after checkout</span></div>
   <div class="ex-info">
     <span class="eyebrow">{e(it["category"])}</span>
     <h1>{e(it["title"])}</h1>
