@@ -20,20 +20,38 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true  # This automatically provisions the Pages site so it never throws a 404 "Not Found" error
-      
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-          name: 'github-pages'
-      
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    name: Automated Partnerize Product Sync
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs automatically every single night at midnight UTC
+  workflow_dispatch: # Gives you a manual "Run workflow" button inside GitHub to test anytime
+
+jobs:
+  build-and-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out your repository code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js environment
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Extraction Script
+      env:
+        PARTNERIZE_APP_KEY: ${{ secrets.PARTNERIZE_APP_KEY }}
+        PARTNERIZE_API_KEY: ${{ secrets.PARTNERIZE_API_KEY }}
+      run: node fetch-products.js
+
+    - name: Commit and Push fresh data back to GitHub
+      run: |
+        git config --global user.name 'Dealux Bot'
+        git config --global user.email 'bot@dealuxapp.com'
+        git add src/data/products.json
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update: Synced fresh Partnerize catalog fields" && git push)
