@@ -257,73 +257,59 @@
 })();
 
 // === ZYNTENT INTENT MONETIZATION PIPELINE ===
-document.addEventListener("DOMContentLoaded", () => {
-  // 1. Check if the user clicked through from your LinkedIn campaigns
-  const urlParams = new URLSearchParams(window.location.search);
-  const isLinkedInTraffic = urlParams.get("utm_source") === "linkedin";
-  
-  // 2. Target the main deal/brand search bar on Dealux
-  const dealuxSearchInput = document.querySelector('input[type="search"]');
+(function() {
+    "use strict";
 
-  async function fetchZyntentOffers(intentQuery) {
-    if (!intentQuery || intentQuery.trim() === "") return;
+    // 1. Automatically grab the dynamic "q" search keyword from the browser URL address bar
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchKeyword = urlParams.get('q') || ''; 
 
-    try {
-      // Pings your live, ultra-fast Cloudflare Worker edge API
-      const response = await fetch("https://workers.dev", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          queryText: intentQuery,
-          country: "US"
-        })
-      });
+    // 2. Pre-build the structural layout container globally so it is instantly ready
+    const zyntentContainer = document.createElement('div');
+    zyntentContainer.className = 'zyntent-holder';
+    zyntentContainer.style.cssText = 'width: 100%; min-height: 350px; padding: 20px; box-sizing: border-box; background: #ffffff;';
 
-      if (!response.ok) return;
-      const data = await response.json();
+    // Build the high-contrast dark heading text for your clean white popup theme
+    const heading = document.createElement('h3');
+    heading.innerText = '🌐 More Deals Around the Web';
+    heading.style.cssText = 'font-family: inherit; font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; color: #111111; margin-top: 0; display: block;';
+    zyntentContainer.appendChild(heading);
 
-      // 3. Render matching merchant deals if Zyntent finds commercial intent
-      if (data && data.ads && data.ads.length > 0) {
-        displayNativeCommerceCards(data.ads);
-      }
-    } catch (error) {
-      console.error("Monetization background sync error:", error);
-    }
-  }
+    // Create the clean target wrapper element for Zyntent's layout engine to mount to
+    const widgetTarget = document.createElement('div');
+    widgetTarget.id = 'zyntent-widget-target';
+    zyntentContainer.appendChild(widgetTarget);
 
-  // 4. Trigger instantly for warm LinkedIn traffic or manual user searches
-  if (isLinkedInTraffic) {
-    const targetTopic = urlParams.get("q") || document.title;
-    fetchZyntentOffers(targetTopic);
-  }
-
-  if (dealuxSearchInput) {
-    dealuxSearchInput.addEventListener("change", (e) => fetchZyntentOffers(e.target.value));
-  }
-});
-
-// 5. Dynamic Native Component Renderer
-function displayNativeCommerceCards(adsArray) {
-  // Looks for a placeholder on your page to inject cards into
-  let monetizationGrid = document.getElementById("native-dealux-offers-box");
-  
-  // Fallback: If no placeholder is found, inject it right at the top of your shop/journal articles
-  if (!monetizationGrid) {
-    monetizationGrid = document.createElement("div");
-    monetizationGrid.id = "native-dealux-offers-box";
-    monetizationGrid.style.cssText = "display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 8px;";
+    // 3. Pre-load the Zyntent script engine globally as soon as the page finishes loading
+    const zyntentScript = document.createElement('script');
+    zyntentScript.src = "https://zyntent.ai";
+    zyntentScript.setAttribute('data-widget-id', 'fdd7a0e2-d595-4cad-b61a-00f101617262');
+    zyntentScript.setAttribute('data-channel-id', 'dff4832a-60b6-46cc-8792-b6d544f0c361');
     
-    const mainContent = document.querySelector("main") || document.body;
-    mainContent.insertBefore(monetizationGrid, mainContent.firstChild);
-  }
+    // IF a search keyword exists in the URL, pass it directly to Zyntent as an explicit fallback target
+    if (searchKeyword) {
+        zyntentScript.setAttribute('data-query', searchKeyword);
+    }
+    
+    zyntentScript.async = true;
+    
+    // Append the engine script to the head right away so it initializes ahead of time
+    document.head.appendChild(zyntentScript);
 
-  monetizationGrid.innerHTML = adsArray.map(ad => `
-    <a href="${ad.click_url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none; color:inherit; display:block; padding:16px; background:#fff; border:1px solid #eee; border-radius:6px; box-shadow:0 2px 4px rgba(0,0,0,0.05); transition:transform 0.2s;">
-      <div style="font-size:11px; text-transform:uppercase; color:#0066cc; font-weight:bold; margin-bottom:4px;">Featured Deal</div>
-      <h4 style="margin:0 0 8px 0; font-size:16px; color:#111;">${ad.title}</h4>
-      <p style="margin:0 0 12px 0; font-size:13px; color:#666;">${ad.description || 'Click to claim this limited-time offer.'}</p>
-      <span style="font-size:13px; color:#0066cc; font-weight:bold;">View Deal →</span>
-    </a>
-  `).join('');
-}
+    // 4. Global window function called by your gold header button interaction to mount the container
+    window.openZyntentPopup = function(panelContentElement) {
+        if (!panelContentElement) return;
+
+        // Secure mount: If the container isn't inside the white pop-up yet, drop it in
+        if (!panelContentElement.querySelector('.zyntent-holder')) {
+            panelContentElement.appendChild(zyntentContainer);
+        }
+        
+        // Handle visual panel activation (keeps your close actions & overlay states active)
+        const globalPanel = panelContentElement.closest('.popup-panel') || panelContentElement.parentElement;
+        if (globalPanel) {
+            globalPanel.classList.add('is-open');
+        }
+    };
+})();
 // === END OF ZYNTENT MONETIZATION PIPELINE ===
