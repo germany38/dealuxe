@@ -260,52 +260,56 @@
 (function() {
     "use strict";
 
-    // 1. Automatically grab the dynamic "q" search keyword from the browser URL address bar
+    // 1. Instantly parse out the "q" search variable from the browser window's URL path
     const urlParams = new URLSearchParams(window.location.search);
-    const searchKeyword = urlParams.get('q') || ''; 
+    let searchKeyword = urlParams.get('q') || ''; 
 
-    // 2. Pre-build the structural layout container globally so it is instantly ready
+    // Fallback strategy: If no active query string is passed, extract the document title 
+    // and strip away the brand suffix to use as a primary keyword fallback query context
+    if (!searchKeyword) {
+        searchKeyword = document.title.replace(/\s*[-|•]\s*Dealux.*/gi, '').trim();
+    }
+
+    // 2. Pre-assemble the structural layout container globally so it is immediately initialized
     const zyntentContainer = document.createElement('div');
     zyntentContainer.className = 'zyntent-holder';
     zyntentContainer.style.cssText = 'width: 100%; min-height: 350px; padding: 20px; box-sizing: border-box; background: #ffffff;';
 
-    // Build the high-contrast dark heading text for your clean white popup theme
+    // Build a high-contrast dark heading to maximize scannability inside our clean white modal layout
     const heading = document.createElement('h3');
     heading.innerText = '🌐 More Deals Around the Web';
     heading.style.cssText = 'font-family: inherit; font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; color: #111111; margin-top: 0; display: block;';
     zyntentContainer.appendChild(heading);
 
-    // Create the clean target wrapper element for Zyntent's layout engine to mount to
+    // Create the clean placeholder target element for Zyntent's widget engine to anchor onto
     const widgetTarget = document.createElement('div');
     widgetTarget.id = 'zyntent-widget-target';
     zyntentContainer.appendChild(widgetTarget);
 
-    // 3. Pre-load the Zyntent script engine globally as soon as the page finishes loading
+    // 3. Programmatically generate and preload the Zyntent script engine directly to the page head
     const zyntentScript = document.createElement('script');
     zyntentScript.src = "https://zyntent.ai";
     zyntentScript.setAttribute('data-widget-id', 'fdd7a0e2-d595-4cad-b61a-00f101617262');
     zyntentScript.setAttribute('data-channel-id', 'dff4832a-60b6-46cc-8792-b6d544f0c361');
     
-    // IF a search keyword exists in the URL, pass it directly to Zyntent as an explicit fallback target
+    // Explicit Intent Injection: Force pass our extracted text keyword parameter directly into the ad engine
     if (searchKeyword) {
         zyntentScript.setAttribute('data-query', searchKeyword);
     }
     
     zyntentScript.async = true;
-    
-    // Append the engine script to the head right away so it initializes ahead of time
     document.head.appendChild(zyntentScript);
 
-    // 4. Global window function called by your gold header button interaction to mount the container
+    // 4. Secure mounting logic executed when our global gold header navigation button is triggered
     window.openZyntentPopup = function(panelContentElement) {
         if (!panelContentElement) return;
 
-        // Secure mount: If the container isn't inside the white pop-up yet, drop it in
+        // Ensure the global preloaded UI container mounts seamlessly inside the white modal area
         if (!panelContentElement.querySelector('.zyntent-holder')) {
             panelContentElement.appendChild(zyntentContainer);
         }
         
-        // Handle visual panel activation (keeps your close actions & overlay states active)
+        // Activate visual modal animations while strictly preserving all original overlay close bindings
         const globalPanel = panelContentElement.closest('.popup-panel') || panelContentElement.parentElement;
         if (globalPanel) {
             globalPanel.classList.add('is-open');
