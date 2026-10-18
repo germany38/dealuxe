@@ -1,5 +1,17 @@
 User-agent: *
 Allow: /
 Disallow: /exclusive-files/
+# Search-result URLs are an endless crawl space; product, brand and ticket pages are linked directly.
+Disallow: /*?q=
+Disallow: /*&q=
+# Source code, build scripts and raw data dumps are not pages.
+Disallow: /.github/
+Disallow: /scripts/
+Disallow: /db/
+Disallow: /netlify/
+Disallow: /functions/
+Disallow: /edge-functions/
+Disallow: /*.csv$
+Disallow: /products.txt
 
 Sitemap: https://dealuxapp.com/sitemap-index.xml
