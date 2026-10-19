@@ -73,6 +73,12 @@ export default async (req: Request, context: Context) => {
       : {}),
   };
 
+  // Google rejects Product markup without an offer, so price-less listings (e.g. affiliate
+  // banners and text links) are described as a plain web page instead.
+  const structured = price
+    ? jsonLd
+    : { "@context": "https://schema.org", "@type": "WebPage", name, description: desc, url: canonical, ...(image ? { image } : {}) };
+
   html = html
     .replace(/<title>.*?<\/title>/, `<title>${esc(name)} — Dealux</title>`)
     .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(desc)}">`)
@@ -81,7 +87,7 @@ export default async (req: Request, context: Context) => {
       `<link rel="canonical" href="${esc(canonical)}">\n<meta name="robots" content="index, follow">` +
         `\n<meta property="og:type" content="product"><meta property="og:title" content="${esc(name)}"><meta property="og:url" content="${esc(canonical)}">` +
         (image ? `<meta property="og:image" content="${esc(image)}">` : "") +
-        `\n<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, "\\u003c")}</script>`,
+        `\n<script type="application/ld+json">${JSON.stringify(structured).replace(/</g, "\\u003c")}</script>`,
     )
     .replace('<img data-img-slug=""', `<img data-img-slug="${esc(slug)}"${image ? ` src="${esc(image)}"` : ""}`)
     .replace(/<h1 data-product-name>.*?<\/h1>/, `<h1 data-product-name>${esc(name)}</h1>`)
