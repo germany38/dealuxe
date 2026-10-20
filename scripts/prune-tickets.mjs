@@ -8,7 +8,7 @@ const now = new Date();
 const today = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
 const slugify = (s) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-// Shards: id -> { n, v, c, s, k, i, d: [[YYYYMMDD, time, priceCents, ticketNetwork, ticketLiquidator, stubHub]] }
+// Shards: id -> { n, v, c, s, k, i, d: [[YYYYMMDD, time, priceCents, ticketNetwork, ticketLiquidator, stubHub, ticombo?]] }
 const live = new Map();
 for (let i = 0; i < 512; i++) {
   const file = new URL(`${i}.json`, dir);
@@ -21,14 +21,14 @@ for (let i = 0; i < 512; i++) {
   fs.writeFileSync(file, JSON.stringify(shard));
 }
 
-// Index rows: [id, name, venue, city, state, category, firstDate, lastDate, minPriceCents, dateCount]
+// Index rows: [id, name, venue, city, state, category, firstDate, lastDate, minPriceCents, dateCount, currency?]
 const indexFile = new URL('index.json', dir);
 const index = JSON.parse(fs.readFileSync(indexFile, 'utf8'))
   .filter((r) => live.has(r[0]))
   .map((r) => {
     const d = live.get(r[0]).d;
     const prices = d.map((x) => x[2]).filter(Boolean);
-    return [r[0], r[1], r[2], r[3], r[4], r[5], d[0][0], d[d.length - 1][0], prices.length ? Math.min(...prices) : 0, d.length];
+    return [r[0], r[1], r[2], r[3], r[4], r[5], d[0][0], d[d.length - 1][0], prices.length ? Math.min(...prices) : 0, d.length, ...r.slice(10)];
   })
   .sort((a, b) => a[6] - b[6] || a[1].localeCompare(b[1]));
 fs.writeFileSync(indexFile, JSON.stringify(index));
