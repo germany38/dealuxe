@@ -1,3 +1,7 @@
+// Impact affiliate tracking tag. Loaded from the shared script so it runs on
+// every page that carries affiliate links.
+(function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A5661882-9e84-4a48-8d7e-ab9d5989e7151.js','script','impactStat',document,window);impactStat('trackImpression');
+
 // Dealux client-side features. Everything runs in the browser: there is no
 // server, account or database.
 (function () {
