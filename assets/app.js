@@ -358,3 +358,15 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
+
+// Terms of Service & Privacy Policy link, added to the site footer on every page.
+(function () {
+  function mount() {
+    var footer = document.querySelector('.site-footer .wrap, body > footer');
+    if (!footer || footer.querySelector('a[href^="/legal"]')) return;
+    var p = document.createElement('p');
+    p.innerHTML = '<a href="/legal">Terms of Service &amp; Privacy Policy</a>';
+    footer.appendChild(p);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+})();
