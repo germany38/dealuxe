@@ -335,6 +335,7 @@
       '<input name="order" placeholder="Order / session ID (optional)" aria-label="Order ID"></div>' +
       '<textarea name="message" placeholder="How can we help?" required aria-label="Message"></textarea>' +
       '<input type="hidden" name="page">' +
+      '<input type="hidden" name="subject" value="Dealux support request (%{submissionId})">' +
       '<button type="submit">Send message</button><div class="dx-status" role="status"></div></form>';
     var footer = document.querySelector('body > footer');
     if (footer) footer.parentNode.insertBefore(box, footer); else document.body.appendChild(box);
@@ -343,9 +344,12 @@
       e.preventDefault();
       form.page.value = location.href;
       btn.disabled = true; status.style.color = '#555'; status.textContent = 'Sending…';
-      fetch('/__forms.html', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(form)).toString() })
+      // dealuxapp.com is fronted by a host that rejects POSTs (405), so off Netlify the submission goes
+      // straight to the Netlify deploy. That reply has no CORS headers, hence "no-cors" (opaque response).
+      var onNetlify = /\.netlify\.app$/.test(location.hostname) || location.hostname === 'localhost';
+      fetch(onNetlify ? '/__forms.html' : 'https://dealux.netlify.app/__forms.html', { method: 'POST', mode: onNetlify ? 'same-origin' : 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(form)).toString() })
         .then(function (r) {
-          if (!r.ok) throw new Error(r.status);
+          if (r.type !== 'opaque' && !r.ok) throw new Error(r.status);
           form.reset(); status.style.color = '#1a7f37';
           status.textContent = '✓ Thanks! Your message was sent. We’ll reply from support@dealuxapp.com within 24–48 business hours.';
         })
