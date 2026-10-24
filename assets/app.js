@@ -329,8 +329,7 @@
       '<form name="support-contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">' +
       '<input type="hidden" name="form-name" value="support-contact">' +
       '<p hidden><label>Leave blank <input name="bot-field"></label></p>' +
-      '<div class="dx-row"><input name="name" placeholder="Your name" required aria-label="Your name">' +
-      '<input type="email" name="email" placeholder="Your email" required aria-label="Your email"></div>' +
+      '<input type="email" name="email" placeholder="Your email" required aria-label="Your email">' +
       '<div class="dx-row"><select name="topic" aria-label="Topic"><option>Download / delivery issue</option><option>Checkout question</option><option>Technical help</option><option>Other</option></select>' +
       '<input name="order" placeholder="Order / session ID (optional)" aria-label="Order ID"></div>' +
       '<textarea name="message" placeholder="How can we help?" required aria-label="Message"></textarea>' +
@@ -356,6 +355,18 @@
         .catch(function () { status.style.color = '#c62828'; status.textContent = 'Something went wrong. Please email support@dealuxapp.com directly.'; })
         .then(function () { btn.disabled = false; });
     });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+})();
+
+// Terms of Service & Privacy Policy link, added to the site footer on every page.
+(function () {
+  function mount() {
+    var footer = document.querySelector('.site-footer .wrap, body > footer');
+    if (!footer || footer.querySelector('a[href^="/legal"]')) return;
+    var p = document.createElement('p');
+    p.innerHTML = '<a href="/legal">Terms of Service &amp; Privacy Policy</a>';
+    footer.appendChild(p);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
