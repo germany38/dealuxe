@@ -306,3 +306,52 @@
     if (e.target.closest('[data-copyfirst]')) copy();
   });
 })();
+
+// Contact Dealux Support box, injected at the bottom of every page (Netlify Forms: "support-contact").
+(function () {
+  function mount() {
+    if (document.getElementById('dx-support')) return;
+    var box = document.createElement('section');
+    box.id = 'dx-support';
+    box.setAttribute('aria-labelledby', 'dx-support-title');
+    box.innerHTML =
+      '<style>#dx-support{box-sizing:border-box;max-width:760px;margin:40px auto 10px;padding:24px;border:1px solid #e3e3e8;border-radius:14px;background:#fafafc;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#222}' +
+      '#dx-support *{box-sizing:border-box}#dx-support h2{margin:0 0 8px;font-size:1.3em}#dx-support p{margin:0 0 10px;color:#555;line-height:1.5}' +
+      '#dx-support ul{margin:0 0 16px;padding-left:18px;color:#444;line-height:1.7}#dx-support a{color:#5b3df5}' +
+      '#dx-support .dx-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:560px){#dx-support .dx-row{grid-template-columns:1fr}}' +
+      '#dx-support input,#dx-support select,#dx-support textarea{width:100%;padding:10px 12px;margin:0 0 10px;border:1px solid #d4d4dc;border-radius:8px;font:inherit;background:#fff;color:#222}' +
+      '#dx-support textarea{min-height:110px;resize:vertical}#dx-support button{padding:11px 22px;border:0;border-radius:8px;background:#5b3df5;color:#fff;font-weight:600;font-size:1em;cursor:pointer}' +
+      '#dx-support button[disabled]{opacity:.6;cursor:wait}#dx-support .dx-status{margin-top:10px;font-weight:500}</style>' +
+      '<h2 id="dx-support-title">Contact Dealux Support</h2>' +
+      '<p>For any digital download asset delivery issues, checkout questions, or technical help, please reach out to our team directly.</p>' +
+      '<ul><li><strong>Customer Support Email:</strong> <a href="mailto:support@dealuxapp.com">support@dealuxapp.com</a></li>' +
+      '<li><strong>Response Window:</strong> We review all inquiries within 24–48 business hours.</li></ul>' +
+      '<form name="support-contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">' +
+      '<input type="hidden" name="form-name" value="support-contact">' +
+      '<p hidden><label>Leave blank <input name="bot-field"></label></p>' +
+      '<div class="dx-row"><input name="name" placeholder="Your name" required aria-label="Your name">' +
+      '<input type="email" name="email" placeholder="Your email" required aria-label="Your email"></div>' +
+      '<div class="dx-row"><select name="topic" aria-label="Topic"><option>Download / delivery issue</option><option>Checkout question</option><option>Technical help</option><option>Other</option></select>' +
+      '<input name="order" placeholder="Order / session ID (optional)" aria-label="Order ID"></div>' +
+      '<textarea name="message" placeholder="How can we help?" required aria-label="Message"></textarea>' +
+      '<input type="hidden" name="page">' +
+      '<button type="submit">Send message</button><div class="dx-status" role="status"></div></form>';
+    var footer = document.querySelector('body > footer');
+    if (footer) footer.parentNode.insertBefore(box, footer); else document.body.appendChild(box);
+    var form = box.querySelector('form'), status = box.querySelector('.dx-status'), btn = box.querySelector('button');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      form.page.value = location.href;
+      btn.disabled = true; status.style.color = '#555'; status.textContent = 'Sending…';
+      fetch('/__forms.html', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(form)).toString() })
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          form.reset(); status.style.color = '#1a7f37';
+          status.textContent = '✓ Thanks! Your message was sent. We’ll reply from support@dealuxapp.com within 24–48 business hours.';
+        })
+        .catch(function () { status.style.color = '#c62828'; status.textContent = 'Something went wrong. Please email support@dealuxapp.com directly.'; })
+        .then(function () { btn.disabled = false; });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+})();
