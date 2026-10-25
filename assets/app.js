@@ -1,6 +1,12 @@
 // Google Analytics (gtag.js). Loaded from the shared script so every page is measured.
 (function(){var id='G-FDZM02YJ3Q',s=document.createElement('script');s.async=1;s.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(s);window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',id);})();
 
+// Pinterest Tag (base code). Loaded from the shared script so every page can be
+// used for conversion tracking and retargeting audiences.
+!function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version="3.0";var t=document.createElement("script");t.async=!0,t.src=e;var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
+pintrk('load', '2613676142219');
+pintrk('page');
+
 // Impact affiliate tracking tag. Loaded from the shared script so it runs on
 // every page that carries affiliate links.
 (function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A5661882-9e84-4a48-8d7e-ab9d5989e7151.js','script','impactStat',document,window);impactStat('trackImpression');
@@ -16,6 +22,38 @@
   var slugify = function (s) { return s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); };
   var params = new URLSearchParams(location.search);
   var page = document.body.getAttribute('data-page');
+
+  // ---- Pinterest conversion events ----
+  var pinId = function () { return 'dx-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); };
+  var pinTrack = function (name, data) { data.event_id = pinId(); window.pintrk('track', name, data); };
+  pinTrack('pagevisit', { property: 'Dealux' });
+  // Brand, type and department listings count as category views.
+  var catMatch = location.pathname.match(/^\/shop\/(brand|type|department)\/[^\/]+/);
+  if (catMatch) {
+    var catTitle = $('h1');
+    pinTrack('viewcategory', { line_items: [{ product_category: catTitle ? catTitle.textContent.trim() : document.title }] });
+  }
+  // Searches: report the query once the visitor stops typing or submits.
+  $$('[data-search-form], [data-brand-filter]').forEach(function (f) {
+    var last = '';
+    var report = function () {
+      var q = f.q && f.q.value.trim();
+      if (q && q !== last) { last = q; pinTrack('search', { search_query: q }); }
+    };
+    if (f.q && f.q.value.trim()) report();
+    f.addEventListener('submit', report);
+    f.addEventListener('input', function () { clearTimeout(report.t); report.t = setTimeout(report, 1500); });
+  });
+  // Checkout: clicks on store "Buy" links (product pages) and Stripe buy buttons (exclusive items).
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('[data-product-link], a[href^="https://buy.stripe.com/"]');
+    if (!a) return;
+    var priceText = (a.textContent.match(/\$\s*([\d,.]+)/) || [])[1];
+    var data = { order_quantity: 1, currency: a.getAttribute('data-currency') || 'USD' };
+    var value = Number(a.getAttribute('data-value') || (priceText || '').replace(/,/g, ''));
+    if (value) data.value = value;
+    pinTrack('checkout', data);
+  });
 
   // ---- Partner logos: compact strip under the header on every page, plus
   // a larger block on the homepage. Each logo sits in its own tile so
@@ -198,6 +236,7 @@
     detailsFor(slug).then(function (d) {
       if (d[0]) { $('[data-product-name]').textContent = d[0]; document.title = d[0] + ' — Dealux'; }
       $('[data-product-brand]').textContent = [money(d[1], d[2]), d[3] && 'by ' + d[3]].filter(Boolean).join(' · ');
+      if (d[1]) { link.setAttribute('data-value', d[1]); link.setAttribute('data-currency', d[2] || 'USD'); }
       if (d[5]) {
         link.href = d[5];
         link.textContent = 'Buy at ' + (d[3] || 'the store') + ' →';
