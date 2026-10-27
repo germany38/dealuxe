@@ -409,3 +409,30 @@ pintrk('page');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
+
+// Takefluence referral sidebar, shown on every page. Pinned to the right edge on
+// wide screens; on narrower screens it sits inline just above the footer.
+(function () {
+  function mount() {
+    if (document.querySelector('.dx-takefluence')) return;
+    var css = document.createElement('style');
+    css.textContent = '.dx-takefluence{box-sizing:border-box;width:220px;padding:1rem;border:1px solid #e5e7eb;border-radius:14px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.08);font:14px/1.45 system-ui,sans-serif;color:#222;text-align:center}' +
+      '.dx-takefluence strong{display:block;font-size:1.05rem;margin-bottom:.4rem;color:#111}' +
+      '.dx-takefluence p{margin:0 0 .8rem}' +
+      '.dx-takefluence a.dx-tf-btn{display:inline-block;padding:.55rem 1rem;border-radius:999px;background:#6d28d9;color:#fff;font-weight:600;text-decoration:none}' +
+      '.dx-takefluence a.dx-tf-btn:hover{background:#5b21b6}' +
+      '@media (min-width:1500px){.dx-takefluence{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:40}}' +
+      '@media (max-width:1499px){.dx-takefluence{width:auto;max-width:520px;margin:1.5rem auto}}';
+    document.head.appendChild(css);
+    var box = document.createElement('aside');
+    box.className = 'dx-takefluence';
+    box.setAttribute('aria-label', 'Sponsored: Takefluence');
+    box.innerHTML = '<strong>Turn Your Influence Into Income</strong>' +
+      '<p>From personal profiles to themed pages — monetize with Takefluence. No matter the platform or following.</p>' +
+      '<a class="dx-tf-btn" href="https://takefluence.com/?ref=DLOOA" target="_blank" rel="sponsored noopener">Join Takefluence</a>';
+    var footer = document.querySelector('.site-footer, body > footer');
+    if (footer && window.matchMedia('(max-width:1499px)').matches) footer.parentNode.insertBefore(box, footer);
+    else document.body.appendChild(box);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+})();
