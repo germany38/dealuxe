@@ -89,7 +89,10 @@ export default async (req: Request, context: Context) => {
         (image ? `<meta property="og:image" content="${esc(image)}">` : "") +
         `\n<script type="application/ld+json">${JSON.stringify(structured).replace(/</g, "\\u003c")}</script>`,
     )
-    .replace('<img data-img-slug=""', `<img data-img-slug="${esc(slug)}"${image ? ` src="${esc(image)}"` : ""}`)
+    .replace(
+      '<img data-img-slug="" referrerpolicy="no-referrer" alt="">',
+      `<img data-img-slug="${esc(slug)}"${image ? ` src="${esc(image)}"` : ""} referrerpolicy="no-referrer" alt="${esc(name)}">`,
+    )
     .replace(/<h1 data-product-name>.*?<\/h1>/, `<h1 data-product-name>${esc(name)}</h1>`)
     .replace(
       /<p class="muted" data-product-brand><\/p>/,
