@@ -341,8 +341,29 @@ def update_brand_directory(brand_counts, brand_names):
     open(p, 'w', encoding='utf-8').write(h)
 
 
+SITEMAP_HEAD = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n')
+
+
+def load_records():
+    records = {}
+    for n in range(IMG_SHARDS):
+        records.update(read_json(f'data/img/{n}.json', {}))
+    return records
+
+
+def product_url_entry(slug, rec, lastmod):
+    """One product <url>, with an image:image entry so Google/Bing Images can index the product photo."""
+    img = ''
+    if rec and len(rec) > 4 and rec[4].startswith(('http://', 'https://')):
+        title = html.escape(rec[0] or slug.replace('-', ' ').title(), quote=False)
+        img = f'<image:image><image:loc>{html.escape(rec[4], quote=False)}</image:loc><image:title>{title}</image:title></image:image>'
+    return f'  <url><loc>{SITE}/shop/{html.escape(slug)}</loc><lastmod>{lastmod}</lastmod>{img}</url>\n'
+
+
 def update_sitemaps(slugs, pages):
     today = TODAY.isoformat()
+    records = load_records()
     existing = sorted(glob.glob('sitemap-shop-products-*.xml'), key=lambda f: int(re.search(r'(\d+)', f).group(1)))
     present = set()
     for f in existing:
@@ -353,9 +374,8 @@ def update_sitemaps(slugs, pages):
     for i in range(0, len(slugs), 10000):
         name = f'sitemap-shop-products-{nxt}.xml'
         nxt += 1
-        body = ''.join(f'  <url><loc>{SITE}/shop/{html.escape(s)}</loc><lastmod>{today}</lastmod></url>\n' for s in slugs[i:i + 10000])
-        open(name, 'w', encoding='utf-8').write(
-            '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + body + '</urlset>\n')
+        body = ''.join(product_url_entry(s, records.get(s), today) for s in slugs[i:i + 10000])
+        open(name, 'w', encoding='utf-8').write(SITEMAP_HEAD + body + '</urlset>\n')
         new_files.append(name)
 
     sm = open('sitemap-shop.xml', encoding='utf-8').read()
