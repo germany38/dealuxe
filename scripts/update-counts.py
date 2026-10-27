@@ -68,6 +68,16 @@ def main():
     h = re.sub(r'(<h2>Latest from the Journal.*?<div class="grid">).*?(</div>)', lambda mm: mm.group(1) + posts + mm.group(2), h, count=1, flags=re.S)
     open(p, 'w', encoding='utf-8').write(h)
 
+    # ---- homepage "Trending deals": a pool of priced, pictured products, sampled per visit by app.js ----
+    per_brand = {}
+    for n in range(64):
+        for slug, rec in json.load(open(f'data/img/{n}.json', encoding='utf-8')).items():
+            if len(rec) > 5 and rec[1] and rec[4].startswith('https://') and rec[5]:
+                per_brand.setdefault(rec[3], []).append(slug)
+    pool = [s for b in sorted(per_brand) for s in sorted(per_brand[b])[:2]]
+    pool = pool[::max(1, -(-len(pool) // 1500))]  # keep the homepage download small
+    json.dump(pool, open('data/list/trending.json', 'w', encoding='utf-8'), separators=(',', ':'))
+
     # ---- journal index ----
     p = 'journal/index.html'
     h = open(p, encoding='utf-8').read()
