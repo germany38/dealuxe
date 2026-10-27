@@ -176,6 +176,7 @@ pintrk('page');
           if (meta && (d[1] || d[3])) meta.textContent = [money(d[1], d[2]), d[3]].filter(Boolean).join(' · ');
         }
         if (!d[4]) return;
+        if (!img.alt && d[0]) img.alt = d[0];
         img.onerror = function () { img.parentNode.classList.remove('has-img'); img.remove(); };
         img.src = d[4];
         img.parentNode.classList.add('has-img');
@@ -196,6 +197,18 @@ pintrk('page');
       return list.map(function (b) { return { name: b[0], link: b[1], slug: slugify(b[0]) }; }).sort(function (a, b) { return b.slug.length - a.slug.length; });
     });
     return brandsPromise;
+  }
+
+  // ---- Homepage: a different random set of deals on every visit ----
+  var trending = $('[data-trending]');
+  if (trending) {
+    fetch(trending.getAttribute('data-trending')).then(function (r) { return r.json(); }).then(function (pool) {
+      for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+      trending.innerHTML = pool.slice(0, 12).map(function (slug) {
+        return '<a class="card product-card" href="/shop/' + encodeURIComponent(slug) + '"><span class="product-thumb"><img data-img-slug="' + esc(slug) + '" loading="lazy" referrerpolicy="no-referrer" alt=""></span><h3>' + esc(titleCase(slug)) + '</h3><span class="muted">View product →</span></a>';
+      }).join('');
+      fillImages(trending);
+    });
   }
 
   if (page === 'shop') {
