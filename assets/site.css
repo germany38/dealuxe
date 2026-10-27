@@ -135,3 +135,22 @@ a.card:hover { border-color: var(--gold); }
 .share-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; padding: 0 .55rem; border-radius: 8px; border: 1px solid var(--line); color: var(--text); background: var(--panel); font: inherit; font-size: .85rem; cursor: pointer; }
 .share-btn:hover { filter: brightness(1.15); }
 .share-copy { color: var(--gold); }
+/* Deal videos (homepage block, /videos/ and watch pages) */
+.video-block { margin: 2rem 0; }
+.video-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.video-card { display: flex; flex-direction: column; gap: .4rem; }
+.video-card h3 { margin: 0; font-size: 1rem; }
+.video-card h3 a { color: inherit; text-decoration: none; }
+.video-card .muted { margin: 0; font-size: .85rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.video-card .product-actions { margin-top: auto; display: flex; gap: .5rem; flex-wrap: wrap; }
+.video-thumb { position: relative; display: block; width: 100%; aspect-ratio: 16/9; padding: 0; border: 0; border-radius: 10px; overflow: hidden; background: #000; cursor: pointer; }
+.video-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.video-noposter { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted); font-weight: 600; }
+.video-play { position: absolute; inset: 0; margin: auto; width: 54px; height: 54px; border-radius: 50%; background: rgba(0,0,0,.6); color: var(--gold-hi); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+.video-thumb:hover .video-play { background: var(--gold); color: #17130a; }
+.video-card .video-player { width: 100%; aspect-ratio: 16/9; border-radius: 10px; background: #000; }
+.video-watch .video-player { display: block; width: 100%; max-height: 80vh; margin: 1rem 0; border-radius: 12px; background: #000; }
+.video-mini-list { display: flex; flex-direction: column; gap: .5rem; margin-top: .5rem; }
+.video-mini { display: block; padding: .6rem .8rem; font-size: .9rem; color: var(--text); text-decoration: none; }
+.video-mini .muted { display: block; font-size: .75rem; }
+.imp-pixel { position: absolute; visibility: hidden; }
