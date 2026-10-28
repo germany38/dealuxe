@@ -71,7 +71,7 @@ function relatedFrom(listText, slug) {
 
 async function notFound(env, request) {
   const body = (await asset(env, request, '/404.html')) || 'Not found';
-  return new Response(body, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8', 'x-robots-tag': 'noindex' } });
+  return new Response(body, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
 }
 
 export async function onRequestGet(context) {

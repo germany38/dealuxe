@@ -36,7 +36,7 @@
       '<p class="muted">' + esc(v.desc) + '</p>' +
       (v.deal ? '<p class="promo-note">' + esc(v.deal) + '</p>' : '') +
       '<div class="product-actions"><a class="btn btn-ghost" href="/videos/' + esc(v.slug) + '/">Details</a>' +
-      '<a class="btn btn-gold" href="' + esc(v.link) + '" target="_blank" rel="nofollow sponsored noopener">Get offer →</a></div></div>';
+      '<a class="btn btn-gold" href="' + esc(v.link) + '" target="_blank" rel="sponsored noopener">Get offer →</a></div></div>';
   }
 
   function show() {

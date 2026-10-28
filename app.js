@@ -81,7 +81,7 @@
   function partnerRows() {
     return PARTNER_ROWS.filter(function (row) { return row.length; }).map(function (row) {
       return '<div class="partner-row">' + row.map(function (p) {
-        return '<a class="partner-tile" href="' + esc(p[1]) + '" target="_blank" rel="nofollow sponsored noopener" title="' + esc(p[0]) + '">' +
+        return '<a class="partner-tile" href="' + esc(p[1]) + '" target="_blank" rel="sponsored noopener" title="' + esc(p[0]) + '">' +
           '<img src="/assets/partners/' + p[2] + '" alt="' + esc(p[0]) + '" loading="lazy" decoding="async"></a>';
       }).join('') + '</div>';
     }).join('');

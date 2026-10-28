@@ -142,7 +142,7 @@ def main(feed_path):
 def job_page(template, slug, t, desc, body, date, url, raw, meta):
     company, location, kind, family = meta
     apply = next((a for a in re.findall(r'href="(https?://[^"]+)"', raw) if 'blogspot.com' not in a), url)
-    btn = f'<p><a class="btn btn-gold" href="{html.escape(apply)}" target="_blank" rel="nofollow noopener">Apply now →</a></p>'
+    btn = f'<p><a class="btn btn-gold" href="{html.escape(apply)}" target="_blank" rel="sponsored noopener">Apply now →</a></p>'
     h = template
     h = re.sub(r'<title>.*?</title>', lambda _: f'<title>{t} — Dealux Jobs</title>', h, count=1)
     h = re.sub(r'<meta name="description" content="[^"]*">', lambda _: f'<meta name="description" content="{desc}">', h, count=1)
@@ -151,7 +151,7 @@ def job_page(template, slug, t, desc, body, date, url, raw, meta):
     h = re.sub(r'<p class="muted"><b>Company:</b>.*?</p>',
                lambda _: f'<p class="muted"><b>Company:</b> {html.escape(company)} · <b>Location:</b> {location} · '
                          f'<b>Type:</b> {kind} · <b>Posted:</b> {date}</p>', h, count=1)
-    h = re.sub(r'<p><a class="btn btn-gold" href="[^"]*" target="_blank" rel="nofollow noopener">Apply now →</a></p>\n  <div class="post-body">.*?</div>\n  <p><a class="btn btn-gold"[^\n]*</p>',
+    h = re.sub(r'<p><a class="btn btn-gold" href="[^"]*" target="_blank" rel="sponsored noopener">Apply now →</a></p>\n  <div class="post-body">.*?</div>\n  <p><a class="btn btn-gold"[^\n]*</p>',
                lambda _: f'{btn}\n  <div class="post-body">\n{body}\n  </div>\n  {btn}', h, count=1, flags=re.S)
     plain = text(body)
     loc_type = '"jobLocationType":"TELECOMMUTE","applicantLocationRequirements":{"@type":"Country","name":"Worldwide"}' \

@@ -179,7 +179,7 @@ def watch_page(v, related):
   {player(v)}
   <p>{esc(v["desc"])}</p>
   {deal}
-  <p><a class="btn btn-gold" href="{esc(v["link"])}" target="_blank" rel="nofollow sponsored noopener">Get the {esc(v["brand"])} offer →</a></p>
+  <p><a class="btn btn-gold" href="{esc(v["link"])}" target="_blank" rel="sponsored noopener">Get the {esc(v["brand"])} offer →</a></p>
   {pixel(v)}
 </article>
 <aside class="post-sidebar">
@@ -204,7 +204,7 @@ def card(v):
             f'<p class="muted">{esc(v["desc"])}</p>'
             + (f'<p class="promo-note">{esc(v["deal"])}</p>' if v['deal'] else '') +
             f'<div class="product-actions"><a class="btn btn-ghost" href="/videos/{v["slug"]}/">Details</a>'
-            f'<a class="btn btn-gold" href="{esc(v["link"])}" target="_blank" rel="nofollow sponsored noopener">Get offer →</a></div>'
+            f'<a class="btn btn-gold" href="{esc(v["link"])}" target="_blank" rel="sponsored noopener">Get offer →</a></div>'
             f'</div>')
 
 
