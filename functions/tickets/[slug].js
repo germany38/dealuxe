@@ -64,12 +64,12 @@ export async function onRequestGet(context) {
       title: `${e ? e.n : 'Event'} — Tickets no longer available | Dealux Tickets`,
       desc: 'Tickets for this event are no longer available. Browse upcoming concerts, sports and theatre events on Dealux.',
       canonical: 'https://dealuxapp.com/tickets/',
-      robots: 'noindex, follow',
+      robots: 'index, follow',
       name: 'This event has ended',
       place: e ? e.n : '',
       body: '<p>Tickets for this event are no longer available.</p><p><a class="btn btn-gold" href="/tickets/">Browse upcoming events →</a></p>',
     });
-    return new Response(html, { status: e ? 410 : 404, headers: { 'content-type': 'text/html; charset=utf-8', 'x-robots-tag': 'noindex' } });
+    return new Response(html, { status: e ? 410 : 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
   const slug = `${slugify(e.n) || 'event'}-${id}`;
@@ -110,7 +110,7 @@ export async function onRequestGet(context) {
     (e.i ? `<meta property="og:image" content="${esc(e.i)}">` : '') +
     `\n${jsonLd(events.length === 1 ? events[0] : events)}`;
 
-  const btn = (u, l) => (u ? `<a class="btn btn-gold" style="margin:4px 8px 4px 0" href="${esc(u)}" target="_blank" rel="nofollow sponsored noopener">${l} →</a>` : '');
+  const btn = (u, l) => (u ? `<a class="btn btn-gold" style="margin:4px 8px 4px 0" href="${esc(u)}" target="_blank" rel="sponsored noopener">${l} →</a>` : '');
   const body =
     (e.i ? `<p><img src="${esc(e.i)}" alt="${esc(`${e.n} seating map`)}" referrerpolicy="no-referrer" loading="lazy" style="max-width:100%;max-height:320px;border-radius:12px"></p>` : '') +
     `<h2>${dates.length} upcoming date${dates.length > 1 ? 's' : ''}</h2>` +

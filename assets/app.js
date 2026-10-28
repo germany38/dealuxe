@@ -126,7 +126,7 @@ pintrk('page');
   function partnerRows() {
     return PARTNER_ROWS.filter(function (row) { return row.length; }).map(function (row) {
       return '<div class="partner-row">' + row.map(function (p) {
-        return '<a class="partner-tile" href="' + esc(p[1]) + '" target="_blank" rel="nofollow sponsored noopener" title="' + esc(p[0]) + '">' +
+        return '<a class="partner-tile" href="' + esc(p[1]) + '" target="_blank" rel="sponsored noopener" title="' + esc(p[0]) + '">' +
           '<img src="/assets/partners/' + p[2] + '" alt="' + esc(p[0]) + '" loading="lazy" decoding="async"></a>';
       }).join('') + '</div>';
     }).join('');
@@ -410,29 +410,86 @@ pintrk('page');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
 
-// Takefluence referral sidebar, shown on every page. Pinned to the right edge on
-// wide screens; on narrower screens it sits inline just above the footer.
+// Admitad, Temu and FlexJobs partner cards, guaranteed on every page. Cards a page already
+// ships in its own sidebar are left alone; any that are missing are added to that sidebar,
+// or, on pages without one, to a partner row just above the footer.
+(function () {
+  var CARDS = [
+    ['twnfz.com/g/vtnpdcgcecc0d22003ddbef570c363', '<div class="card promo-card side-banner">' +
+      '<span class="eyebrow">Admitad · Publishers</span>' +
+      '<h3>Wait – don’t leave empty-handed</h3>' +
+      '<p class="muted">It takes 2 minutes to get started. Tell us who you are and we’ll take you to the right place.</p>' +
+      '<p class="muted"><b>Publishers:</b> Turn your traffic and audience into steady revenue with 3000+ brands.</p>' +
+      '<a class="btn btn-gold" href="https://twnfz.com/g/vtnpdcgcecc0d22003ddbef570c363/" target="_blank" rel="sponsored noopener">Get Started with ADMITAD →</a></div>'],
+    ['temu.to/k/pss0huunk6r', '<div class="card promo-card temu-storefront">' +
+      '<span class="eyebrow">Temu · My storefront</span>' +
+      '<h3>✨Discover Amazing Finds at My Storefront 🎁</h3>' +
+      '<p class="muted">Don’t miss out on the special coupon bundle waiting for you. 🌟 Packed with top-notch products at unbeatable prices. Click my link now to enjoy, shop, and save big! 🛍️✨</p>' +
+      '<a class="btn btn-gold" href="https://temu.to/k/pss0huunk6r" target="_blank" rel="sponsored noopener">Shop my storefront →</a></div>'],
+    ['flexjobs.sjv.io/c/5661882/1847140/20168', '<div class="card promo-card flexjobs-card">' +
+      '<span class="eyebrow">FlexJobs · Remote work</span>' +
+      '<a rel="sponsored noopener" href="https://flexjobs.sjv.io/c/5661882/1847140/20168" target="_blank"><img src="https://a.impactradius-go.com/display-ad/20168-1847140" alt="FlexJobs" width="200" height="200" loading="lazy" style="max-width:200px;height:auto"></a>' +
+      '<img height="0" width="0" src="https://imp.pxf.io/i/5661882/1847140/20168" style="position:absolute;visibility:hidden;" alt="">' +
+      '<h3>The #1 Job Site to Find Work From Home Jobs</h3>' +
+      '<p class="muted">No Ads, Scams, or Junk. Find legitimate work-from-home jobs with options for flexible hours and hybrid work.</p>' +
+      '<a class="btn btn-gold" href="https://flexjobs.sjv.io/c/5661882/1847140/20168" target="_blank" rel="sponsored noopener">Start your 2 week trial →</a></div>']
+  ];
+  function mount() {
+    if (document.querySelector('.dx-partner-cards')) return;
+    var missing = CARDS.filter(function (c) { return !document.querySelector('.promo-card a[href*="' + c[0] + '"]'); });
+    if (!missing.length) return;
+    var html = missing.map(function (c) { return c[1]; }).join('');
+    var existing = document.querySelector('.post-sidebar .promo-card, .ex-widgets .promo-card, aside .promo-card');
+    if (existing) {
+      var wrap = document.createElement('div');
+      wrap.className = 'dx-partner-cards';
+      wrap.style.cssText = 'display:contents';
+      wrap.innerHTML = html;
+      existing.parentNode.appendChild(wrap);
+      return;
+    }
+    var css = document.createElement('style');
+    css.textContent = '.dx-partner-cards.wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:2rem;margin-bottom:2rem}' +
+      '.dx-partner-cards .card{display:flex;flex-direction:column;gap:8px}.dx-partner-cards .btn{align-self:flex-start}';
+    document.head.appendChild(css);
+    var box = document.createElement('aside');
+    box.className = 'wrap dx-partner-cards';
+    box.setAttribute('aria-label', 'Sponsored partners');
+    box.innerHTML = html;
+    var footer = document.querySelector('.site-footer, body > footer');
+    if (footer) footer.parentNode.insertBefore(box, footer); else document.body.appendChild(box);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+})();
+
+// Takefluence referral card, on every page and on screen as soon as the page opens. It leads
+// the page's partner sidebar; when that sidebar starts below the first screen (phones, where
+// sidebars stack under the content) or the page has none, it sits at the top of the content.
 (function () {
   function mount() {
     if (document.querySelector('.dx-takefluence')) return;
     var css = document.createElement('style');
-    css.textContent = '.dx-takefluence{box-sizing:border-box;width:220px;padding:1rem;border:1px solid #e5e7eb;border-radius:14px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.08);font:14px/1.45 system-ui,sans-serif;color:#222;text-align:center}' +
-      '.dx-takefluence strong{display:block;font-size:1.05rem;margin-bottom:.4rem;color:#111}' +
-      '.dx-takefluence p{margin:0 0 .8rem}' +
-      '.dx-takefluence a.dx-tf-btn{display:inline-block;padding:.55rem 1rem;border-radius:999px;background:#6d28d9;color:#fff;font-weight:600;text-decoration:none}' +
-      '.dx-takefluence a.dx-tf-btn:hover{background:#5b21b6}' +
-      '@media (min-width:1500px){.dx-takefluence{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:40}}' +
-      '@media (max-width:1499px){.dx-takefluence{width:auto;max-width:520px;margin:1.5rem auto}}';
+    css.textContent = '.dx-takefluence{display:flex;flex-direction:column;gap:8px}' +
+      '.dx-takefluence .btn{align-self:flex-start}' +
+      '.dx-takefluence.dx-tf-top{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1.5rem;margin:1rem 0}' +
+      '.dx-tf-top .dx-tf-text{flex:1 1 320px}.dx-tf-top h3{margin:.2rem 0}.dx-tf-top .btn{align-self:center}';
     document.head.appendChild(css);
-    var box = document.createElement('aside');
-    box.className = 'dx-takefluence';
+    var box = document.createElement('div');
+    box.className = 'card promo-card dx-takefluence';
     box.setAttribute('aria-label', 'Sponsored: Takefluence');
-    box.innerHTML = '<strong>Turn Your Influence Into Income</strong>' +
-      '<p>From personal profiles to themed pages — monetize with Takefluence. No matter the platform or following.</p>' +
-      '<a class="dx-tf-btn" href="https://takefluence.com/?ref=DLOOA" target="_blank" rel="sponsored noopener">Join Takefluence</a>';
-    var footer = document.querySelector('.site-footer, body > footer');
-    if (footer && window.matchMedia('(max-width:1499px)').matches) footer.parentNode.insertBefore(box, footer);
-    else document.body.appendChild(box);
+    box.innerHTML = '<div class="dx-tf-text"><span class="eyebrow">Takefluence · Creators</span>' +
+      '<h3>Turn Your Influence Into Income</h3>' +
+      '<p class="muted">From personal profiles to themed pages — monetize with Takefluence. No matter the platform or following.</p></div>' +
+      '<a class="btn btn-gold" href="https://takefluence.com/?ref=DLOOA" target="_blank" rel="sponsored noopener">Join Takefluence →</a>';
+    var card = document.querySelector('.post-sidebar .promo-card, .ex-widgets .promo-card, aside .promo-card');
+    var sidebar = card && card.parentNode.closest('aside') || (card && card.parentNode);
+    if (sidebar && sidebar.getBoundingClientRect().top < window.innerHeight - 120) {
+      sidebar.insertBefore(box, sidebar.firstChild);
+      return;
+    }
+    box.classList.add('dx-tf-top');
+    var main = document.querySelector('main') || document.body;
+    main.insertBefore(box, main.firstChild);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();

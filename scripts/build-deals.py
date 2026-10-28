@@ -146,7 +146,7 @@ for path in sys.argv[1:]:
                 + (f'  {code_html}\n' if code_html else '')
                 + f'  <p class="muted deal-meta">{e(DEPTS[dept])}</p>\n'
                 + (f'  {exp}\n' if exp else '')
-                + f'  <a class="btn btn-gold" href="{e(url)}" target="_blank" rel="nofollow sponsored noopener">{cta}</a>\n</div>')
+                + f'  <a class="btn btn-gold" href="{e(url)}" target="_blank" rel="sponsored noopener">{cta}</a>\n</div>')
         cards.append(dict(html=card, dept=dept, brand=brand, href=href, imported=True))
 
         page_title = f'{brand}: {title}'
@@ -164,7 +164,7 @@ for path in sys.argv[1:]:
                    + f'  <p class="muted">Department: <a href="/deals/?department={dept}">{e(DEPTS[dept])}</a> · '
                      f'Brand: <a href="/deals/?brand={e(bslug)}">{e(brand)}</a> · Store: {e(r["merchant_domain"])}</p>\n'
                    + (f'  {exp}\n' if exp else '')
-                   + f'  <p><a class="btn btn-gold" href="{e(url)}" target="_blank" rel="nofollow sponsored noopener">{cta}</a></p>\n</article>')
+                   + f'  <p><a class="btn btn-gold" href="{e(url)}" target="_blank" rel="sponsored noopener">{cta}</a></p>\n</article>')
         os.makedirs(os.path.join(DEALS, slug), exist_ok=True)
         with open(os.path.join(DEALS, slug, 'index.html'), 'w', encoding='utf-8') as f:
             f.write(ph + article + tpl_tail)

@@ -75,10 +75,10 @@ def ad_page(a, related, parts=False):
   <a class="muted" href="/ads/">← All offers</a>
   <span class="eyebrow">{esc(a["brand"])} · Offer</span>
   <h1>{t}</h1>
-  <figure><a href="{esc(a["link"])}" target="_blank" rel="nofollow sponsored noopener">{img_tag(a, lazy=False)}</a>{cap}</figure>
+  <figure><a href="{esc(a["link"])}" target="_blank" rel="sponsored noopener">{img_tag(a, lazy=False)}</a>{cap}</figure>
   <p>{esc(a["desc"])}</p>
   {"".join(facts)}
-  <p><a class="btn btn-gold" href="{esc(a["link"])}" target="_blank" rel="nofollow sponsored noopener">Get the {esc(a["brand"])} offer →</a></p>
+  <p><a class="btn btn-gold" href="{esc(a["link"])}" target="_blank" rel="sponsored noopener">Get the {esc(a["brand"])} offer →</a></p>
 </article>
 <aside class="post-sidebar">
   <div class="card promo-card">
@@ -92,10 +92,10 @@ def ad_page(a, related, parts=False):
 
 
 def card(a):
-    return (f'<div class="card"><a href="{esc(a["link"])}" target="_blank" rel="nofollow sponsored noopener">{img_tag(a)}</a>'
+    return (f'<div class="card"><a href="{esc(a["link"])}" target="_blank" rel="sponsored noopener">{img_tag(a)}</a>'
             f'<span class="eyebrow">{esc(a["brand"])}</span><h3><a href="/ads/{a["slug"]}/">{esc(a["name"])}</a></h3>'
             f'<div class="product-actions"><a class="btn btn-ghost" href="/ads/{a["slug"]}/">Details</a>'
-            f'<a class="btn btn-gold" href="{esc(a["link"])}" target="_blank" rel="nofollow sponsored noopener">Get offer →</a></div></div>')
+            f'<a class="btn btn-gold" href="{esc(a["link"])}" target="_blank" rel="sponsored noopener">Get offer →</a></div></div>')
 
 
 def page_url(n):

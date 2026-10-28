@@ -50,7 +50,7 @@ var dates=e.d.filter(function(d){return d[0]>=today});
 name.textContent=e.n;document.title=e.n+' Tickets — Dealux Tickets';
 place.textContent=[e.v,[e.c,e.s].filter(Boolean).join(', '),CATS[e.k]||e.k].filter(Boolean).join(' · ');
 if(!dates.length)return ended();
-var btn=function(u,l){return u?'<a class="btn btn-gold" style="margin:4px 8px 4px 0" href="'+esc(u)+'" target="_blank" rel="nofollow sponsored noopener">'+l+' →</a>':''};
+var btn=function(u,l){return u?'<a class="btn btn-gold" style="margin:4px 8px 4px 0" href="'+esc(u)+'" target="_blank" rel="sponsored noopener">'+l+' →</a>':''};
 box.innerHTML=(e.i?'<p><img src="'+esc(e.i)+'" alt="" referrerpolicy="no-referrer" loading="lazy" style="max-width:100%;max-height:320px;border-radius:12px"></p>':'')+'<h2>'+dates.length+' upcoming date'+(dates.length>1?'s':'')+'</h2>'+dates.map(function(d){var t=d[1]?' · '+d[1].slice(0,5):'';return '<div class="card" style="padding:14px;margin:0 0 10px"><b>'+fmt(d[0])+t+'</b>'+(d[2]?' <span class="muted">· from '+usd(d[2],e.$)+'</span>':'')+'<div style="margin-top:8px">'+btn(d[3],'TicketNetwork')+btn(d[4],'TicketLiquidator')+btn(d[5],'StubHub')+btn(d[6],'Ticombo')+'</div></div>'}).join('');
 }).catch(ended);})();
 </script>

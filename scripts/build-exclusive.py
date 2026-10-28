@@ -28,14 +28,14 @@ WIDGETS = """<aside class="ex-widgets">
     <span class="eyebrow">Temu · My storefront</span>
     <h3>✨Discover Amazing Finds at My Storefront 🎁</h3>
     <p class="muted">Don’t miss out on the special coupon bundle waiting for you. 🌟 Packed with top-notch products at unbeatable prices. Click my link now to enjoy, shop, and save big! 🛍️✨</p>
-    <a class="btn btn-gold" href="https://temu.to/k/pss0huunk6r" target="_blank" rel="nofollow sponsored noopener">Shop my storefront →</a>
+    <a class="btn btn-gold" href="https://temu.to/k/pss0huunk6r" target="_blank" rel="sponsored noopener">Shop my storefront →</a>
   </div>
   <div class="card promo-card flexjobs-card">
     <span class="eyebrow">FlexJobs · Remote work</span>
     <a rel="sponsored noopener" href="https://flexjobs.sjv.io/c/5661882/1847140/20168" target="_blank" id="1847140"><img src="https://a.impactradius-go.com/display-ad/20168-1847140" border="0" alt="FlexJobs" width="200" height="200" loading="lazy"></a><img height="0" width="0" src="https://imp.pxf.io/i/5661882/1847140/20168" style="position:absolute;visibility:hidden;" border="0" alt="">
     <h3>The #1 Job Site to Find Work From Home Jobs</h3>
     <p class="muted">No Ads, Scams, or Junk. Find legitimate work-from-home jobs with options for flexible hours and hybrid work.</p>
-    <a class="btn btn-gold" href="https://flexjobs.sjv.io/c/5661882/1847140/20168" target="_blank" rel="nofollow sponsored noopener">Start your 2 week trial →</a>
+    <a class="btn btn-gold" href="https://flexjobs.sjv.io/c/5661882/1847140/20168" target="_blank" rel="sponsored noopener">Start your 2 week trial →</a>
   </div>
 </aside>"""
 
@@ -169,7 +169,7 @@ def main():
       <li><strong>File:</strong> {e(it["file_name"])}</li>
       <li><strong>Item #:</strong> {e(it["id"])}</li>
     </ul>
-    <a class="btn btn-gold ex-buy" href="{e(it["purchase_url"])}" rel="nofollow noopener">Buy &amp; download — ${it["price_usd"]} →</a>
+    <a class="btn btn-gold ex-buy" href="{e(it["purchase_url"])}" rel="sponsored noopener">Buy &amp; download — ${it["price_usd"]} →</a>
     <p class="muted ex-note">Secure checkout by Stripe. After payment you're returned to Dealux and your PDF download starts right away.</p>
   </div>
 </article>
@@ -206,7 +206,6 @@ def main():
             "Download your Dealux Exclusive PDF.",
             f"{SITE}/exclusive/success/",
             body,
-            '<meta name="robots" content="noindex">\n',
         ),
     )
 
