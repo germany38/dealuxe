@@ -2,6 +2,10 @@
 # (netlify.toml also forces a 404 for these on Netlify; this rule covers hosts that read _redirects only.)
 /exclusive-files/*  /exclusive/  302
 
+# Ad banners are served from this domain: Impact's image host blocks crawlers in robots.txt,
+# which would keep the banners out of Google Images.
+/ad-img/*  https://a.impactradius-go.com/display-ad/:splat  200
+
 # Product and ticket pages have no file per item. dealuxapp.com is currently served by a host
 # that ignores netlify.toml and edge functions, so rewrite them to the shared pages here
 # (both pages read the item from the URL path).
