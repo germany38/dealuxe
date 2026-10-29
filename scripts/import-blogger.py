@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""Import the newest posts from the Dealux Blogger blog into the Journal.
+"""Import the newest posts from the Dealux Blogger blogs into the Journal.
 
-Usage: python3 scripts/import-blogger.py path/to/feed.json
-  (feed.json = https://dealuxbestoffers.blogspot.com/feeds/posts/default?alt=json&max-results=150)
+Usage: python3 scripts/import-blogger.py [feed.json | blog URL ...]
+  With no arguments every blog in BLOGS is fetched. A feed.json is
+  https://<blog>.blogspot.com/feeds/posts/default?alt=json&max-results=150
 
 Each post the Journal doesn't have yet becomes /journal/<slug>/ built from an
 existing article page, and is added to journal.json, the Journal grid and the
 sitemaps. Job listings (see JOBS) become /jobs/<slug>/ pages on the Jobs board
 instead. Posts are matched on title so re-running is a no-op.
 """
-import datetime, html, json, os, re, sys, unicodedata
+import datetime, html, json, os, re, sys, unicodedata, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
@@ -17,6 +18,7 @@ SITE = 'https://dealuxapp.com'
 TEMPLATE = 'journal/the-ultimate-guide-to-mac-virtualization-streamline-cross-platform-workflows-wit/index.html'
 SINCE = '2026-10-21'
 JOB_TEMPLATE = 'jobs/agent-engineer/index.html'
+BLOGS = ['https://dealuxbestoffers.blogspot.com/', 'https://dealuxdeals.blogspot.com/']
 
 # Posts whose titles don't transliterate to a useful slug.
 SLUGS = {
@@ -32,7 +34,12 @@ JOBS = {
 }
 FAMILIES = {'teaching': 'Teaching &amp; Education'}
 TOPICS = [
-    (r'english|british council', 'education'),
+    (r'english|british council|academy|education|tutor|книгарн|книг|літератур', 'education'),
+    (r'pet\b|pets|тварин|zoo', 'pets'),
+    (r'jewel|прикрас|ювелір|palmonas', 'jewelry'),
+    (r'skincare|beauty|cosmetic|perfume|parfum|fragrance|cologne|grooming|ayurveda|wig|hair|lingerie|косметик|парфум|аромат|догляд|zapach|perfumy', 'beauty'),
+    (r'sport|fitness|running|footwear|sneaker|gps watch|decathlon|спорт|бігу', 'sports'),
+    (r'sushi|pizza|meal|food|restaurant|nutrition|суші|піц|ресторан|продукт|кухн', 'food-drink'),
     (r'baby|toddler|nursery|little spoon|mamas|hydration|water|air quality|levoit', 'home'),
     (r'myntra|levi|fashion', 'fashion'),
     (r'ticombo|ticket|entradas|boletos|tiket|门票|டிக்கெட்', 'entertainment'),
@@ -40,10 +47,20 @@ TOPICS = [
     (r'holiday|getaway|travel|hotel|air france|airasia|flying', 'travel'),
     (r'game|gamivo|software|vpn|remotive|remote jobs', 'technology'),
     (r'shopping|consumertestconnect|rewards', 'gifts'),
+    (r'bank|forex|trading|invest|p2p|insur|legal|law|trademark|business|кредит|банк|страх|фінанс|ubezpiecz|pojišt|půjčk', 'finance'),
+    (r'bus|flight|авіа|автобус|квитк|подорож', 'travel'),
+    (r'furniture|kitchen|appliance|home|garden|interior|textile|сад|текстил|побутов|меблі|curtain|ستائر|ديكور', 'home'),
+    (r'tech|electronic|gadget|smartphone|phone|hosting|server|cloud|proxy|software|wearable|security|ПК|техн|електрон|гаджет|смартфон|الإلكترونيات|الهواتف|ігров|cs2|case opening|gaming|vpn|digital', 'technology'),
+    (r'fashion|clothing|apparel|одяг|гардероб|trikotaž|трикотаж|шкарпет|dkny|أناقة', 'fashion'),
+    (r'concert|music|концерт|музик', 'entertainment'),
 ]
+CYRILLIC = dict(zip('абвгґдеєжзиіїйклмнопрстуфхцчшщьюяыэъё',
+                    'a b v h g d e ye zh z y i yi y k l m n o p r s t u f kh ts ch sh shch _ yu ya y e _ yo'.split()))
+CYRILLIC.update({'ь': '', 'ъ': ''})
 
 
 def slugify(s):
+    s = ''.join(CYRILLIC.get(c, c) if c.islower() else CYRILLIC.get(c.lower(), c).title() for c in s)
     s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode().lower()
     return re.sub(r'[^a-z0-9]+', '-', s).strip('-')
 
@@ -52,8 +69,20 @@ def text(s):
     return re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', ' ', s or ''))).strip()
 
 
-def main(feed_path):
-    feed = json.load(open(feed_path, encoding='utf-8'))['feed']['entry']
+def load_feed(src):
+    if not src.startswith('http'):
+        return json.load(open(src, encoding='utf-8'))['feed'].get('entry', [])
+    base, entries = src.split('/feeds/')[0].rstrip('/'), []
+    while True:  # Blogger caps a feed page at 150 posts
+        url = f'{base}/feeds/posts/default?alt=json&max-results=150&start-index={len(entries) + 1}'
+        page = json.load(urllib.request.urlopen(url, timeout=60))['feed'].get('entry', [])
+        entries += page
+        if len(page) < 150 or page[-1]['published']['$t'][:10] < SINCE:
+            return entries
+
+
+def main(sources):
+    feed = [e for src in sources for e in load_feed(src)]
     journal = json.load(open('journal.json', encoding='utf-8'))
     have_titles = {p[1].lower() for p in journal}
     have_slugs = {p[0] for p in journal}
@@ -75,7 +104,11 @@ def main(feed_path):
             continue
         url = next(l['href'] for l in e['link'] if l['rel'] == 'alternate')
         key = url.rsplit('/', 1)[1].removesuffix('.html')
-        slug = SLUGS.get(key) or slugify(title)[:80].strip('-') or key
+        slug = SLUGS.get(key) or slugify(title)[:80].strip('-')
+        if len(slug) < 12:  # e.g. Arabic titles: keep the Latin words and the Blogger key
+            slug = slugify(f'{title} {key}')[:80].strip('-')
+        if key in JOBS and slug in os.listdir('jobs'):
+            continue  # job already on the board (the blogs repeat some listings)
         while slug in have_slugs:
             slug += '-2'
         have_slugs.add(slug)
@@ -106,6 +139,9 @@ def main(feed_path):
         h = re.sub(r'(<article class="post">.*?)<h1>.*?</h1>', lambda m: f'{m.group(1)}<h1>{t}</h1>', h, count=1, flags=re.S)
         h = re.sub(r'<div class="post-body"><div class="post-content">.*?</div></div>\n  \n</article>',
                    lambda _: f'<div class="post-body"><div class="post-content">\n{body}\n</div></div>\n  \n</article>', h, count=1, flags=re.S)
+        # Every Journal article carries the template's left and right sidebars.
+        if h.count('<aside class="post-sidebar') != 2 or body not in h:
+            sys.exit(f'Could not build {slug} with both sidebars from {TEMPLATE}')
         os.makedirs(f'journal/{slug}', exist_ok=True)
         open(f'journal/{slug}/index.html', 'w', encoding='utf-8').write(h)
         new.append([slug, title, topic, date, ''])
@@ -125,6 +161,7 @@ def main(feed_path):
     cards = ''.join(f'<a class="card post-card" href="/journal/{p[0]}/">\n  \n  <span class="eyebrow">{p[2].replace("-", " ").title()} · '
                     f'{datetime.date.fromisoformat(p[3]).strftime("%b %-d, %Y")}</span>\n  <h3>{html.escape(p[1])}</h3>\n</a>' for p in new)
     idx = idx.replace('<div class="grid" data-results>', '<div class="grid" data-results>' + cards, 1)
+    idx = re.sub(r'\b\d[\d,]* articles\b', f'{len(journal):,} articles', idx)
     open('journal/index.html', 'w', encoding='utf-8').write(idx)
 
     sm = open('sitemap-journal.xml', encoding='utf-8').read()
@@ -204,4 +241,4 @@ def add_jobs(jobs):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    main(sys.argv[1:] or BLOGS)
