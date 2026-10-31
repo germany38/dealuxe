@@ -120,7 +120,9 @@ def main(sources):
         body = re.sub(r'<h1[^>]*>.*?</h1>', '', body, count=1, flags=re.S).strip()
         m = re.search(r'<meta name="description" content="([^"]*)"', raw)
         desc = text(m.group(1)) if m else text(body)
-        desc = html.escape(desc[:160], quote=True)
+        if len(desc) > 160:  # cut at a word boundary so search snippets don't end mid-word
+            desc = desc[:157].rsplit(' ', 1)[0].rstrip(' ,.;:—-') + '…'
+        desc = html.escape(desc, quote=True)
         topic = next((t for pat, t in TOPICS if re.search(pat, title + ' ' + key, re.I)), 'gifts')
         words = len(text(body).split())
         pretty = datetime.date.fromisoformat(date).strftime('%b %-d, %Y')
@@ -134,6 +136,23 @@ def main(sources):
         h = re.sub(r'<title>.*?</title>', lambda _: f'<title>{t} — Dealux Journal</title>', h, count=1)
         h = re.sub(r'<meta name="description" content="[^"]*">', lambda _: f'<meta name="description" content="{desc}">', h, count=1)
         h = re.sub(r'<link rel="canonical" href="[^"]*">', lambda _: f'<link rel="canonical" href="{SITE}/journal/{slug}/">', h, count=1)
+        img = next((i for i in re.findall(r'<img[^>]+src="(https?://[^"]+)"', body)), '')
+        # Social cards and Article structured data so shares and search results look right.
+        ld = json.dumps({'@context': 'https://schema.org', '@type': 'Article', 'headline': title[:110],
+                         'description': html.unescape(desc), 'datePublished': date, 'dateModified': date,
+                         'mainEntityOfPage': f'{SITE}/journal/{slug}/', **({'image': [img]} if img else {}),
+                         'author': {'@type': 'Organization', 'name': 'Dealux'},
+                         'publisher': {'@type': 'Organization', 'name': 'Dealux', 'url': SITE}},
+                        ensure_ascii=False).replace('</', '<\\/')
+        seo = (f'\n<meta property="og:type" content="article">\n<meta property="og:site_name" content="Dealux">'
+               f'\n<meta property="og:title" content="{t}">\n<meta property="og:description" content="{desc}">'
+               f'\n<meta property="og:url" content="{SITE}/journal/{slug}/">'
+               + (f'\n<meta property="og:image" content="{html.escape(img, quote=True)}">' if img else '')
+               + f'\n<meta property="article:published_time" content="{date}">'
+               f'\n<meta name="twitter:card" content="{"summary_large_image" if img else "summary"}">'
+               f'\n<meta name="twitter:title" content="{t}">\n<meta name="twitter:description" content="{desc}">'
+               f'\n<script type="application/ld+json">{ld}</script>')
+        h = h.replace('\n<link rel="icon"', seo + '\n<link rel="icon"', 1)
         h = re.sub(r'<span class="eyebrow">[^<]*· \d+ min read</span>',
                    lambda _: f'<span class="eyebrow">{topic.replace("-", " ").title()} · {pretty} · {max(1, round(words / 230))} min read</span>', h, count=1)
         h = re.sub(r'(<article class="post">.*?)<h1>.*?</h1>', lambda m: f'{m.group(1)}<h1>{t}</h1>', h, count=1, flags=re.S)
