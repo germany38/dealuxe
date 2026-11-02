@@ -90,6 +90,16 @@
   var strip = '<nav class="partner-strip" aria-label="Partner deals"><div class="wrap">' + partnerRows() + '</div></nav>';
   if (siteHeader) siteHeader.insertAdjacentHTML('afterend', strip);
   else document.body.insertAdjacentHTML('afterbegin', strip);
+
+  // ---- Partner site: Teachers Pay Teachers card, pinned top-left on wide
+  // screens and shown as a slim banner under the header on narrow ones. ----
+  $('.partner-strip').insertAdjacentHTML('afterend',
+    '<aside class="tpt-side" aria-label="Partner site">' +
+      '<span class="eyebrow">Partner site</span>' +
+      '<strong>Teachers Pay Teachers</strong>' +
+      '<p class="muted">Classroom-ready lessons, worksheets and activities from The Teacher Storefront.</p>' +
+      '<a class="btn btn-gold" href="https://www.teacherspayteachers.com/store/the-teacher-storefront" target="_blank" rel="noopener">Visit the store</a>' +
+    '</aside>');
   $$('[data-partner-logos]').forEach(function (el) { el.innerHTML = partnerRows(); });
 
   // ---- Shared incremental result rendering ----
