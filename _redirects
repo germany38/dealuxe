@@ -11,3 +11,8 @@
 # (both pages read the item from the URL path).
 /shop/:slug     /shop/product/   200
 /tickets/:slug  /tickets/show/   200
+
+# The tutor directory now lives inside the Shop as the Tutoring & Lessons section.
+/tutors/state/:st   /shop/type/tutoring/?state=:st  301
+/tutors/state/:st/  /shop/type/tutoring/?state=:st  301
+/tutors/*          /shop/type/tutoring/            301

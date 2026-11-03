@@ -1,21 +1,25 @@
 #!/usr/bin/env python3
-"""Build the /tutors/ directory from a Wyzant partner product CSV.
+"""Stage tutor pages from a Wyzant partner product CSV, for scripts/add-tutors-to-shop.py.
 
 Usage: python3 scripts/build-tutors.py Wyzant-Tutors.csv
+       python3 scripts/add-tutors-to-shop.py
 
-Writes static, crawlable pages:
+Tutors are published only as Shop listings (/shop/type/tutoring/). The /tutors/ section was removed
+to keep the Cloudflare Pages deploy under its 20,000-file limit, so these pages are written to a
+temporary folder outside the site (DEALUX_TUTORS_DIR, default <tmp>/dealux-tutors) and are not
+deployed. Its layout:
   /tutors/                 hub (disclosure banner, featured grid, states, subjects)
   /tutors/state/<st>/      every tutor in a state, with search + subject filter
   /tutors/<slug>/          one page per tutor, with the shared promo sidebar
-and sitemap-tutors.xml (registered in sitemap-index.xml). Re-running is idempotent.
+Re-running is idempotent.
 Affiliate "Product URL" values are used verbatim so attribution is preserved.
 """
-import csv, html, json, os, re, shutil, sys, unicodedata
+import csv, html, json, os, re, shutil, sys, tempfile, unicodedata
 from collections import Counter, defaultdict
 from datetime import date
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, 'tutors')
+OUT = os.environ.get('DEALUX_TUTORS_DIR') or os.path.join(tempfile.gettempdir(), 'dealux-tutors')
 SITE = 'https://dealuxapp.com'
 TODAY = date.today().isoformat()
 e = lambda s: html.escape(s or '', quote=True)
@@ -227,18 +231,4 @@ with open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8') as f:
                  f'Browse {len(rows):,} private tutors in {len(by_state)} states. Compare hourly rates, subjects and profiles, then book lessons through the Wyzant network.',
                  '/tutors/', body))
 
-# ---- sitemap
-urls = ['/tutors/'] + [f'/tutors/state/{st.lower()}/' for st in sorted(by_state)] + [t['href'] for t in rows]
-with open(os.path.join(ROOT, 'sitemap-tutors.xml'), 'w', encoding='utf-8') as f:
-    f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-            + ''.join(f'  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod><changefreq>weekly</changefreq>'
-                      f'<priority>{"0.8" if u.count("/") <= 4 and "state" in u or u == "/tutors/" else "0.6"}</priority></url>\n' for u in urls)
-            + '</urlset>\n')
-idx_path = os.path.join(ROOT, 'sitemap-index.xml')
-idx = open(idx_path, encoding='utf-8').read()
-loc = f'{SITE}/sitemap-tutors.xml'
-idx = re.sub(r'\s*<sitemap><loc>' + re.escape(loc) + r'</loc>.*?</sitemap>', '', idx)
-idx = idx.replace('</sitemapindex>', f'  <sitemap><loc>{loc}</loc><lastmod>{TODAY}</lastmod></sitemap>\n</sitemapindex>')
-with open(idx_path, 'w', encoding='utf-8') as f:
-    f.write(idx)
-print(f'{len(rows)} tutors, {len(by_state)} states, {len(urls)} sitemap URLs')
+print(f'{len(rows)} tutors, {len(by_state)} states, staged in {OUT}')
