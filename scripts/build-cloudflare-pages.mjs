@@ -1,15 +1,16 @@
 // Rebuilds .cloudflare-pages/, the folder Cloudflare Pages publishes for dealuxapp.com (see wrangler.toml).
 //
 // Cloudflare's free plan allows 20,000 files per deploy, and the site has more than that. So:
-//  - Every section NOT listed in PROXIED is symlinked in, and Cloudflare serves those files itself.
+//  - Every section NOT listed in PROXIED is copied in as real files, and Cloudflare serves them itself.
+//    (Real copies, not symlinks: Cloudflare's build doesn't follow symlinks, so they failed the deploy.)
 //    Static files are free and unlimited, so they don't count toward the 100,000 requests/day limit.
 //  - PROXIED sections are left out, and _routes.json sends them to functions/[[path]].js, which
 //    fetches them from the Netlify site. Only these requests (plus /shop/<product> and
 //    /tickets/<event> pages and Netlify API calls) count toward the daily limit.
 //
-// Run `node scripts/build-cloudflare-pages.mjs` after adding a new top-level file or folder,
-// or if the file count grows near the limit. It fails if the deploy would exceed MAX_FILES.
-// Netlify ignores the folder because its name starts with a dot.
+// Cloudflare runs `node scripts/build-cloudflare-pages.mjs` as its build command on every push.
+// The output folder is generated, so it is git-ignored and not committed.
+// It fails if the deploy would exceed MAX_FILES. Netlify ignores the folder because its name starts with a dot.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -47,13 +48,17 @@ fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT);
 
 let total = 0;
-const linked = [];
+const copied = [];
 for (const name of fs.readdirSync(ROOT).sort()) {
   if (name.startsWith('.') || PRIVATE.has(name) || PROXIED.includes(name)) continue;
-  fs.symlinkSync(path.join('..', name), path.join(OUT, name));
+  fs.cpSync(path.join(ROOT, name), path.join(OUT, name), {
+    recursive: true,
+    dereference: true,
+    filter: (src) => !['.DS_Store', 'node_modules', '.git'].includes(path.basename(src)),
+  });
   // _redirects/_headers are config, not counted as assets.
   if (name !== '_redirects' && name !== '_headers') total += countFiles(path.join(ROOT, name));
-  linked.push(name);
+  copied.push(name);
 }
 
 const routes = {
@@ -69,7 +74,7 @@ const routes = {
 };
 fs.writeFileSync(path.join(OUT, '_routes.json'), JSON.stringify(routes, null, 2) + '\n');
 
-console.log(`Linked ${linked.length} entries, ${total} files (limit ${MAX_FILES}).`);
+console.log(`Copied ${copied.length} entries, ${total} files (limit ${MAX_FILES}).`);
 console.log(`Forwarded to Netlify: ${PROXIED.map((d) => `/${d}/`).join(', ')}`);
 if (total > MAX_FILES) {
   console.error('Too many files for Cloudflare Pages. Add another section to PROXIED.');
