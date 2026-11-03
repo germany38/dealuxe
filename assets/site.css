@@ -159,3 +159,13 @@ a.card:hover { border-color: var(--gold); }
 .video-mini { display: block; padding: .6rem .8rem; font-size: .9rem; color: var(--text); text-decoration: none; }
 .video-mini .muted { display: block; font-size: .75rem; }
 .imp-pixel { position: absolute; visibility: hidden; }
+
+/* Buy Me a Coffee widget: keep the button and tip panel, but switch off all of its motion.
+   The widget sets its animations as inline styles, so !important is needed to override them. */
+#bmc-wbtn, #bmc-wbtn *, #bmc-close-btn, iframe[title="Buy Me a Coffee"] {
+  transition: none !important;
+  animation: none !important;
+}
+#bmc-wbtn { transform: none !important; }
+/* The pop-up greeting bubble that scales in next to the button. */
+#bmc-wbtn + div { display: none !important; }
