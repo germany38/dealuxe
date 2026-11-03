@@ -80,6 +80,7 @@ export default async (req: Request, context: Context) => {
     : { "@context": "https://schema.org", "@type": "WebPage", name, description: desc, url: canonical, ...(image ? { image } : {}) };
 
   html = html
+    .replace(/<meta name="robots"[^>]*>\n?/g, "")
     .replace(/<title>.*?<\/title>/, `<title>${esc(name)} — Dealux</title>`)
     .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(desc)}">`)
     .replace(
