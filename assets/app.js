@@ -503,3 +503,55 @@ pintrk('page');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
+
+// Gumroad partner rail on every Journal, Shop (incl. Tutoring) and Tickets page: a fixed
+// sidebar on wide screens (page content makes room for it), a card above the footer on
+// smaller screens. Below the content sits a row of Bulent Labs QA practice products.
+(function () {
+  if (!/^\/(journal|shop|tickets|tutors)(\/|$)/.test(location.pathname)) return;
+  var QA = [
+    ['yhsmbr', 'PawShop QA – Bug Hunting Practice Platform'],
+    ['gjcft', '7-Day QA Challenge – Learn Testing by Finding Real Bugs'],
+    ['eounw', 'Bug Hunt Edition – Manual QA Testing Practice App'],
+    ['hwwerd', 'PageTurner Bookstore – Manual QA Testing Practice App'],
+    ['ujwclh', 'Manual QA University – Realistic Practice App with 30 Intentional Bugs']
+  ];
+  function mount() {
+    if (document.querySelector('.dx-gumroad-rail')) return;
+    var css = document.createElement('style');
+    css.textContent =
+      '.dx-gumroad-rail{display:flex;flex-direction:column;gap:8px;margin:2rem auto;max-width:1240px}' +
+      '.dx-gumroad-rail .btn{align-self:flex-start}' +
+      '@media(min-width:1100px){body.dx-has-gr-rail{padding-right:260px}' +
+      '.dx-gumroad-rail{position:fixed;right:16px;top:50%;transform:translateY(-50%);width:228px;margin:0;z-index:40;max-height:90vh;overflow:auto}}' +
+      '.dx-bulent{margin-top:2rem;margin-bottom:2rem}.dx-bulent h2{margin:0 0 .25rem}' +
+      '.dx-bulent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:1rem}' +
+      '.dx-bulent .card{display:flex;flex-direction:column;gap:8px;justify-content:space-between}.dx-bulent .btn{align-self:flex-start}';
+    document.head.appendChild(css);
+
+    var rail = document.createElement('aside');
+    rail.className = 'card promo-card dx-gumroad-rail';
+    rail.setAttribute('aria-label', 'Sponsored: Gumroad');
+    rail.innerHTML = '<span class="eyebrow">Gumroad · Digital products</span>' +
+      '<h3>Gumroad: Shop for digital products today!</h3>' +
+      '<p class="muted">Discover ebooks, courses, templates, software and more from independent creators.</p>' +
+      '<a class="btn btn-gold" href="https://gumroad.com/discover?a=938737555" target="_blank" rel="sponsored noopener">Discover on Gumroad →</a>';
+
+    var qa = document.createElement('section');
+    qa.className = 'wrap dx-bulent';
+    qa.setAttribute('aria-label', 'Sponsored: Bulent Labs QA practice apps');
+    qa.innerHTML = '<span class="eyebrow">Sponsored · Courtesy of Bulent Labs in partnership with Gumroad</span>' +
+      '<h2>Practice QA testing on real apps</h2>' +
+      '<div class="dx-bulent-grid">' + QA.map(function (p) {
+        return '<div class="card promo-card"><h3>' + p[1] + '</h3>' +
+          '<a class="btn btn-gold" href="https://gumroad.com/a/699604883/' + p[0] + '" target="_blank" rel="sponsored noopener">Get it on Gumroad →</a></div>';
+      }).join('') + '</div>';
+
+    var footer = document.querySelector('.site-footer, body > footer');
+    var parent = footer ? footer.parentNode : document.body;
+    parent.insertBefore(qa, footer || null);
+    parent.insertBefore(rail, footer || null);
+    document.body.classList.add('dx-has-gr-rail');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+})();
