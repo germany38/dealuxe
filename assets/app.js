@@ -432,7 +432,12 @@ pintrk('page');
       '<img height="0" width="0" src="https://imp.pxf.io/i/5661882/1847140/20168" style="position:absolute;visibility:hidden;" alt="">' +
       '<h3>The #1 Job Site to Find Work From Home Jobs</h3>' +
       '<p class="muted">No Ads, Scams, or Junk. Find legitimate work-from-home jobs with options for flexible hours and hybrid work.</p>' +
-      '<a class="btn btn-gold" href="https://flexjobs.sjv.io/c/5661882/1847140/20168" target="_blank" rel="sponsored noopener">Start your 2 week trial →</a></div>']
+      '<a class="btn btn-gold" href="https://flexjobs.sjv.io/c/5661882/1847140/20168" target="_blank" rel="sponsored noopener">Start your 2 week trial →</a></div>'],
+    ['t.mercor.com/aOxh6', '<div class="card promo-card mercor-card">' +
+      '<span class="eyebrow">Mercor · Remote jobs</span>' +
+      '<h3>Mercor: Apply for remote jobs today!</h3>' +
+      '<p class="muted">Get matched with top AI labs and companies hiring remote experts, engineers and specialists for well-paid contract work.</p>' +
+      '<a class="btn btn-gold" href="https://t.mercor.com/aOxh6" target="_blank" rel="sponsored noopener">Apply on Mercor →</a></div>']
   ];
   function mount() {
     if (document.querySelector('.dx-partner-cards')) return;
