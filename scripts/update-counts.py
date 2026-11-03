@@ -5,12 +5,18 @@ Usage: python3 scripts/update-counts.py
 
 Rebuilds the brand directory from every brand list (so each brand page is
 linked), refreshes the homepage "Shop by brand" and "Latest from the Journal"
-grids, the Journal counts and the "Search Nk+ products" box on every page.
+grids, the Journal counts and the "Search Nk+ products" box on every page, and
+makes sure every site page carries an indexable robots meta tag.
 """
 import datetime, glob, html, json, os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
+
+
+ROBOTS = '<meta name="robots" content="index, follow, max-image-preview:large">'
+# Error page, form-detection stub, ownership-verification file and an HTML snippet: not real pages.
+NOT_PAGES = {'404.html', '__forms.html', 'temu-banner.html', 'commission-factory-3b4b4b57af08471eb3df5e352a483b9c.html'}
 
 
 def brand_name(slug, known):
@@ -77,14 +83,17 @@ def main():
     h = re.sub(r'data-result-count>[\d,]+ articles<', f'data-result-count>{articles:,} articles<', h)
     open(p, 'w', encoding='utf-8').write(h)
 
-    # ---- header search box on every page ----
+    # ---- header search box and robots tag on every page ----
     label = f'Search {products // 1000}k+ products'
     changed = 0
     for f in glob.glob('**/*.html', recursive=True):
-        if f.startswith(('.netlify/', 'node_modules/', 'exclusive-files/')):
+        if f.startswith(('.netlify/', 'node_modules/', 'exclusive-files/', 'data/')) or f in NOT_PAGES:
             continue
         s = open(f, encoding='utf-8').read()
         t = re.sub(r'Search \d+k\+ products', label, s)
+        if '</head>' in t and not re.search(r'<meta name="robots"', t):
+            m = re.search(r'<link rel="canonical"[^>]*>', t)
+            t = t[:m.end()] + '\n' + ROBOTS + t[m.end():] if m else t.replace('</head>', ROBOTS + '\n</head>', 1)
         if t != s:
             open(f, 'w', encoding='utf-8').write(t)
             changed += 1
