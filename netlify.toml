@@ -23,3 +23,10 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+# Cloudflare-only publish folder (see wrangler.toml); not part of the Netlify site.
+[[redirects]]
+  from = "/.cloudflare-pages/*"
+  to = "/404.html"
+  status = 404
+  force = true

@@ -1,5 +1,0 @@
-{
-  "version": 1,
-  "include": ["/shop/*", "/tickets/*"],
-  "exclude": ["/shop/", "/shop/brand/*", "/shop/department/*", "/shop/type/*", "/tickets/", "/tickets/show/*"]
-}
