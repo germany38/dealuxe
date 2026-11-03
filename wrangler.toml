@@ -1,0 +1,9 @@
+# Cloudflare Pages settings for the "dealuxe" project, which currently answers dealuxapp.com.
+# Cloudflare's free plan allows 20,000 files per deploy and the site has more, so Cloudflare
+# publishes .cloudflare-pages/: symlinks to every section it serves directly (about 19,600 files),
+# plus a _routes.json that sends the remaining sections to functions/[[path]].js, which fetches
+# them from Netlify. Regenerate it with `node scripts/build-cloudflare-pages.mjs`.
+# Netlify ignores this file.
+name = "dealuxe"
+pages_build_output_dir = ".cloudflare-pages"
+compatibility_date = "2026-10-01"
