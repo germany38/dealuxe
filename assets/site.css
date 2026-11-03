@@ -131,10 +131,15 @@ a.card:hover { border-color: var(--gold); }
 .dept-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .6rem 0 .2rem; }
 .dept-chips .chip { padding: .3rem .7rem; border: 1px solid rgba(127,127,127,.35); border-radius: 999px; font-size: .82rem; text-decoration: none; color: inherit; }
 .dept-chips .chip:hover, .dept-chips .chip.active { border-color: var(--gold); color: var(--gold); }
-.share-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: .75rem 0 1rem; }
-.share-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; padding: 0 .55rem; border-radius: 8px; border: 1px solid var(--line); color: var(--text); background: var(--panel); font: inherit; font-size: .85rem; cursor: pointer; }
-.share-btn:hover { filter: brightness(1.15); }
-.share-copy { color: var(--gold); }
+.share-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: .75rem 0 1rem; max-width: 100%; }
+.share-bar .eyebrow { margin: 0 .2rem 0 0; }
+.share-bar .share-btn { box-sizing: border-box; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: .35rem; width: 34px; height: 34px; min-width: 0; margin: 0; padding: 0; border-radius: 8px; border: 1px solid rgba(255,255,255,.12); color: var(--text); background: var(--panel); font: inherit; font-size: .85rem; line-height: 1; text-decoration: none; cursor: pointer; transition: transform .15s ease, filter .15s ease; }
+.share-bar .share-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.share-bar .share-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+/* Fixed icon size so page-level image rules (e.g. tutor photos) never stretch the icons. */
+.share-bar .share-btn img { display: block; width: 18px !important; height: 18px !important; max-width: none; margin: 0; padding: 0; border: 0; border-radius: 0 !important; object-fit: contain !important; background: none !important; box-shadow: none; }
+.share-bar .share-copy { width: auto; padding: 0 .7rem; color: var(--gold); white-space: nowrap; }
+.tutor-head .share-bar { flex-basis: 100%; }
 /* Deal videos (homepage block, /videos/ and watch pages) */
 .video-block { margin: 2rem 0; }
 .video-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
