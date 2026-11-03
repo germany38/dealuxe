@@ -206,12 +206,17 @@ pintrk('page');
     var listUrl = results.getAttribute('data-list');
     var source = listUrl ? fetch(listUrl).then(function (r) { return r.json(); }) : null;
     form.q.value = params.get('q') || '';
+    // Tutor listings end in -<state>-<id>, so ?state=ca narrows them to one state.
+    var stateCode = (params.get('state') || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 2);
+    var stateRe = stateCode ? new RegExp('-' + stateCode + '-\\d+$') : null;
+    document.querySelectorAll('[data-state-chip]').forEach(function (c) { c.classList.toggle('active', c.getAttribute('data-state-chip') === stateCode); });
     var run = function () {
       (source || loadProducts()).then(function (all) {
         var q = tokens(form.q.value);
         var items = all.filter(function (slug) {
           var parts = slug.split('-');
           if (keywords.length && !keywords.some(function (k) { return parts.some(function (p) { return p.indexOf(k) === 0; }); })) return false;
+          if (stateRe && !stateRe.test(slug)) return false;
           return q.every(function (w) { return slug.indexOf(w) !== -1; });
         });
         paginate(items, function (slug) {
