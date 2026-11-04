@@ -1,15 +1,38 @@
-// Monetag ad tags (Vignette zone 12187754, In-Page Push zone 12187713) loaded on every page
-// that includes this shared script.
+// Ad networks, all loaded together on every page: Monetag (Vignette zone 12187754, In-Page
+// Push zone 12187713) and Adsterra (popunder + native banner). The native banner is placed
+// mid-content inside <main> (higher viewability than the footer), falling back to above the footer.
 (function () {
-  if (window.__dxMonetag) return;
-  window.__dxMonetag = true;
-  [['12187754', 'https://n6wxm.com/vignette.min.js'], ['12187713', 'https://nap5k.com/tag.min.js']].forEach(function (t) {
+  if (window.__dxAds) return;
+  window.__dxAds = true;
+  function load(src, attrs) {
     var s = document.createElement('script');
-    s.dataset.zone = t[0];
-    s.src = t[1];
+    s.src = src;
     s.async = true;
+    for (var k in attrs) s.setAttribute(k, attrs[k]);
     [document.documentElement, document.body].filter(Boolean).pop().appendChild(s);
-  });
+  }
+  load('https://n6wxm.com/vignette.min.js', { 'data-zone': '12187754' });
+  load('https://nap5k.com/tag.min.js', { 'data-zone': '12187713' });
+  load('https://bauval.org/14/5e5de126617e996b572d87f0b61836a4', { 'data-cfasync': 'false' });
+  function nativeBanner() {
+    if (document.getElementById('container-bedfcb2bbaa5ab391320c5ed6ed248ea')) return;
+    var box = document.createElement('div');
+    box.className = 'dx-native-ad';
+    box.style.cssText = 'margin:2rem 0;min-height:100px';
+    box.innerHTML = '<div id="container-bedfcb2bbaa5ab391320c5ed6ed248ea"></div>';
+    var main = document.querySelector('main');
+    var kids = main ? main.children : [];
+    if (kids.length >= 2) {
+      main.insertBefore(box, kids[Math.min(Math.ceil(kids.length / 2), kids.length - 1)]);
+    } else {
+      box.className += ' wrap';
+      var footer = document.querySelector('body > footer, .site-footer');
+      if (footer) footer.parentNode.insertBefore(box, footer); else document.body.appendChild(box);
+    }
+    load('https://bauval.org/21/bedfcb2bbaa5ab391320c5ed6ed248ea', { 'data-cfasync': 'false' });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', nativeBanner);
+  else nativeBanner();
 })();
 
 // Google Analytics (gtag.js). Loaded from the shared script so every page is measured.
