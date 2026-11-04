@@ -14,7 +14,7 @@ h3 { font-size: 1rem; margin: .3rem 0; font-weight: 600; }
 
 .site-header { position: sticky; top: 0; z-index: 20; background: rgba(20, 19, 24, .92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
 .header-row { display: flex; align-items: center; gap: 1.25rem; height: 64px; }
-.logo { display: inline-block; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; background: #111 url(/assets/dealux-logo-160.png) center / contain no-repeat; font-size: 0; line-height: 0; color: transparent; overflow: hidden; } /* image logo; the "DEALUX" link text stays as the accessible name */
+.logo { font-weight: 800; letter-spacing: .2em; color: var(--gold); }
 .main-nav { display: flex; gap: 1rem; font-size: .95rem; }
 .main-nav a:hover, .see-all:hover { color: var(--gold-hi); }
 .header-search { flex: 1; }
