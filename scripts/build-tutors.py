@@ -92,7 +92,7 @@ def sidebar(state=None):
 
 
 def page(title, desc, path, body, extra_head=''):
-    return (f'<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta name="monetag" content="9bc0a2d87c41c0dac408f78d380989a7">\n<meta charset="utf-8">\n'
+    return (f'<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta name="monetag" content="9bc0a2d87c41c0dac408f78d380989a7">\n<meta name="google-adsense-account" content="ca-pub-5723887718258446">\n<meta charset="utf-8">\n'
             f'<meta name="viewport" content="width=device-width, initial-scale=1">\n'
             f'<title>{e(title)}</title>\n<meta name="description" content="{e(desc[:300])}">\n'
             f'<meta name="robots" content="index, follow">\n'
