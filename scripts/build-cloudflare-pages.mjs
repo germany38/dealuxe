@@ -17,11 +17,15 @@ import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const OUT = path.join(ROOT, '.cloudflare-pages');
-const MAX_FILES = 19900; // Cloudflare free plan limit is 20,000; keep headroom.
+// Set the Cloudflare build environment variable CF_PAGES_PLAN=paid after upgrading. The paid plan
+// allows 100,000 files per deploy, so every section is published as static files: static requests
+// are free and unlimited, and only /shop/<product>, /tickets/<event> and /.netlify/* still run Functions.
+const PAID = String(process.env.CF_PAGES_PLAN || '').toLowerCase() === 'paid';
+const MAX_FILES = PAID ? 99000 : 19900; // Plan limits are 100,000 / 20,000; keep headroom.
 
-// Sections served through the forwarder instead of as Cloudflare files.
+// Sections served through the forwarder instead of as Cloudflare files (free plan only).
 // Chosen because they hold many files but get the least traffic per file.
-const PROXIED = ['deals', 'jobs', 'videos', 'ads'];
+const PROXIED = PAID ? [] : ['deals', 'jobs', 'videos', 'ads'];
 
 // Never published on Cloudflare: private, build-only or tooling files.
 const PRIVATE = new Set([
@@ -75,8 +79,8 @@ const routes = {
 fs.writeFileSync(path.join(OUT, '_routes.json'), JSON.stringify(routes, null, 2) + '\n');
 
 console.log(`Copied ${copied.length} entries, ${total} files (limit ${MAX_FILES}).`);
-console.log(`Forwarded to Netlify: ${PROXIED.map((d) => `/${d}/`).join(', ')}`);
+console.log(`Plan: ${PAID ? 'paid' : 'free'}. Forwarded to Netlify: ${PROXIED.map((d) => `/${d}/`).join(', ') || 'none'}`);
 if (total > MAX_FILES) {
-  console.error('Too many files for Cloudflare Pages. Add another section to PROXIED.');
+  console.error(`Too many files for Cloudflare Pages (${PAID ? 'paid' : 'free'} plan). Add another section to PROXIED.`);
   process.exit(1);
 }

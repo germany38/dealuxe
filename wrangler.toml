@@ -3,6 +3,8 @@
 # publishes .cloudflare-pages/: copies of every section it serves directly (about 19,600 files),
 # plus a _routes.json that sends the remaining sections to functions/[[path]].js, which fetches
 # them from Netlify. Cloudflare generates it with the build command `node scripts/build-cloudflare-pages.mjs`.
+# After upgrading to a paid Cloudflare plan, set CF_PAGES_PLAN=paid in the Pages build environment
+# so every section is published as free static files instead of being forwarded through Functions.
 # Netlify ignores this file.
 name = "dealuxe"
 pages_build_output_dir = ".cloudflare-pages"
