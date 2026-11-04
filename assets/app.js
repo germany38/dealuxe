@@ -296,7 +296,7 @@ pintrk('page');
         var items = list.filter(function (p) { return (!topic || p[2] === topic) && (!q || p[1].toLowerCase().indexOf(q) !== -1); });
         paginate(items, function (p) {
           return '<a class="card post-card" href="/journal/' + p[0] + '/">' + (p[4] ? '<img loading="lazy" src="' + esc(p[4]) + '" alt="">' : '') +
-            '<span class="eyebrow">' + esc(titleCase(p[2] || 'journal')) + ' · ' + p[3] + '</span><h3>' + esc(p[1]) + '</h3></a>';
+            '<span class="eyebrow">' + esc(titleCase(p[2] || 'journal')) + '</span><h3>' + esc(p[1]) + '</h3></a>';
         }, jr, $('[data-load-more]'), $('[data-result-count]'), 'articles', 24, initial);
       });
     };
@@ -504,11 +504,14 @@ pintrk('page');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
 
-// Gumroad partner rail on every Journal, Shop (incl. Tutoring) and Tickets page: a fixed
-// sidebar on wide screens (page content makes room for it), a card above the footer on
-// smaller screens. Below the content sits a row of Bulent Labs QA practice products.
+// Partner rail: a fixed sidebar on wide screens (page content makes room for it), cards above
+// the footer on smaller screens. Clickworker and SproutGigs appear on every Jobs, Journal, Shop
+// (incl. Tutoring) and Tickets page; Gumroad and the Bulent Labs QA product row (below the
+// content) appear on Journal, Shop, Tutoring and Tickets pages.
 (function () {
-  if (!/^\/(journal|shop|tickets|tutors)(\/|$)/.test(location.pathname)) return;
+  var m = location.pathname.match(/^\/(jobs|journal|shop|tickets|tutors)(\/|$)/);
+  if (!m) return;
+  var withGumroad = m[1] !== 'jobs';
   var QA = [
     ['yhsmbr', 'PawShop QA – Bug Hunting Practice Platform'],
     ['gjcft', '7-Day QA Challenge – Learn Testing by Finding Real Bugs'],
@@ -516,40 +519,54 @@ pintrk('page');
     ['hwwerd', 'PageTurner Bookstore – Manual QA Testing Practice App'],
     ['ujwclh', 'Manual QA University – Realistic Practice App with 30 Intentional Bugs']
   ];
+  var CARDS = [
+    withGumroad && ['Gumroad', 'Gumroad · Digital products', 'Gumroad: Shop for digital products today!',
+      'Discover ebooks, courses, templates, software and more from independent creators.',
+      'https://gumroad.com/discover?a=938737555', 'Discover on Gumroad →'],
+    ['Clickworker', 'Clickworker · Earn online', 'Clickworker: Join and make your first $10',
+      'Complete simple online micro-tasks from home and get paid for your work.',
+      'https://www.clickworker.com/clickworker?customer=false&utm_source=31341333&utm_campaign=CW4CW&utm_medium=email', 'Join Clickworker →'],
+    ['SproutGigs', 'SproutGigs · Micro-tasks', 'SproutGigs: Hire Real People For Any Task',
+      'An online marketplace that instantly connects freelancers and business owners around the world with easy-to-do affordable digital tasks.',
+      'https://sproutgigs.com/?a=491c4d1d', 'Visit SproutGigs →']
+  ].filter(Boolean);
   function mount() {
-    if (document.querySelector('.dx-gumroad-rail')) return;
+    if (document.querySelector('.dx-partner-rail')) return;
     var css = document.createElement('style');
     css.textContent =
-      '.dx-gumroad-rail{display:flex;flex-direction:column;gap:8px;margin:2rem auto;max-width:1240px}' +
-      '.dx-gumroad-rail .btn{align-self:flex-start}' +
+      '.dx-partner-rail{display:flex;flex-direction:column;gap:12px;margin:2rem auto;max-width:1240px;padding:0 16px}' +
+      '.dx-partner-rail .card{display:flex;flex-direction:column;gap:8px;margin:0}.dx-partner-rail h3{margin:0;font-size:1rem}' +
+      '.dx-partner-rail p{margin:0;font-size:.85rem}.dx-partner-rail .btn{align-self:flex-start}' +
       '@media(min-width:1100px){body.dx-has-gr-rail{padding-right:260px}' +
-      '.dx-gumroad-rail{position:fixed;right:16px;top:50%;transform:translateY(-50%);width:228px;margin:0;z-index:40;max-height:90vh;overflow:auto}}' +
+      '.dx-partner-rail{position:fixed;right:16px;top:50%;transform:translateY(-50%);width:228px;margin:0;padding:0;z-index:40;max-height:90vh;overflow:auto}}' +
       '.dx-bulent{margin-top:2rem;margin-bottom:2rem}.dx-bulent h2{margin:0 0 .25rem}' +
       '.dx-bulent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:1rem}' +
       '.dx-bulent .card{display:flex;flex-direction:column;gap:8px;justify-content:space-between}.dx-bulent .btn{align-self:flex-start}';
     document.head.appendChild(css);
 
     var rail = document.createElement('aside');
-    rail.className = 'card promo-card dx-gumroad-rail';
-    rail.setAttribute('aria-label', 'Sponsored: Gumroad');
-    rail.innerHTML = '<span class="eyebrow">Gumroad · Digital products</span>' +
-      '<h3>Gumroad: Shop for digital products today!</h3>' +
-      '<p class="muted">Discover ebooks, courses, templates, software and more from independent creators.</p>' +
-      '<a class="btn btn-gold" href="https://gumroad.com/discover?a=938737555" target="_blank" rel="sponsored noopener">Discover on Gumroad →</a>';
-
-    var qa = document.createElement('section');
-    qa.className = 'wrap dx-bulent';
-    qa.setAttribute('aria-label', 'Sponsored: Bulent Labs QA practice apps');
-    qa.innerHTML = '<span class="eyebrow">Sponsored · Courtesy of Bulent Labs in partnership with Gumroad</span>' +
-      '<h2>Practice QA testing on real apps</h2>' +
-      '<div class="dx-bulent-grid">' + QA.map(function (p) {
-        return '<div class="card promo-card"><h3>' + p[1] + '</h3>' +
-          '<a class="btn btn-gold" href="https://gumroad.com/a/699604883/' + p[0] + '" target="_blank" rel="sponsored noopener">Get it on Gumroad →</a></div>';
-      }).join('') + '</div>';
+    rail.className = 'dx-partner-rail';
+    rail.setAttribute('aria-label', 'Sponsored partners');
+    rail.innerHTML = CARDS.map(function (c) {
+      return '<div class="card dx-partner-card" aria-label="Sponsored: ' + c[0] + '">' +
+        '<span class="eyebrow">' + c[1] + '</span><h3>' + c[2] + '</h3><p class="muted">' + c[3] + '</p>' +
+        '<a class="btn btn-gold" href="' + c[4].replace(/&/g, '&amp;') + '" target="_blank" rel="sponsored noopener">' + c[5] + '</a></div>';
+    }).join('');
 
     var footer = document.querySelector('.site-footer, body > footer');
     var parent = footer ? footer.parentNode : document.body;
-    parent.insertBefore(qa, footer || null);
+    if (withGumroad) {
+      var qa = document.createElement('section');
+      qa.className = 'wrap dx-bulent';
+      qa.setAttribute('aria-label', 'Sponsored: Bulent Labs QA practice apps');
+      qa.innerHTML = '<span class="eyebrow">Sponsored · Courtesy of Bulent Labs in partnership with Gumroad</span>' +
+        '<h2>Practice QA testing on real apps</h2>' +
+        '<div class="dx-bulent-grid">' + QA.map(function (p) {
+          return '<div class="card promo-card"><h3>' + p[1] + '</h3>' +
+            '<a class="btn btn-gold" href="https://gumroad.com/a/699604883/' + p[0] + '" target="_blank" rel="sponsored noopener">Get it on Gumroad →</a></div>';
+        }).join('') + '</div>';
+      parent.insertBefore(qa, footer || null);
+    }
     parent.insertBefore(rail, footer || null);
     document.body.classList.add('dx-has-gr-rail');
   }

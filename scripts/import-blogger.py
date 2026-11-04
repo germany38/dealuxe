@@ -139,7 +139,7 @@ def main(sources):
         img = next((i for i in re.findall(r'<img[^>]+src="(https?://[^"]+)"', body)), '')
         # Social cards and Article structured data so shares and search results look right.
         ld = json.dumps({'@context': 'https://schema.org', '@type': 'Article', 'headline': title[:110],
-                         'description': html.unescape(desc), 'datePublished': date, 'dateModified': date,
+                         'description': html.unescape(desc),
                          'mainEntityOfPage': f'{SITE}/journal/{slug}/', **({'image': [img]} if img else {}),
                          'author': {'@type': 'Organization', 'name': 'Dealux'},
                          'publisher': {'@type': 'Organization', 'name': 'Dealux', 'url': SITE}},
@@ -148,13 +148,12 @@ def main(sources):
                f'\n<meta property="og:title" content="{t}">\n<meta property="og:description" content="{desc}">'
                f'\n<meta property="og:url" content="{SITE}/journal/{slug}/">'
                + (f'\n<meta property="og:image" content="{html.escape(img, quote=True)}">' if img else '')
-               + f'\n<meta property="article:published_time" content="{date}">'
-               f'\n<meta name="twitter:card" content="{"summary_large_image" if img else "summary"}">'
+               + f'\n<meta name="twitter:card" content="{"summary_large_image" if img else "summary"}">'
                f'\n<meta name="twitter:title" content="{t}">\n<meta name="twitter:description" content="{desc}">'
                f'\n<script type="application/ld+json">{ld}</script>')
         h = h.replace('\n<link rel="icon"', seo + '\n<link rel="icon"', 1)
         h = re.sub(r'<span class="eyebrow">[^<]*· \d+ min read</span>',
-                   lambda _: f'<span class="eyebrow">{topic.replace("-", " ").title()} · {pretty} · {max(1, round(words / 230))} min read</span>', h, count=1)
+                   lambda _: f'<span class="eyebrow">{topic.replace("-", " ").title()} · {max(1, round(words / 230))} min read</span>', h, count=1)
         h = re.sub(r'(<article class="post">.*?)<h1>.*?</h1>', lambda m: f'{m.group(1)}<h1>{t}</h1>', h, count=1, flags=re.S)
         h = re.sub(r'<div class="post-body"><div class="post-content">.*?</div></div>\n  \n</article>',
                    lambda _: f'<div class="post-body"><div class="post-content">\n{body}\n</div></div>\n  \n</article>', h, count=1, flags=re.S)
@@ -177,8 +176,8 @@ def main(sources):
             json.dump(journal, f, ensure_ascii=False, separators=(',', ':'))
 
     idx = open('journal/index.html', encoding='utf-8').read()
-    cards = ''.join(f'<a class="card post-card" href="/journal/{p[0]}/">\n  \n  <span class="eyebrow">{p[2].replace("-", " ").title()} · '
-                    f'{datetime.date.fromisoformat(p[3]).strftime("%b %-d, %Y")}</span>\n  <h3>{html.escape(p[1])}</h3>\n</a>' for p in new)
+    cards = ''.join(f'<a class="card post-card" href="/journal/{p[0]}/">\n  \n  <span class="eyebrow">{p[2].replace("-", " ").title()}</span>'
+                    f'\n  <h3>{html.escape(p[1])}</h3>\n</a>' for p in new)
     idx = idx.replace('<div class="grid" data-results>', '<div class="grid" data-results>' + cards, 1)
     idx = re.sub(r'\b\d[\d,]* articles\b', f'{len(journal):,} articles', idx)
     open('journal/index.html', 'w', encoding='utf-8').write(idx)

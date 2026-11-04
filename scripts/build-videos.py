@@ -96,6 +96,7 @@ def page_shell(title, desc, canonical, head_extra, main):
     return f'''<!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="monetag" content="9bc0a2d87c41c0dac408f78d380989a7">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
