@@ -169,3 +169,6 @@ a.card:hover { border-color: var(--gold); }
 #bmc-wbtn { transform: none !important; }
 /* The pop-up greeting bubble that scales in next to the button. */
 #bmc-wbtn + div { display: none !important; }
+.main-nav { align-items: center; flex-wrap: wrap; }
+.main-nav .nav-mystery { padding: .6rem 1rem; white-space: nowrap; color: #17130a; }
+.main-nav .nav-mystery:hover { color: #17130a; filter: brightness(1.08); }
