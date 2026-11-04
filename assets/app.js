@@ -1,3 +1,17 @@
+// Monetag ad tags (Vignette zone 12187754, In-Page Push zone 12187713) loaded on every page
+// that includes this shared script.
+(function () {
+  if (window.__dxMonetag) return;
+  window.__dxMonetag = true;
+  [['12187754', 'https://n6wxm.com/vignette.min.js'], ['12187713', 'https://nap5k.com/tag.min.js']].forEach(function (t) {
+    var s = document.createElement('script');
+    s.dataset.zone = t[0];
+    s.src = t[1];
+    s.async = true;
+    [document.documentElement, document.body].filter(Boolean).pop().appendChild(s);
+  });
+})();
+
 // Google Analytics (gtag.js). Loaded from the shared script so every page is measured.
 (function(){var id='G-FDZM02YJ3Q',s=document.createElement('script');s.async=1;s.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(s);window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',id);})();
 
@@ -504,14 +518,12 @@ pintrk('page');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
 
-// Partner rail: a fixed sidebar on wide screens (page content makes room for it), cards above
-// the footer on smaller screens. Clickworker and SproutGigs appear on every Jobs, Journal, Shop
-// (incl. Tutoring) and Tickets page; Gumroad and the Bulent Labs QA product row (below the
-// content) appear on Journal, Shop, Tutoring and Tickets pages.
+// Partner row: four sponsor cards (Gumroad, Clickworker, SproutGigs, Monetag) shown on every
+// page as a static (in-flow, non-floating) row directly below the white partner-logo strip. The
+// Bulent Labs QA product row stays above the footer on Journal, Shop, Tutoring and Tickets pages.
 (function () {
   var m = location.pathname.match(/^\/(jobs|journal|shop|tickets|tutors)(\/|$)/);
-  if (!m) return;
-  var withGumroad = m[1] !== 'jobs';
+  var withQA = !!m && m[1] !== 'jobs';
   var QA = [
     ['yhsmbr', 'PawShop QA – Bug Hunting Practice Platform'],
     ['gjcft', '7-Day QA Challenge – Learn Testing by Finding Real Bugs'],
@@ -520,7 +532,7 @@ pintrk('page');
     ['ujwclh', 'Manual QA University – Realistic Practice App with 30 Intentional Bugs']
   ];
   var CARDS = [
-    withGumroad && ['Gumroad', 'Gumroad · Digital products', 'Gumroad: Shop for digital products today!',
+    ['Gumroad', 'Gumroad · Digital products', 'Gumroad: Shop for digital products today!',
       'Discover ebooks, courses, templates, software and more from independent creators.',
       'https://gumroad.com/discover?a=938737555', 'Discover on Gumroad →'],
     ['Clickworker', 'Clickworker · Earn online', 'Clickworker: Join and make your first $10',
@@ -528,34 +540,40 @@ pintrk('page');
       'https://www.clickworker.com/clickworker?customer=false&utm_source=31341333&utm_campaign=CW4CW&utm_medium=email', 'Join Clickworker →'],
     ['SproutGigs', 'SproutGigs · Micro-tasks', 'SproutGigs: Hire Real People For Any Task',
       'An online marketplace that instantly connects freelancers and business owners around the world with easy-to-do affordable digital tasks.',
-      'https://sproutgigs.com/?a=491c4d1d', 'Visit SproutGigs →']
-  ].filter(Boolean);
+      'https://sproutgigs.com/?a=491c4d1d', 'Visit SproutGigs →'],
+    ['Monetag', 'Monetag · Publishers', 'Join Monetag and Monetize your Projects!',
+      'Turn your website, app or blog traffic into revenue with Monetag ad formats.',
+      'https://monetag.com/?ref_id=tpAC', 'Join Monetag →']
+  ];
+  function card(c) {
+    return '<div class="card dx-partner-card" aria-label="Sponsored: ' + c[0] + '">' +
+      '<span class="eyebrow">' + c[1] + '</span><h3>' + c[2] + '</h3><p class="muted">' + c[3] + '</p>' +
+      '<a class="btn btn-gold" href="' + c[4].replace(/&/g, '&amp;') + '" target="_blank" rel="sponsored noopener">' + c[5] + '</a></div>';
+  }
   function mount() {
-    if (document.querySelector('.dx-partner-rail')) return;
+    if (document.querySelector('.dx-partner-rails')) return;
     var css = document.createElement('style');
     css.textContent =
-      '.dx-partner-rail{display:flex;flex-direction:column;gap:12px;margin:2rem auto;max-width:1240px;padding:0 16px}' +
-      '.dx-partner-rail .card{display:flex;flex-direction:column;gap:8px;margin:0}.dx-partner-rail h3{margin:0;font-size:1rem}' +
-      '.dx-partner-rail p{margin:0;font-size:.85rem}.dx-partner-rail .btn{align-self:flex-start}' +
-      '@media(min-width:1100px){body.dx-has-gr-rail{padding-right:260px}' +
-      '.dx-partner-rail{position:fixed;right:16px;top:50%;transform:translateY(-50%);width:228px;margin:0;padding:0;z-index:40;max-height:90vh;overflow:auto}}' +
+      '.dx-partner-rails{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:1240px;margin:1rem auto;padding:0 16px}' +
+      '@media(max-width:900px){.dx-partner-rails{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.dx-partner-rails{grid-template-columns:1fr}}' +
+      '.dx-partner-rail{display:contents}' +
+      '.dx-partner-rails .card{display:flex;flex-direction:column;gap:6px;margin:0;padding:12px}.dx-partner-rails h3{margin:0;font-size:.95rem;line-height:1.25}' +
+      '.dx-partner-rails p{margin:0;font-size:.8rem;line-height:1.35;flex:1}.dx-partner-rails .btn{align-self:flex-start;font-size:.8rem;padding:6px 10px}' +
       '.dx-bulent{margin-top:2rem;margin-bottom:2rem}.dx-bulent h2{margin:0 0 .25rem}' +
       '.dx-bulent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:1rem}' +
       '.dx-bulent .card{display:flex;flex-direction:column;gap:8px;justify-content:space-between}.dx-bulent .btn{align-self:flex-start}';
     document.head.appendChild(css);
 
-    var rail = document.createElement('aside');
-    rail.className = 'dx-partner-rail';
-    rail.setAttribute('aria-label', 'Sponsored partners');
-    rail.innerHTML = CARDS.map(function (c) {
-      return '<div class="card dx-partner-card" aria-label="Sponsored: ' + c[0] + '">' +
-        '<span class="eyebrow">' + c[1] + '</span><h3>' + c[2] + '</h3><p class="muted">' + c[3] + '</p>' +
-        '<a class="btn btn-gold" href="' + c[4].replace(/&/g, '&amp;') + '" target="_blank" rel="sponsored noopener">' + c[5] + '</a></div>';
-    }).join('');
+    var half = Math.ceil(CARDS.length / 2);
+    var rail = document.createElement('div');
+    rail.className = 'dx-partner-rails';
+    rail.innerHTML =
+      '<aside class="dx-partner-rail dx-left" aria-label="Sponsored partners">' + CARDS.slice(0, half).map(card).join('') + '</aside>' +
+      '<aside class="dx-partner-rail dx-right" aria-label="Sponsored partners">' + CARDS.slice(half).map(card).join('') + '</aside>';
 
     var footer = document.querySelector('.site-footer, body > footer');
     var parent = footer ? footer.parentNode : document.body;
-    if (withGumroad) {
+    if (withQA) {
       var qa = document.createElement('section');
       qa.className = 'wrap dx-bulent';
       qa.setAttribute('aria-label', 'Sponsored: Bulent Labs QA practice apps');
@@ -567,8 +585,10 @@ pintrk('page');
         }).join('') + '</div>';
       parent.insertBefore(qa, footer || null);
     }
-    parent.insertBefore(rail, footer || null);
-    document.body.classList.add('dx-has-gr-rail');
+    var strip = document.querySelector('.partner-strip');
+    if (strip) strip.parentNode.insertBefore(rail, strip.nextSibling);
+    else parent.insertBefore(rail, footer || null);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
+
