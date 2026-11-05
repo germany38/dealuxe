@@ -101,7 +101,7 @@ def page(title, desc, path, body, extra_head=''):
             f'<meta property="og:url" content="{SITE}{path}">\n'
             '<link rel="stylesheet" href="/assets/dealux.css">\n<link rel="stylesheet" href="/assets/site.css?v=20261012b">\n'
             f'<script src="/assets/app.js?v=20261012c" defer></script>\n{CSS}\n{extra_head}</head>\n<body data-page="tutors">\n'
-            f'{HEADER}\n<main class="wrap">\n{body}\n</main>\n{FOOTER}\n<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="dealuxfeed" data-description="Support me on Buy me a coffee!" data-message="Thank you for your contribution. We sincerely appreciate your support!" data-color="#FF813F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>\n</body>\n</html>\n')
+            f'{HEADER}\n<main class="wrap">\n{body}\n</main>\n{FOOTER}\n<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="dealuxfeed" data-description="Support me on Buy me a coffee!" data-message="Thank you for your contribution. We sincerely appreciate your support!" data-color="#FF813F" data-position="Left" data-x_margin="18" data-y_margin="18"></script>\n</body>\n</html>\n')
 
 
 # ---- read CSV
