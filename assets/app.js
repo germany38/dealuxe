@@ -1,38 +1,58 @@
-// Ad networks, all loaded together on every page: Monetag (Vignette zone 12187754, In-Page
-// Push zone 12187713) and Adsterra (popunder + native banner). The native banner is placed
-// mid-content inside <main> (higher viewability than the footer), falling back to above the footer.
+// Ad networks, staggered: each page view loads exactly ONE network, rotating in turn so a
+// visitor never sees Monetag, Adsterra and HilltopAds stacked on the same page.
+//   0 Monetag   – Vignette zone 12187754
+//   1 Adsterra  – popunder
+//   2 HilltopAds – unfoldedtrade.com ad tag
+// The in-page image units (Monetag In-Page Push, Adsterra native banner) were removed because
+// they served dating creatives; don't re-add them.
+// The turn is kept per visitor in localStorage (random start if storage is unavailable).
+// Add ?dxads=monetag|adsterra|hilltop to a URL to preview a specific network.
 (function () {
   if (window.__dxAds) return;
   window.__dxAds = true;
+  var NETWORKS = ['monetag', 'adsterra', 'hilltop'];
+  var pick = -1;
+  var forced = (location.search.match(/[?&]dxads=(\w+)/) || [])[1];
+  if (forced) pick = NETWORKS.indexOf(forced);
+  if (pick < 0) {
+    try {
+      var n = parseInt(localStorage.getItem('dx_ad_turn'), 10);
+      if (isNaN(n)) n = Math.floor(Math.random() * NETWORKS.length);
+      pick = n % NETWORKS.length;
+      localStorage.setItem('dx_ad_turn', String((pick + 1) % NETWORKS.length));
+    } catch (e) {
+      pick = Math.floor(Math.random() * NETWORKS.length);
+    }
+  }
+  window.__dxAdNetwork = NETWORKS[pick];
   function load(src, attrs) {
     var s = document.createElement('script');
     s.src = src;
     s.async = true;
     for (var k in attrs) s.setAttribute(k, attrs[k]);
     [document.documentElement, document.body].filter(Boolean).pop().appendChild(s);
+    return s;
   }
-  load('https://n6wxm.com/vignette.min.js', { 'data-zone': '12187754' });
-  load('https://nap5k.com/tag.min.js', { 'data-zone': '12187713' });
-  load('https://bauval.org/14/5e5de126617e996b572d87f0b61836a4', { 'data-cfasync': 'false' });
-  function nativeBanner() {
-    if (document.getElementById('container-bedfcb2bbaa5ab391320c5ed6ed248ea')) return;
-    var box = document.createElement('div');
-    box.className = 'dx-native-ad';
-    box.style.cssText = 'margin:2rem 0;min-height:100px';
-    box.innerHTML = '<div id="container-bedfcb2bbaa5ab391320c5ed6ed248ea"></div>';
-    var main = document.querySelector('main');
-    var kids = main ? main.children : [];
-    if (kids.length >= 2) {
-      main.insertBefore(box, kids[Math.min(Math.ceil(kids.length / 2), kids.length - 1)]);
-    } else {
-      box.className += ' wrap';
-      var footer = document.querySelector('body > footer, .site-footer');
-      if (footer) footer.parentNode.insertBefore(box, footer); else document.body.appendChild(box);
-    }
-    load('https://bauval.org/21/bedfcb2bbaa5ab391320c5ed6ed248ea', { 'data-cfasync': 'false' });
+  function monetag() {
+    load('https://n6wxm.com/vignette.min.js', { 'data-zone': '12187754' });
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', nativeBanner);
-  else nativeBanner();
+  function adsterra() {
+    load('https://bauval.org/14/5e5de126617e996b572d87f0b61836a4', { 'data-cfasync': 'false' });
+  }
+  function hilltop() {
+    // HilltopAds tag, as supplied by HilltopAds.
+    (function(qcrbg){
+    var d = document,
+        s = d.createElement('script'),
+        l = d.currentScript || d.scripts[d.scripts.length - 1];
+    s.settings = qcrbg || {};
+    s.src = "\/\/unfoldedtrade.com\/bJXXV.sJdCGvl\/0tYIWBcm\/Ie\/mn9mu\/ZBUplQkSP\/TkcJ1\/O\/THYf3pNsDOEWtLNQz\/U\/5rN\/j\/cH0iNqQ_";
+    s.async = true;
+    s.referrerPolicy = 'no-referrer-when-downgrade';
+    if (l && l.parentNode) l.parentNode.insertBefore(s, l); else document.head.appendChild(s);
+    })({});
+  }
+  [monetag, adsterra, hilltop][pick]();
 })();
 
 // Google Analytics (gtag.js). Loaded from the shared script so every page is measured.
@@ -509,40 +529,10 @@ pintrk('page');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
 
-// Takefluence referral card, on every page and on screen as soon as the page opens. It leads
-// the page's partner sidebar; when that sidebar starts below the first screen (phones, where
-// sidebars stack under the content) or the page has none, it sits at the top of the content.
-(function () {
-  function mount() {
-    if (document.querySelector('.dx-takefluence')) return;
-    var css = document.createElement('style');
-    css.textContent = '.dx-takefluence{display:flex;flex-direction:column;gap:8px}' +
-      '.dx-takefluence .btn{align-self:flex-start}' +
-      '.dx-takefluence.dx-tf-top{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1.5rem;margin:1rem 0}' +
-      '.dx-tf-top .dx-tf-text{flex:1 1 320px}.dx-tf-top h3{margin:.2rem 0}.dx-tf-top .btn{align-self:center}';
-    document.head.appendChild(css);
-    var box = document.createElement('div');
-    box.className = 'card promo-card dx-takefluence';
-    box.setAttribute('aria-label', 'Sponsored: Takefluence');
-    box.innerHTML = '<div class="dx-tf-text"><span class="eyebrow">Takefluence · Creators</span>' +
-      '<h3>Turn Your Influence Into Income</h3>' +
-      '<p class="muted">From personal profiles to themed pages — monetize with Takefluence. No matter the platform or following.</p></div>' +
-      '<a class="btn btn-gold" href="https://takefluence.com/?ref=DLOOA" target="_blank" rel="sponsored noopener">Join Takefluence →</a>';
-    var card = document.querySelector('.post-sidebar .promo-card, .ex-widgets .promo-card, aside .promo-card');
-    var sidebar = card && card.parentNode.closest('aside') || (card && card.parentNode);
-    if (sidebar && sidebar.getBoundingClientRect().top < window.innerHeight - 120) {
-      sidebar.insertBefore(box, sidebar.firstChild);
-      return;
-    }
-    box.classList.add('dx-tf-top');
-    var main = document.querySelector('main') || document.body;
-    main.insertBefore(box, main.firstChild);
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
-})();
-
-// Partner row: four sponsor cards (Gumroad, Clickworker, SproutGigs, Monetag) shown on every
-// page as a static (in-flow, non-floating) row directly below the white partner-logo strip. The
+// Partner row: five compact sponsor boxes (Gumroad, Clickworker, SproutGigs, Monetag, Takefluence)
+// shown on every page as a static (in-flow, non-floating) row directly below the white
+// partner-logo strip, so they're on screen as the page opens. Each whole box is one link; the
+// longer description is kept as its hover tooltip to keep the row short. The
 // Bulent Labs QA product row stays above the footer on Journal, Shop, Tutoring and Tickets pages.
 (function () {
   var m = location.pathname.match(/^\/(jobs|journal|shop|tickets|tutors)(\/|$)/);
@@ -566,33 +556,38 @@ pintrk('page');
       'https://sproutgigs.com/?a=491c4d1d', 'Visit SproutGigs →'],
     ['Monetag', 'Monetag · Publishers', 'Join Monetag and Monetize your Projects!',
       'Turn your website, app or blog traffic into revenue with Monetag ad formats.',
-      'https://monetag.com/?ref_id=tpAC', 'Join Monetag →']
+      'https://monetag.com/?ref_id=tpAC', 'Join Monetag →'],
+    ['Takefluence', 'Takefluence · Creators', 'Turn Your Influence Into Income',
+      'From personal profiles to themed pages — monetize with Takefluence. No matter the platform or following.',
+      'https://takefluence.com/?ref=DLOOA', 'Join Takefluence →']
   ];
   function card(c) {
-    return '<div class="card dx-partner-card" aria-label="Sponsored: ' + c[0] + '">' +
-      '<span class="eyebrow">' + c[1] + '</span><h3>' + c[2] + '</h3><p class="muted">' + c[3] + '</p>' +
-      '<a class="btn btn-gold" href="' + c[4].replace(/&/g, '&amp;') + '" target="_blank" rel="sponsored noopener">' + c[5] + '</a></div>';
+    return '<a class="card dx-partner-card" href="' + c[4].replace(/&/g, '&amp;') + '" target="_blank" rel="sponsored noopener"' +
+      ' title="' + c[3] + '" aria-label="Sponsored: ' + c[0] + ' – ' + c[2] + '">' +
+      '<span class="eyebrow">' + c[1] + '</span><b class="dx-pc-title">' + c[2] + '</b>' +
+      '<span class="dx-pc-cta">' + c[5] + '</span></a>';
   }
   function mount() {
     if (document.querySelector('.dx-partner-rails')) return;
     var css = document.createElement('style');
     css.textContent =
-      '.dx-partner-rails{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:1240px;margin:1rem auto;padding:0 16px}' +
-      '@media(max-width:900px){.dx-partner-rails{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.dx-partner-rails{grid-template-columns:1fr}}' +
+      '.dx-partner-rails{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:1240px;margin:.6rem auto;padding:0 16px}' +
+      '@media(max-width:900px){.dx-partner-rails{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:560px){.dx-partner-rails{grid-template-columns:repeat(2,minmax(0,1fr))}}' +
       '.dx-partner-rail{display:contents}' +
-      '.dx-partner-rails .card{display:flex;flex-direction:column;gap:6px;margin:0;padding:12px}.dx-partner-rails h3{margin:0;font-size:.95rem;line-height:1.25}' +
-      '.dx-partner-rails p{margin:0;font-size:.8rem;line-height:1.35;flex:1}.dx-partner-rails .btn{align-self:flex-start;font-size:.8rem;padding:6px 10px}' +
+      '.dx-partner-rails .dx-partner-card{display:flex;flex-direction:column;gap:3px;margin:0;padding:8px 10px;text-decoration:none;color:inherit;min-width:0}' +
+      '.dx-partner-rails .dx-partner-card:hover{border-color:var(--gold)}' +
+      '.dx-partner-rails .eyebrow{font-size:.62rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+      '.dx-pc-title{font-size:.8rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}' +
+      '.dx-pc-cta{font-size:.72rem;font-weight:600;color:var(--gold)}' +
       '.dx-bulent{margin-top:2rem;margin-bottom:2rem}.dx-bulent h2{margin:0 0 .25rem}' +
       '.dx-bulent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:1rem}' +
       '.dx-bulent .card{display:flex;flex-direction:column;gap:8px;justify-content:space-between}.dx-bulent .btn{align-self:flex-start}';
     document.head.appendChild(css);
 
-    var half = Math.ceil(CARDS.length / 2);
-    var rail = document.createElement('div');
+    var rail = document.createElement('aside');
     rail.className = 'dx-partner-rails';
-    rail.innerHTML =
-      '<aside class="dx-partner-rail dx-left" aria-label="Sponsored partners">' + CARDS.slice(0, half).map(card).join('') + '</aside>' +
-      '<aside class="dx-partner-rail dx-right" aria-label="Sponsored partners">' + CARDS.slice(half).map(card).join('') + '</aside>';
+    rail.setAttribute('aria-label', 'Sponsored partners');
+    rail.innerHTML = CARDS.map(card).join('');
 
     var footer = document.querySelector('.site-footer, body > footer');
     var parent = footer ? footer.parentNode : document.body;

@@ -172,3 +172,24 @@ a.card:hover { border-color: var(--gold); }
 .main-nav { align-items: center; flex-wrap: wrap; }
 .main-nav .nav-mystery { padding: .6rem 1rem; white-space: nowrap; color: #17130a; }
 .main-nav .nav-mystery:hover { color: #17130a; filter: brightness(1.08); }
+
+/* Homepage: featured videos in a right-hand column (stacks below the content on narrow screens) */
+.home-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 1.5rem; align-items: start; }
+.home-main { min-width: 0; }
+.home-side .video-block { margin: 2rem 0 0; }
+.home-side .video-block h2 { font-size: 1.1rem; display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem; }
+.home-side .video-grid { grid-template-columns: 1fr; gap: .75rem; }
+.home-side .video-card { padding: .6rem; }
+.home-side .video-card h3 { font-size: .9rem; }
+.home-side .video-card .muted { -webkit-line-clamp: 2; font-size: .8rem; }
+.home-side .video-card .btn { font-size: .8rem; padding: 5px 10px; }
+@media (max-width: 1000px) { .home-layout { display: block; } }
+
+/* Jobs: listings as a grid of small square tiles instead of full-width strips */
+#job-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+#job-list .job-card { margin: 0 !important; padding: 12px !important; aspect-ratio: 1 / 1; overflow: hidden; }
+#job-list .job-card h3 { font-size: .9rem; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+#job-list .job-card p { font-size: .75rem; line-height: 1.35; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+#job-list .job-card p.muted { -webkit-line-clamp: 2; }
+#job-list .job-card p:not(.muted) { -webkit-line-clamp: 3; }
+@media (max-width: 420px) { #job-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } #job-list .job-card h3 { -webkit-line-clamp: 3; } }
