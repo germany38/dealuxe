@@ -84,7 +84,7 @@ def page(title, desc, canonical, body, extra_head=""):
     <p>© 2026 Dealux. Digital downloads are delivered instantly after secure checkout with Stripe.</p>
   </div>
 </footer>
-<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="dealuxfeed" data-description="Support me on Buy me a coffee!" data-message="Thank you for your contribution. We sincerely appreciate your support!" data-color="#FF813F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="dealuxfeed" data-description="Support me on Buy me a coffee!" data-message="Thank you for your contribution. We sincerely appreciate your support!" data-color="#FF813F" data-position="Left" data-x_margin="18" data-y_margin="18"></script>
 </body>
 </html>
 """
