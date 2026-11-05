@@ -4,7 +4,15 @@
 //  - functions/_middleware.js (pages Cloudflare Pages Functions render, e.g. /shop/<product>)
 
 // Clickio consent (TCF stub + Google Consent Mode defaults + CMP main tag), injected into every HTML page's <head>.
-export const HEAD_TAGS = `<!-- TCF stub -->
+// Adcash autotag library goes first so it sits as high in <head> as possible.
+export const HEAD_TAGS = `<!-- Adcash library -->
+<script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
+<script type="text/javascript">
+    aclib.runAutoTag({
+        zoneId: '82fvxfxrpl',
+    });
+</script>
+<!-- TCF stub -->
 <script type="text/javascript">
 !function(){"use strict";var t,e,o=(t=function(t){function e(t){return(e="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}t.exports=function(){for(var t,o,n=[],r=window,a=r;a;){try{if(a.frames.__tcfapiLocator){t=a;break}}catch(t){}if(a===r.top)break;a=a.parent}t||(function t(){var e=r.document,o=!!r.frames.__tcfapiLocator;if(!o)if(e.body){var n=e.createElement("iframe");n.style.cssText="display:none",n.name="__tcfapiLocator",e.body.appendChild(n)}else setTimeout(t,5);return!o}(),r.__tcfapi=function(){for(var t=arguments.length,e=new Array(t),r=0;r<t;r++)e[r]=arguments[r];if(!e.length)return n;"setGdprApplies"===e[0]?e.length>3&&2===parseInt(e[1],10)&&"boolean"==typeof e[3]&&(o=e[3],"function"==typeof e[2]&&e[2]("set",!0)):"ping"===e[0]?"function"==typeof e[2]&&e[2]({gdprApplies:o,cmpLoaded:!1,cmpStatus:"stub"}):n.push(e)},r.addEventListener("message",(function(t){var o="string"==typeof t.data,n={};if(o)try{n=JSON.parse(t.data)}catch(t){}else n=t.data;var r="object"===e(n)&&null!==n?n.__tcfapiCall:null;r&&window.__tcfapi(r.command,r.version,(function(e,n){var a={__tcfapiReturn:{returnValue:e,success:n,callId:r.callId}};t&&t.source&&t.source.postMessage&&t.source.postMessage(o?JSON.stringify(a):a,"*")}),r.parameter)}),!1))}},t(e={exports:{}}),e.exports);o()}();
 </script>
