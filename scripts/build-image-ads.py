@@ -98,6 +98,12 @@ def card(a):
             f'<a class="btn btn-gold" href="{esc(a["link"])}" target="_blank" rel="sponsored noopener">Get offer →</a></div></div>')
 
 
+def row(a):
+    # Text-only directory row: no banner images, so a directory page loads instantly and stays crawlable.
+    deal = f' <span class="muted">— {esc(a["deal"])}</span>' if a.get('deal') else ''
+    return (f'<li><a href="/ads/{a["slug"]}/">{esc(a["name"])}</a> <span class="eyebrow">{esc(a["brand"])}</span>{deal}</li>')
+
+
 def page_url(n):
     return '/ads/' if n == 1 else f'/ads/page/{n}/'
 
@@ -179,7 +185,13 @@ def main(paths):
             {'@type': 'ListItem', 'position': (n - 1) * PER_PAGE + i + 1, 'url': f"{SITE}/ads/{a['slug']}/"} for i, a in enumerate(chunk)]}
         rel = [ROBOTS] + ([f'<link rel="prev" href="{SITE}{page_url(n - 1)}">'] if n > 1 else []) + \
               ([f'<link rel="next" href="{SITE}{page_url(n + 1)}">'] if n < len(pages) else [])
-        nav = ' '.join(f'<b>{i}</b>' if i == n else f'<a href="{page_url(i)}">{i}</a>' for i in range(1, len(pages) + 1))
+        # Compact pager (first/last, neighbours, every 10th page) keeps each page small but every page reachable.
+        keep = sorted({1, len(pages), *range(max(1, n - 3), min(len(pages), n + 3) + 1), *range(10, len(pages) + 1, 10)})
+        nav = ' '.join(f'<b>{i}</b>' if i == n else f'<a href="{page_url(i)}">{i}</a>' for i in keep)
+        if n > 1:
+            nav = f'<a href="{page_url(n - 1)}" rel="prev">← Prev</a> ' + nav
+        if n < len(pages):
+            nav += f' <a href="{page_url(n + 1)}" rel="next">Next →</a>'
         suffix = f' — page {n}' if n > 1 else ''
         os.makedirs(f'.{page_url(n)}', exist_ok=True)
         open(f'.{page_url(n)}index.html', 'w', encoding='utf-8').write(bv.page_shell(
@@ -187,10 +199,12 @@ def main(paths):
             f'Browse {len(ads):,} current offers from {len(by_pid):,} brands, each with a direct link to the deal{suffix}.',
             f'{SITE}{page_url(n)}', '\n'.join(rel + [ld_script(lst)]),
             f'<section class="hero"><h1>Featured <span class="gold">offers</span></h1><p class="muted">{len(ads):,} offers from {len(by_pid):,} brands{suffix}.</p></section>\n'
-            '<div class="grid">' + ''.join(card(a) for a in chunk) + '</div>\n'
+            '<ul class="offer-list">' + ''.join(row(a) for a in chunk) + '</ul>\n'
             f'<nav class="pagination" aria-label="Offer pages" style="margin:2rem 0;line-height:2;word-spacing:.4rem">{nav}</nav>'))
 
-    feat = bv.featured(ads)
+    # Feature the ads from the export(s) just imported first, so a new upload shows on the homepage.
+    fresh = {a['adid'] for p in paths for a in from_csv(p)}
+    feat = bv.featured([a for a in ads if a['adid'] in fresh] + [a for a in ads if a['adid'] not in fresh])
     block = (f'<!-- image-ads:start -->\n<section class="video-block" aria-label="Featured offers">\n'
              f'<h2>Featured offers <a class="see-all" href="/ads/">All {len(ads):,} offers →</a></h2>\n'
              '<div class="grid">' + ''.join(card(a) for a in feat) + '</div>\n</section>\n<!-- image-ads:end -->\n')

@@ -193,3 +193,9 @@ a.card:hover { border-color: var(--gold); }
 #job-list .job-card p.muted { -webkit-line-clamp: 2; }
 #job-list .job-card p:not(.muted) { -webkit-line-clamp: 3; }
 @media (max-width: 420px) { #job-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } #job-list .job-card h3 { -webkit-line-clamp: 3; } }
+
+/* Static site: no motion anywhere (ads already add enough movement). */
+*, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+.offer-list { list-style: none; padding: 0; margin: 1rem 0; columns: 2 320px; column-gap: 2rem; }
+.offer-list li { break-inside: avoid; padding: .45rem 0; border-bottom: 1px solid var(--line); line-height: 1.4; }
+.offer-list .eyebrow { margin-left: .35rem; }

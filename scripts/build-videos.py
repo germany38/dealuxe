@@ -118,7 +118,7 @@ def page_shell(title, desc, canonical, head_extra, main):
       <a href="/shop/">Shop</a><a href="/exclusive/">Exclusives</a><a href="/deals/">Deals</a><a href="/brands/">Brands</a><a href="/journal/">Journal</a><a href="/jobs/">Jobs</a><a href="/tickets/">Tickets</a>
     </nav>
     <form class="header-search" action="/shop/" method="get" role="search">
-      <input type="search" name="q" placeholder="Search 206k+ products" aria-label="Search products">
+      <input type="search" name="q" placeholder="Search 215k+ products" aria-label="Search products">
     </form>
   </div>
 </header>
