@@ -2,6 +2,3 @@
 /data/*
   X-Robots-Tag: noindex
 
-# Proxied ad banners (see _redirects) are indexable images; cache them for a day.
-/ad-img/*
-  Cache-Control: public, max-age=86400

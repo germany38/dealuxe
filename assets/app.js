@@ -1,3 +1,9 @@
+// Hide any image that fails to load (e.g. a banner an advertiser removed) instead of showing a broken icon.
+(function () {
+  function hide(img) { if (img && img.tagName === 'IMG') img.style.display = 'none'; }
+  document.addEventListener('error', function (e) { hide(e.target); }, true);
+  Array.prototype.forEach.call(document.images, function (img) { if (img.complete && img.naturalWidth === 0 && img.src) hide(img); });
+})();
 // Ad networks, staggered: each page view loads exactly ONE network, rotating in turn so a
 // visitor never sees Monetag, Adsterra and HilltopAds stacked on the same page.
 //   0 Monetag   – Vignette zone 12187754

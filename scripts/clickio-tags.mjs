@@ -62,7 +62,7 @@ const CLICKIO_SIDEBAR = `<aside id="ckio-side" aria-label="For website owners">
 #ckio-side .ck-x{position:absolute;top:6px;right:8px;background:none;border:0;color:#94a3b8;font-size:18px;cursor:pointer;line-height:1}
 #ckio-side .ck-tab{display:none;writing-mode:vertical-rl;background:#0f172a;color:#fbbf24;border:0;border-radius:8px 0 0 8px;padding:12px 7px;font-weight:700;font-size:12px;cursor:pointer;letter-spacing:.05em}
 #ckio-side.ck-min .ck-card{display:none}#ckio-side.ck-min .ck-tab{display:block}
-@media (max-width:900px){#ckio-side .ck-card{display:none}#ckio-side .ck-tab{display:block}#ckio-side.ck-open .ck-card{display:block}#ckio-side.ck-open .ck-tab{display:none}}
+@media (max-width:1759px){#ckio-side .ck-card{display:none}#ckio-side .ck-tab{display:block}#ckio-side.ck-open .ck-card{display:block}#ckio-side.ck-open .ck-tab{display:none}}
 </style>
 <div class="ck-card">
 <button class="ck-x" type="button" aria-label="Minimize">&times;</button>
@@ -72,7 +72,7 @@ const CLICKIO_SIDEBAR = `<aside id="ckio-side" aria-label="For website owners">
 <a class="ck-cta" href="http://account.clickio.com/r/fiATaVdVVWR4QlVp/" target="_blank" rel="sponsored noopener">Join Clickio free &rarr;</a>
 </div>
 <button class="ck-tab" type="button">FOR PUBLISHERS</button>
-<script>(function(){var s=document.getElementById("ckio-side");if(!s)return;var m=window.matchMedia("(max-width:900px)");try{if(localStorage.getItem("ckioSideMin")==="1")s.classList.add("ck-min")}catch(e){}
+<script>(function(){var s=document.getElementById("ckio-side");if(!s)return;var m=window.matchMedia("(max-width:1759px)");try{if(localStorage.getItem("ckioSideMin")==="1")s.classList.add("ck-min")}catch(e){}
 s.querySelector(".ck-x").onclick=function(){s.classList.remove("ck-open");s.classList.add("ck-min");try{localStorage.setItem("ckioSideMin","1")}catch(e){}};
 s.querySelector(".ck-tab").onclick=function(){s.classList.remove("ck-min");if(m.matches)s.classList.add("ck-open");try{localStorage.removeItem("ckioSideMin")}catch(e){}};})();</script>
 </aside>`;
@@ -80,6 +80,8 @@ s.querySelector(".ck-tab").onclick=function(){s.classList.remove("ck-min");if(m.
 export const HEAD_TAGS = CLICKIO_ENABLED ? `${ADCASH_HEAD}\n${CLICKIO_HEAD}` : ADCASH_HEAD;
 export const SIDEBAR = CLICKIO_ENABLED ? CLICKIO_SIDEBAR : "";
 
+// Both side cards only open fully when the window has room beside the 1240px content column
+// (>=1760px); otherwise they stay a slim edge tab so they never cover page content.
 // Slim, dismissible left-side tab promoting Adcash's advertiser/publisher signup.
 export const ADCASH_SIDEBAR = `<aside id="acsh-side" aria-label="Advertise or monetize with Adcash">
 <style>
@@ -93,7 +95,7 @@ export const ADCASH_SIDEBAR = `<aside id="acsh-side" aria-label="Advertise or mo
 #acsh-side .ac-x{position:absolute;top:6px;right:8px;background:none;border:0;color:#86efac;font-size:18px;cursor:pointer;line-height:1}
 #acsh-side .ac-tab{display:none;writing-mode:vertical-rl;transform:rotate(180deg);background:#0b3b2e;color:#4ade80;border:0;border-radius:8px 0 0 8px;padding:12px 7px;font-weight:700;font-size:12px;cursor:pointer;letter-spacing:.05em}
 #acsh-side.ac-min .ac-card{display:none}#acsh-side.ac-min .ac-tab{display:block}
-@media (max-width:900px){#acsh-side .ac-card{display:none}#acsh-side .ac-tab{display:block}#acsh-side.ac-open .ac-card{display:block}#acsh-side.ac-open .ac-tab{display:none}}
+@media (max-width:1759px){#acsh-side .ac-card{display:none}#acsh-side .ac-tab{display:block}#acsh-side.ac-open .ac-card{display:block}#acsh-side.ac-open .ac-tab{display:none}}
 </style>
 <div class="ac-card">
 <button class="ac-x" type="button" aria-label="Minimize">&times;</button>
@@ -103,13 +105,14 @@ export const ADCASH_SIDEBAR = `<aside id="acsh-side" aria-label="Advertise or mo
 <a class="ac-cta" href="https://adcash.myadcash.com/register?prmid=49EZFSSAQ6" target="_blank" rel="sponsored noopener">Sign up with Adcash &rarr;</a>
 </div>
 <button class="ac-tab" type="button">ADVERTISE</button>
-<script>(function(){var s=document.getElementById("acsh-side");if(!s)return;var m=window.matchMedia("(max-width:900px)");try{if(localStorage.getItem("acshSideMin")==="1")s.classList.add("ac-min")}catch(e){}
+<script>(function(){var s=document.getElementById("acsh-side");if(!s)return;var m=window.matchMedia("(max-width:1759px)");try{if(localStorage.getItem("acshSideMin")==="1")s.classList.add("ac-min")}catch(e){}
 s.querySelector(".ac-x").onclick=function(){s.classList.remove("ac-open");s.classList.add("ac-min");try{localStorage.setItem("acshSideMin","1")}catch(e){}};
 s.querySelector(".ac-tab").onclick=function(){s.classList.remove("ac-min");if(m.matches)s.classList.add("ac-open");try{localStorage.removeItem("acshSideMin")}catch(e){}};})();</script>
 </aside>`;
 
 // Adcash display banner (with a "courtesy of" label) plus the video slider, which docks bottom-right
 // (the Buy Me a Coffee widget sits bottom-left to stay clear of it). Relies on aclib loaded in HEAD_TAGS.
+// The body padding keeps both bottom widgets from covering the footer and last row of content.
 export const ADCASH_UNITS = `<div id="acsh-banner" style="max-width:100%;margin:24px auto;text-align:center;clear:both">
 <div style="font:11px/1.4 system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;margin-bottom:6px">Display courtesy of Adcash</div>
 <div>
@@ -120,6 +123,7 @@ export const ADCASH_UNITS = `<div id="acsh-banner" style="max-width:100%;margin:
     </script>
 </div>
 </div>
+<style>body{padding-bottom:96px}</style>
 <script type="text/javascript">
     aclib.runVideoSlider({
         zoneId: '12408198',
