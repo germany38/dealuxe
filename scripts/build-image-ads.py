@@ -10,11 +10,16 @@ data/ad-pages/<n>.json shards (one file per ad made the deploy too big to upload
 /ads/ + /ads/page/<n>/ (paginated directory), /sitemap-ads.xml (image sitemap, added to sitemap-index.xml) and a
 "Featured offers" block on the homepage right after the videos block.
 
-Ad images are served from /ad-img/<program>-<ad> (a _redirects proxy to Impact's image
-host) because a.impactradius-go.com's robots.txt blocks crawlers, which would keep the
-images out of Google Images. Shared helpers come from build-videos.py.
+Ad images are plain <img> tags pointing straight at the advertiser's image host (Impact's
+display-ad URL, or the creative's own URL for "URL"-hosted ads). Nothing is proxied, resized
+or re-hosted, so banners cost no Netlify or Cloudflare bandwidth, functions or image transforms,
+and they load the same on both hosts. (The old /ad-img/* proxy 404'd on Cloudflare, which
+can't proxy to another domain from _redirects; those URLs now redirect to Impact instead.)
+
+Pass --check-images to test every banner and drop ads whose image no longer loads.
+Shared helpers come from build-videos.py.
 """
-import csv, glob, html, importlib.util, json, os, re, shutil, sys
+import concurrent.futures, csv, glob, html, importlib.util, json, os, re, shutil, sys, urllib.request
 
 spec = importlib.util.spec_from_file_location('bv', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build-videos.py'))
 bv = importlib.util.module_from_spec(spec); spec.loader.exec_module(bv)
@@ -28,18 +33,43 @@ LANGS = {'', 'ENGLISH', 'ENGLISH_GB', 'ENGLISH_US', 'ENGLISH_AU', 'ENGLISH_CA'}
 ROBOTS = '<meta name="robots" content="index, follow, max-image-preview:large">'
 
 
+IMPACT_IMG = 'https://a.impactradius-go.com/display-ad/'
+
+
 def img_path(a):
-    return f"/ad-img/{a['pid']}-{a['adid']}"
+    return a.get('img') or f"{IMPACT_IMG}{a['pid']}-{a['adid']}"
 
 
 def img_tag(a, lazy=True):
     dims = f' width="{a["w"]}" height="{a["h"]}"' if a['w'] and a['h'] else ''
-    return f'<img src="{img_path(a)}" alt="{esc(a["alt"])}"{dims}{" loading=\"lazy\"" if lazy else ""} style="max-width:100%;height:auto">'
+    # A banner the advertiser has since removed hides itself instead of showing a broken image.
+    return (f'<img src="{esc(img_path(a))}" alt="{esc(a["alt"])}"{dims}{" loading=\"lazy\"" if lazy else ""} decoding="async"'
+            ' onerror="this.style.display=\'none\'" style="max-width:100%;height:auto">')
+
+
+def image_ok(url):
+    req = urllib.request.Request(url, headers={'Range': 'bytes=0-0', 'User-Agent': 'Mozilla/5.0 (Dealux image check)'})
+    for _ in range(2):
+        try:
+            with urllib.request.urlopen(req, timeout=20) as r:
+                return r.status in (200, 206) and r.headers.get_content_maintype() == 'image'
+        except urllib.error.HTTPError:
+            return False
+        except Exception:
+            continue
+    return True  # network trouble, not a dead banner: keep it
+
+
+def drop_dead(ads):
+    with concurrent.futures.ThreadPoolExecutor(48) as ex:
+        ok = list(ex.map(lambda a: image_ok(img_path(a)), ads))
+    print(f'Dropped {ok.count(False)} ads whose banner image no longer loads')
+    return [a for a, k in zip(ads, ok) if k]
 
 
 def ad_page(a, related, parts=False):
     t = esc(a['name'])
-    url, img = f"{SITE}/ads/{a['slug']}/", SITE + img_path(a)
+    url, img = f"{SITE}/ads/{a['slug']}/", img_path(a)
     img_ld = {'@context': 'https://schema.org', '@type': 'ImageObject', 'name': a['name'], 'description': a['desc'],
               'caption': a['alt'], 'contentUrl': img, 'url': url, 'uploadDate': a['date'],
               'creator': {'@type': 'Organization', 'name': a['brand']}, 'creditText': a['brand'],
@@ -54,11 +84,11 @@ def ad_page(a, related, parts=False):
         {'@type': 'ListItem', 'position': 3, 'name': a['name'], 'item': url}]}
     og = [ROBOTS, '<meta property="og:type" content="article">', f'<meta property="og:title" content="{t}">',
           f'<meta property="og:description" content="{esc(a["desc"][:200])}">', f'<meta property="og:url" content="{url}">',
-          f'<meta property="og:image" content="{img}">', f'<meta property="og:image:alt" content="{esc(a["alt"])}">']
+          f'<meta property="og:image" content="{esc(img)}">', f'<meta property="og:image:alt" content="{esc(a["alt"])}">']
     if a['w'] and a['h']:
         og += [f'<meta property="og:image:width" content="{a["w"]}">', f'<meta property="og:image:height" content="{a["h"]}">']
-    og += ['<meta name="twitter:card" content="summary_large_image">', f'<meta name="twitter:image" content="{img}">']
-    head = '\n'.join(og + [f'<link rel="preload" as="image" href="{img_path(a)}">', ld_script(img_ld), ld_script(crumbs)])
+    og += ['<meta name="twitter:card" content="summary_large_image">', f'<meta name="twitter:image" content="{esc(img)}">']
+    head = '\n'.join(og + [ld_script(img_ld), ld_script(crumbs)])
     facts = []
     if a['deal']:
         facts.append(f'<p class="promo-note"><b>Current deal:</b> {esc(a["deal"])}</p>')
@@ -134,17 +164,23 @@ def from_csv(path):
         w, h = r['ThirdPartyServableAdCreativeWidth'].strip(), r['ThirdPartyServableAdCreativeHeight'].strip()
         if r['Language'].strip().upper() not in LANGS or (w and h and (int(w) < 100 or int(h) < 50)):
             continue
+        creative = r['Creative'].strip()
+        hosted = r['HostedBy'].strip().upper() == 'URL'
+        if hosted and not re.match(r'^https://\S+$', creative):
+            continue  # externally hosted creative without a usable (https) image URL
         brand = bv.brand_of(r)
         name = re.sub(r'\s+', ' ', r['Name']).strip() or f'{brand} offer'
         desc = re.sub(r'\s+', ' ', r['Description']).strip() or f"“{name}” — a current offer from {brand}. Tap through for {brand}’s latest deal."
         out.append(dict(slug=f"{bv.slugify(name)[:70].strip('-')}-{r['AdId']}", adid=r['AdId'], pid=r['ProgramId'], name=name,
                         brand=brand, desc=desc, deal=bv.deal_of(r), alt=r['ImageAlternativeTag'].strip() or name,
                         link=r['TrackingLink'].strip() or r['LandingPage'].strip(), w=w, h=h, date=TODAY,
-                        ends=r['LimitedTimeEndDate'][:10].strip(), labels=[l.strip() for l in r['Labels'].split(',') if l.strip()]))
+                        ends=r['LimitedTimeEndDate'][:10].strip(), **({'img': creative} if hosted else {}), labels=[l.strip() for l in r['Labels'].split(',') if l.strip()]))
     return out
 
 
 def main(paths):
+    check = '--check-images' in paths
+    paths = [p for p in paths if p != '--check-images']
     ads = json.load(open(MANIFEST, encoding='utf-8')) if os.path.exists(MANIFEST) else bootstrap()
     ads = [a for a in ads if not (a.get('ends') and a['ends'] < TODAY)]
     seen = {a['adid'] for a in ads}
@@ -153,6 +189,8 @@ def main(paths):
             if a['adid'] not in seen:
                 seen.add(a['adid'])
                 ads.append(a)
+    if check:
+        ads = drop_dead(ads)
     json.dump(ads, open(MANIFEST, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 
     by_pid = {}
@@ -170,6 +208,11 @@ def main(paths):
         else:
             shutil.rmtree(f"ads/{a['slug']}", ignore_errors=True)
             shards[int(a['adid']) % SHARDS][a['slug']] = ad_page(a, related, parts=True)
+    # Remove pages of ads that expired or lost their banner, so no page shows a broken image.
+    live = {a['slug'] for a in ads}
+    for d in os.listdir('ads'):
+        if d != 'page' and d not in live and os.path.isdir(f'ads/{d}'):
+            shutil.rmtree(f'ads/{d}')
     shutil.rmtree('data/ad-pages', ignore_errors=True)
     os.makedirs('data/ad-pages')
     for n, sh in enumerate(shards):
@@ -203,8 +246,10 @@ def main(paths):
             f'<nav class="pagination" aria-label="Offer pages" style="margin:2rem 0;line-height:2;word-spacing:.4rem">{nav}</nav>'))
 
     # Feature the ads from the export(s) just imported first, so a new upload shows on the homepage.
-    fresh = {a['adid'] for p in paths for a in from_csv(p)}
-    feat = bv.featured([a for a in ads if a['adid'] in fresh] + [a for a in ads if a['adid'] not in fresh])
+    fresh = {a['adid'] for p in paths for a in from_csv(p)} & {a['adid'] for a in ads}
+    # Brands kept off the homepage block (their offer pages still exist).
+    home_ok = lambda a: not re.search(r'shapellx', a['brand'] + ' ' + a['name'] + ' ' + a['link'], re.I)
+    feat = bv.featured([a for a in ads if a['adid'] in fresh and home_ok(a)] + [a for a in ads if a['adid'] not in fresh and home_ok(a)])
     block = (f'<!-- image-ads:start -->\n<section class="video-block" aria-label="Featured offers">\n'
              f'<h2>Featured offers <a class="see-all" href="/ads/">All {len(ads):,} offers →</a></h2>\n'
              '<div class="grid">' + ''.join(card(a) for a in feat) + '</div>\n</section>\n<!-- image-ads:end -->\n')
@@ -219,7 +264,7 @@ def main(paths):
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">']
     sm += [f'  <url><loc>{SITE}{page_url(n)}</loc><lastmod>{TODAY}</lastmod></url>' for n in range(1, len(pages) + 1)]
-    sm += [f'  <url><loc>{SITE}/ads/{a["slug"]}/</loc><lastmod>{a["date"]}</lastmod><image:image><image:loc>{x(SITE + img_path(a))}</image:loc></image:image></url>' for a in ads]
+    sm += [f'  <url><loc>{SITE}/ads/{a["slug"]}/</loc><lastmod>{a["date"]}</lastmod><image:image><image:loc>{x(img_path(a))}</image:loc></image:image></url>' for a in ads]
     open('sitemap-ads.xml', 'w', encoding='utf-8').write('\n'.join(sm + ['</urlset>\n']))
     si = open('sitemap-index.xml', encoding='utf-8').read()
     if 'sitemap-ads.xml' not in si:
