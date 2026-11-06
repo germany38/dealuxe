@@ -247,7 +247,9 @@ def main(paths):
 
     # Feature the ads from the export(s) just imported first, so a new upload shows on the homepage.
     fresh = {a['adid'] for p in paths for a in from_csv(p)} & {a['adid'] for a in ads}
-    feat = bv.featured([a for a in ads if a['adid'] in fresh] + [a for a in ads if a['adid'] not in fresh])
+    # Brands kept off the homepage block (their offer pages still exist).
+    home_ok = lambda a: not re.search(r'shapellx', a['brand'] + ' ' + a['name'] + ' ' + a['link'], re.I)
+    feat = bv.featured([a for a in ads if a['adid'] in fresh and home_ok(a)] + [a for a in ads if a['adid'] not in fresh and home_ok(a)])
     block = (f'<!-- image-ads:start -->\n<section class="video-block" aria-label="Featured offers">\n'
              f'<h2>Featured offers <a class="see-all" href="/ads/">All {len(ads):,} offers →</a></h2>\n'
              '<div class="grid">' + ''.join(card(a) for a in feat) + '</div>\n</section>\n<!-- image-ads:end -->\n')
