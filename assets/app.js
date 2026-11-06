@@ -616,11 +616,3 @@ pintrk('page');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
 
-
-// === Header: gold "Mystery Offer" button next to Tickets ===
-(function () {
-  document.querySelectorAll('.main-nav a[href="/tickets/"]').forEach(function (t) {
-    if (t.parentNode.querySelector('.nav-mystery')) return;
-    t.insertAdjacentHTML('afterend', '<a class="btn btn-gold nav-mystery" href="https://asiafilm.org/4/0536461e1edd88f5fc5fe72c914c432d" target="_blank" rel="sponsored noopener">Unlock Today\'s Mystery Offer</a>');
-  });
-})();
