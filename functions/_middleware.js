@@ -4,8 +4,6 @@
 // outbound requests (what Cloudflare's paid plan bills on) low. Netlify API calls (/.netlify/*),
 // non-GET requests and personalised responses (cookies) are never cached.
 
-import { injectClickio } from '../scripts/clickio-tags.mjs';
-
 const TTL = 3600; // seconds a page stays in the edge cache
 const CACHEABLE = new Set([200, 301, 404, 410]);
 
@@ -21,15 +19,7 @@ export async function onRequest(context) {
   const hit = await cache.match(key);
   if (hit) return hit;
 
-  let res = await context.next();
-  // Pages rendered by Cloudflare Functions (e.g. /shop/<product>) never pass through Netlify's edge function,
-  // so add the Clickio tags here. Pages forwarded from Netlify already have them and are left unchanged.
-  if ((res.headers.get('Content-Type') || '').includes('text/html')) {
-    const html = await res.text();
-    const headers = new Headers(res.headers);
-    headers.delete('Content-Length');
-    res = new Response(injectClickio(html), { status: res.status, statusText: res.statusText, headers });
-  }
+  const res = await context.next();
   if (!CACHEABLE.has(res.status) || res.headers.has('Set-Cookie') || /no-store|private/.test(res.headers.get('Cache-Control') || '')) {
     return res;
   }
