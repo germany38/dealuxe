@@ -616,3 +616,45 @@ pintrk('page');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
 
+
+// Top-converting offers: 3–5 cards, shuffled on every page view, in the sidebar of Shop
+// (incl. tutors), Journal article and Tickets pages. Free trials and $0 sign-ups first.
+(function () {
+  var p = location.pathname;
+  if (!/^\/(shop|tickets|tutors)(\/|$)/.test(p) && !/^\/journal\/[^\/]+/.test(p)) return;
+  var OFFERS = [
+    ['Amazon Prime · 30-day free trial', 'Try Prime free for 30 days', 'Fast free delivery, Prime Video, Prime Music and member deals. Cancel anytime.', 'https://link.amazon/B06mOwNMn', 'Start free trial →'],
+    ['Audible · Free trial', 'Your first audiobook is on us', 'Start an Audible free trial and listen to bestsellers, podcasts and Originals.', 'https://link.amazon/A0dWMpD9R', 'Try Audible free →'],
+    ['Kindle Unlimited · Free trial', 'Read millions of ebooks free', 'Unlimited reading on any device during your Kindle Unlimited free trial.', 'https://link.amazon/A0iKJZ418', 'Start reading free →'],
+    ['Amazon Music Unlimited · Free trial', '100 million songs, ad-free', 'Try Amazon Music Unlimited free and listen offline on any device.', 'https://link.amazon/A04nYUHSN', 'Listen free →'],
+    ['Prime Video · Free trial', 'Stream movies & originals free', 'Watch award-winning Amazon Originals and blockbusters with a Prime Video trial.', 'https://link.amazon/A0bM79KKJ', 'Watch free →'],
+    ['Prime for Young Adults', '6 months of Prime free', 'Ages 18–24: full Prime benefits free for 6 months, then half price.', 'https://link.amazon/B0iBeZKpt', 'Claim 6 months free →'],
+    ['Temu · $100 coupon bundle', '👋 Get a $100 coupon bundle', 'Download the Temu app, then use code afp71786 at checkout for 30% off.', 'https://temu.to/k/us99VQ0Kn3pQvzg', 'Get $100 in coupons →'],
+    ['FlexJobs · Remote work', 'Find legit work-from-home jobs', 'Hand-screened remote and flexible jobs. No ads, scams or junk.', 'https://flexjobs.sjv.io/c/5661882/1847140/20168', 'Start your trial →']
+  ];
+  function mount() {
+    if (document.querySelector('.dx-top-offers')) return;
+    var list = OFFERS.slice();
+    for (var i = list.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = list[i]; list[i] = list[j]; list[j] = t; }
+    list = list.slice(0, 3 + Math.floor(Math.random() * 3));
+    var box = document.createElement('div');
+    box.className = 'dx-top-offers';
+    box.setAttribute('aria-label', 'Sponsored offers');
+    box.innerHTML = list.map(function (o) {
+      return '<div class="card promo-card"><span class="eyebrow">' + o[0] + '</span><h3>' + o[1] + '</h3>' +
+        '<p class="muted">' + o[2] + '</p><a class="btn btn-gold" href="' + o[3] + '" target="_blank" rel="sponsored noopener">' + o[4] + '</a></div>';
+    }).join('');
+    var css = document.createElement('style');
+    css.textContent = '.dx-top-offers{display:flex;flex-direction:column;gap:1rem;margin:0 0 1rem}.dx-top-offers .btn{align-self:flex-start}' +
+      '.dx-top-offers.dx-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:1rem 0 1.5rem}';
+    document.head.appendChild(css);
+    var side = document.querySelector('.post-sidebar:not(.post-sidebar-left)') || document.querySelector('.shop-layout > aside.sidebar') ||
+      document.querySelector('aside.product-flexjobs');
+    if (side) { side.insertBefore(box, side.firstChild); return; }
+    var h1 = document.querySelector('main h1');
+    box.className += ' dx-row';
+    if (h1 && h1.parentNode) h1.parentNode.insertBefore(box, h1.nextSibling);
+    else (document.querySelector('main') || document.body).appendChild(box);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+})();
