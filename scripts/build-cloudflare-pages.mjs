@@ -24,8 +24,10 @@ const PAID = String(process.env.CF_PAGES_PLAN || '').toLowerCase() === 'paid';
 const MAX_FILES = PAID ? 99000 : 19900; // Plan limits are 100,000 / 20,000; keep headroom.
 
 // Sections served through the forwarder instead of as Cloudflare files (free plan only).
-// Chosen because they hold many files but get the least traffic per file.
-const PROXIED = PAID ? [] : ['deals', 'jobs', 'videos', 'ads'];
+// Chosen because they hold many files but get the least traffic per file. /jobs/, /videos/ and /ads/
+// are published as static files so they stay up even when the Netlify site is unavailable
+// (e.g. when Netlify credits run out); /ads/<slug>/ pages without a file render via functions/ads/[slug].js.
+const PROXIED = PAID ? [] : ['deals'];
 
 // Never published on Cloudflare: private, build-only or tooling files.
 const PRIVATE = new Set([
@@ -73,8 +75,9 @@ const routes = {
     ...PROXIED.flatMap((d) => [`/${d}`, `/${d}/*`]),
     '/shop/*',
     '/tickets/*',
+    '/ads/*',
   ],
-  exclude: ['/shop/', '/shop/brand/*', '/shop/department/*', '/shop/type/*', '/tickets/', '/tickets/show/*'],
+  exclude: ['/ads/', '/ads/page/*', '/shop/', '/shop/brand/*', '/shop/department/*', '/shop/type/*', '/tickets/', '/tickets/show/*'],
 };
 fs.writeFileSync(path.join(OUT, '_routes.json'), JSON.stringify(routes, null, 2) + '\n');
 
