@@ -4,6 +4,44 @@
   document.addEventListener('error', function (e) { hide(e.target); }, true);
   Array.prototype.forEach.call(document.images, function (img) { if (img.complete && img.naturalWidth === 0 && img.src) hide(img); });
 })();
+// Google AdSense (publisher ca-pub-5723887718258446, "Dealux Ad" responsive unit, slot 2061084255).
+// Loads the AdSense library once and places one responsive unit at the end of the page's main
+// content (just above the footer). Served from this shared script so it runs on every page,
+// whether the site is answered by Netlify or by the Cloudflare Pages copy.
+(function () {
+  if (window.__dxAdsense) return;
+  window.__dxAdsense = true;
+  var CLIENT = 'ca-pub-5723887718258446';
+  if (!document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]')) {
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + CLIENT;
+    s.crossOrigin = 'anonymous';
+    document.head.appendChild(s);
+  }
+  function place() {
+    if (document.querySelector('ins.adsbygoogle[data-ad-slot="2061084255"]')) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'dx-adsense';
+    wrap.style.cssText = 'margin:24px auto;max-width:1200px;padding:0 16px;clear:both';
+    var ins = document.createElement('ins');
+    ins.className = 'adsbygoogle';
+    ins.style.display = 'block';
+    ins.setAttribute('data-ad-client', CLIENT);
+    ins.setAttribute('data-ad-slot', '2061084255');
+    ins.setAttribute('data-ad-format', 'auto');
+    ins.setAttribute('data-full-width-responsive', 'true');
+    wrap.appendChild(ins);
+    var main = document.querySelector('main');
+    var footer = document.querySelector('footer');
+    if (main) main.appendChild(wrap);
+    else if (footer && footer.parentNode) footer.parentNode.insertBefore(wrap, footer);
+    else document.body.appendChild(wrap);
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', place);
+  else place();
+})();
 // Ad networks, staggered: each page view loads exactly ONE network, rotating in turn so a
 // visitor never sees Monetag, Adsterra and HilltopAds stacked on the same page.
 //   0 Monetag   – Vignette zone 12187754
