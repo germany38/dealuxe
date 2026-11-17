@@ -705,3 +705,56 @@ pintrk('page');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
+// TravelPayouts partner sidebar (marker 699401): a sticky right rail on wide screens and a
+// compact dismissible card on small screens, shown on every page that loads this script.
+(function () {
+  var KEY = 'dx-tp-side-closed';
+  function mount() {
+    if (document.getElementById('dx-tp-side')) return;
+    try { if (sessionStorage.getItem(KEY)) return; } catch (e) {}
+    var css = document.createElement('style');
+    css.textContent =
+      '#dx-tp-side{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:900;width:200px;' +
+      'font-family:inherit;border-radius:18px;padding:18px 16px 16px;color:#fff;box-sizing:border-box;' +
+      'background:linear-gradient(160deg,#0b3d91 0%,#1565d8 55%,#22b3c8 100%);' +
+      'box-shadow:0 18px 40px -12px rgba(11,61,145,.55),0 0 0 1px rgba(255,255,255,.08) inset;animation:dxTpIn .45s ease-out}' +
+      '@keyframes dxTpIn{from{opacity:0;transform:translate(24px,-50%)}to{opacity:1;transform:translate(0,-50%)}}' +
+      '#dx-tp-side .dx-tp-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;' +
+      'background:rgba(255,255,255,.18);padding:3px 8px;border-radius:999px;margin-bottom:10px}' +
+      '#dx-tp-side .dx-tp-ico{font-size:28px;line-height:1;margin-bottom:8px}' +
+      '#dx-tp-side h3{margin:0 0 6px;font-size:17px;line-height:1.25;font-weight:800;color:#fff}' +
+      '#dx-tp-side h3 b{color:#ffd54a}' +
+      '#dx-tp-side p{margin:0 0 14px;font-size:12.5px;line-height:1.45;color:rgba(255,255,255,.88)}' +
+      '#dx-tp-side a.dx-tp-cta{display:block;text-align:center;background:#ffd54a;color:#0b2a5c;font-weight:800;font-size:13.5px;' +
+      'padding:10px 12px;border-radius:10px;text-decoration:none;transition:transform .15s,box-shadow .15s}' +
+      '#dx-tp-side a.dx-tp-cta:hover{transform:translateY(-1px);box-shadow:0 8px 18px -6px rgba(0,0,0,.4)}' +
+      '#dx-tp-side .dx-tp-x{position:absolute;top:8px;right:10px;background:none;border:0;color:rgba(255,255,255,.75);' +
+      'font-size:18px;line-height:1;cursor:pointer;padding:2px}' +
+      '#dx-tp-side .dx-tp-x:hover{color:#fff}' +
+      '#dx-tp-side small{display:block;margin-top:8px;font-size:10px;color:rgba(255,255,255,.6);text-align:center}' +
+      '@media (max-width:1400px){#dx-tp-side{width:180px;right:10px}}' +
+      '@media (max-width:1180px){#dx-tp-side{top:auto;bottom:16px;left:auto;right:12px;transform:none;width:auto;max-width:320px;' +
+      'padding:12px 36px 12px 14px;display:flex;align-items:center;gap:12px;animation:none}' +
+      '#dx-tp-side .dx-tp-tag,#dx-tp-side p,#dx-tp-side small{display:none}#dx-tp-side .dx-tp-ico{margin:0;font-size:24px}' +
+      '#dx-tp-side h3{font-size:13.5px;margin:0 0 6px}#dx-tp-side a.dx-tp-cta{display:inline-block;padding:6px 12px;font-size:12.5px}}' +
+      '@media print{#dx-tp-side{display:none}}';
+    document.head.appendChild(css);
+    var box = document.createElement('aside');
+    box.id = 'dx-tp-side';
+    box.setAttribute('aria-label', 'Partner program: TravelPayouts');
+    box.innerHTML =
+      '<button type="button" class="dx-tp-x" aria-label="Close">&times;</button>' +
+      '<span class="dx-tp-tag">Partner program</span>' +
+      '<div class="dx-tp-ico" aria-hidden="true">&#9992;&#65039;</div>' +
+      '<div><h3>Earn up to <b>$3,000</b> promoting travel brands</h3>' +
+      '<p>Join TravelPayouts and get paid for flights, hotels, tours and more you recommend.</p>' +
+      '<a class="dx-tp-cta" href="https://www.travelpayouts.com/?marker=699401" target="_blank" rel="sponsored noopener">Join TravelPayouts &rarr;</a>' +
+      '<small>Sponsored</small></div>';
+    box.querySelector('.dx-tp-x').addEventListener('click', function () {
+      box.remove();
+      try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+    });
+    document.body.appendChild(box);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+})();
