@@ -4,6 +4,15 @@
   document.addEventListener('error', function (e) { hide(e.target); }, true);
   Array.prototype.forEach.call(document.images, function (img) { if (img.complete && img.naturalWidth === 0 && img.src) hide(img); });
 })();
+// TravelPayouts (emrldco.com, t=602381). Loaded once on every page from this shared script.
+(function () {
+  if (document.querySelector('script[src*="emrldco.com/NjAyMzgx.js"]')) return;
+  var script = document.createElement("script");
+  script.async = 1;
+  script.setAttribute("data-cmp-ab", "2");
+  script.src = 'https://emrldco.com/NjAyMzgx.js?t=602381';
+  document.head.appendChild(script);
+})();
 // Google AdSense (publisher ca-pub-5723887718258446, "Dealux Ad" responsive unit, slot 2061084255).
 // Loads the AdSense library once and places one responsive unit at the end of the page's main
 // content (just above the footer). Served from this shared script so it runs on every page,
