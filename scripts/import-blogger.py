@@ -34,6 +34,7 @@ JOBS = {
 }
 FAMILIES = {'teaching': 'Teaching &amp; Education'}
 TOPICS = [
+    (r'car rental|rent(ing)? a car|esim|sightseeing|frictionless travel', 'travel'),
     (r'english|british council|academy|education|tutor|книгарн|книг|літератур', 'education'),
     (r'pet\b|pets|тварин|zoo', 'pets'),
     (r'jewel|прикрас|ювелір|palmonas', 'jewelry'),
