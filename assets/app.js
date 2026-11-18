@@ -705,55 +705,106 @@ pintrk('page');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
-// TravelPayouts partner sidebar (marker 699401): a sticky right rail on wide screens and a
-// compact dismissible card on small screens, shown on every page that loads this script.
+// Static partner sidebar on every page that loads this script: TravelPayouts (marker 699401) and
+// Creative HR Solutions AI automation (am_id smlux6738218502). A fixed right rail on wide screens and
+// a compact fixed bar at the bottom on small screens. It is always shown and has no close button.
 (function () {
-  var KEY = 'dx-tp-side-closed';
   function mount() {
     if (document.getElementById('dx-tp-side')) return;
-    try { if (sessionStorage.getItem(KEY)) return; } catch (e) {}
     var css = document.createElement('style');
     css.textContent =
-      '#dx-tp-side{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:900;width:200px;' +
-      'font-family:inherit;border-radius:18px;padding:18px 16px 16px;color:#fff;box-sizing:border-box;' +
-      'background:linear-gradient(160deg,#0b3d91 0%,#1565d8 55%,#22b3c8 100%);' +
-      'box-shadow:0 18px 40px -12px rgba(11,61,145,.55),0 0 0 1px rgba(255,255,255,.08) inset;animation:dxTpIn .45s ease-out}' +
-      '@keyframes dxTpIn{from{opacity:0;transform:translate(24px,-50%)}to{opacity:1;transform:translate(0,-50%)}}' +
-      '#dx-tp-side .dx-tp-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;' +
-      'background:rgba(255,255,255,.18);padding:3px 8px;border-radius:999px;margin-bottom:10px}' +
-      '#dx-tp-side .dx-tp-ico{font-size:28px;line-height:1;margin-bottom:8px}' +
-      '#dx-tp-side h3{margin:0 0 6px;font-size:17px;line-height:1.25;font-weight:800;color:#fff}' +
+      '#dx-tp-side{position:fixed;right:8px;top:50%;transform:translateY(-50%);z-index:900;width:136px;' +
+      'display:flex;flex-direction:column;gap:8px;font-family:inherit}' +
+      '#dx-tp-side .dx-sc{border-radius:14px;padding:10px;color:#fff;box-sizing:border-box;' +
+      'box-shadow:0 18px 40px -12px rgba(11,61,145,.55),0 0 0 1px rgba(255,255,255,.08) inset}' +
+      '#dx-tp-side .dx-sc-tp{background:linear-gradient(160deg,#0b3d91 0%,#1565d8 55%,#22b3c8 100%)}' +
+      '#dx-tp-side .dx-sc-hr{background:linear-gradient(160deg,#1e1b4b 0%,#4338ca 55%,#2563eb 100%)}' +
+      '#dx-tp-side .dx-tp-tag{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;' +
+      'background:rgba(255,255,255,.18);padding:3px 8px;border-radius:999px;margin-bottom:5px}' +
+      '#dx-tp-side .dx-tp-ico{font-size:18px;line-height:1;margin-bottom:4px}' +
+      '#dx-tp-side h3{margin:0 0 4px;font-size:13px;line-height:1.25;font-weight:800;color:#fff}' +
       '#dx-tp-side h3 b{color:#ffd54a}' +
-      '#dx-tp-side p{margin:0 0 14px;font-size:12.5px;line-height:1.45;color:rgba(255,255,255,.88)}' +
-      '#dx-tp-side a.dx-tp-cta{display:block;text-align:center;background:#ffd54a;color:#0b2a5c;font-weight:800;font-size:13.5px;' +
-      'padding:10px 12px;border-radius:10px;text-decoration:none;transition:transform .15s,box-shadow .15s}' +
+      '#dx-tp-side p{margin:0 0 8px;font-size:11px;line-height:1.45;color:rgba(255,255,255,.88)}' +
+      '#dx-tp-side a.dx-tp-cta{display:block;text-align:center;background:#ffd54a;color:#0b2a5c;font-weight:800;font-size:13px;' +
+      'padding:9px 10px;border-radius:10px;text-decoration:none;transition:transform .15s,box-shadow .15s}' +
       '#dx-tp-side a.dx-tp-cta:hover{transform:translateY(-1px);box-shadow:0 8px 18px -6px rgba(0,0,0,.4)}' +
-      '#dx-tp-side .dx-tp-x{position:absolute;top:8px;right:10px;background:none;border:0;color:rgba(255,255,255,.75);' +
-      'font-size:18px;line-height:1;cursor:pointer;padding:2px}' +
-      '#dx-tp-side .dx-tp-x:hover{color:#fff}' +
-      '#dx-tp-side small{display:block;margin-top:8px;font-size:10px;color:rgba(255,255,255,.6);text-align:center}' +
-      '@media (max-width:1400px){#dx-tp-side{width:180px;right:10px}}' +
-      '@media (max-width:1180px){#dx-tp-side{top:auto;bottom:16px;left:auto;right:12px;transform:none;width:auto;max-width:320px;' +
-      'padding:12px 36px 12px 14px;display:flex;align-items:center;gap:12px;animation:none}' +
-      '#dx-tp-side .dx-tp-tag,#dx-tp-side p,#dx-tp-side small{display:none}#dx-tp-side .dx-tp-ico{margin:0;font-size:24px}' +
-      '#dx-tp-side h3{font-size:13.5px;margin:0 0 6px}#dx-tp-side a.dx-tp-cta{display:inline-block;padding:6px 12px;font-size:12.5px}}' +
+      '#dx-tp-side small{display:block;margin-top:6px;font-size:10px;color:rgba(255,255,255,.6);text-align:center}' +
+            '@media (max-height:700px) and (min-width:1541px){#dx-tp-side p,#dx-tp-side .dx-tp-ico{display:none}}' +
+      '@media (max-width:1540px){#dx-tp-side{top:auto;bottom:0;left:0;right:0;transform:none;width:auto;flex-direction:row;gap:6px;padding:6px}' +
+      '#dx-tp-side .dx-sc{flex:1;min-width:0;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px}' +
+      '#dx-tp-side .dx-tp-tag,#dx-tp-side p,#dx-tp-side small{display:none}#dx-tp-side .dx-tp-ico{margin:0;font-size:20px}' +
+      '#dx-tp-side h3{font-size:12px;margin:0 0 4px}#dx-tp-side a.dx-tp-cta{display:inline-block;padding:5px 10px;font-size:11.5px}' +
+      'body{padding-bottom:84px!important}}' +
       '@media print{#dx-tp-side{display:none}}';
     document.head.appendChild(css);
     var box = document.createElement('aside');
     box.id = 'dx-tp-side';
-    box.setAttribute('aria-label', 'Partner program: TravelPayouts');
+    box.setAttribute('aria-label', 'Sponsored partners');
     box.innerHTML =
-      '<button type="button" class="dx-tp-x" aria-label="Close">&times;</button>' +
-      '<span class="dx-tp-tag">Partner program</span>' +
+      '<div class="dx-sc dx-sc-tp"><span class="dx-tp-tag">Partner program</span>' +
       '<div class="dx-tp-ico" aria-hidden="true">&#9992;&#65039;</div>' +
       '<div><h3>Earn up to <b>$3,000</b> promoting travel brands</h3>' +
       '<p>Join TravelPayouts and get paid for flights, hotels, tours and more you recommend.</p>' +
       '<a class="dx-tp-cta" href="https://www.travelpayouts.com/?marker=699401" target="_blank" rel="sponsored noopener">Join TravelPayouts &rarr;</a>' +
-      '<small>Sponsored</small></div>';
-    box.querySelector('.dx-tp-x').addEventListener('click', function () {
-      box.remove();
-      try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
-    });
+      '<small>Sponsored</small></div></div>' +
+      '<div class="dx-sc dx-sc-hr"><span class="dx-tp-tag">AI for business</span>' +
+      '<div class="dx-tp-ico" aria-hidden="true">&#129302;</div>' +
+      '<div><h3>Stop losing <b>62%</b> of your calls</h3>' +
+      '<p>Missed-call text back, AI webchat and voice assistants that capture every lead 24/7. Book a live demo today.</p>' +
+      '<a class="dx-tp-cta" href="https://creativehrsolutions.co/home?am_id=smlux6738218502" target="_blank" rel="sponsored noopener">Get AI automation &rarr;</a>' +
+      '<small>Sponsored</small></div></div>';
+    document.body.appendChild(box);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+})();
+// Amazon partner rail (tag smlux6738210a-20): Amazon card on every page, plus an Audible free-trial
+// card on Journal, Shop (including tutor listings) and Tickets pages. Fixed left rail on wide
+// screens; on small screens the cards sit just above the bottom partner bar. Always shown.
+(function () {
+  var AMZ = 'https://www.amazon.com?&linkCode=ll2&tag=smlux6738210a-20&linkId=fc2c1dc089167358f0bceafba1fb78d7&language=en_US&ref_=as_li_ss_tl';
+  var AUD = 'https://www.amazon.com/hz/audible/arya/mlp?_encoding=UTF8&purchaseType=STANDARD_MTRIAL&SHOPPING_PORTAL_MODE=AUGMENTED&linkCode=ll2&tag=smlux6738210a-20&linkId=e8094007a5ab2170b3d3253482a29fd2&language=en_US&ref_=as_li_ss_tl';
+  function mount() {
+    if (document.getElementById('dx-amz-side')) return;
+    var audible = /^\/(journal|shop|tickets|tutors)(\/|$)/.test(location.pathname);
+    var css = document.createElement('style');
+    css.textContent =
+      '#dx-amz-side{position:fixed;left:8px;top:50%;transform:translateY(-50%);z-index:900;width:136px;display:flex;flex-direction:column;gap:8px;font-family:inherit}' +
+      '#dx-amz-side .dx-ac{border-radius:14px;padding:10px;color:#fff;box-sizing:border-box;box-shadow:0 18px 40px -12px rgba(0,0,0,.5)}' +
+      '#dx-amz-side .dx-ac-amz{background:linear-gradient(160deg,#131921 0%,#232f3e 60%,#37475a 100%)}' +
+      '#dx-amz-side .dx-ac-aud{background:linear-gradient(160deg,#c2410c 0%,#f97316 60%,#fb923c 100%)}' +
+      '#dx-amz-side .dx-tag{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.18);padding:3px 8px;border-radius:999px;margin-bottom:5px}' +
+      '#dx-amz-side .dx-ico{font-size:18px;line-height:1;margin-bottom:4px}' +
+      '#dx-amz-side h3{margin:0 0 4px;font-size:13px;line-height:1.25;font-weight:800;color:#fff}' +
+      '#dx-amz-side h3 b{color:#ffd54a}' +
+      '#dx-amz-side p{margin:0 0 8px;font-size:11px;line-height:1.45;color:rgba(255,255,255,.9)}' +
+      '#dx-amz-side a.dx-cta{display:block;text-align:center;background:#ffd54a;color:#131921;font-weight:800;font-size:11.5px;padding:7px 6px;border-radius:10px;text-decoration:none;transition:transform .15s}' +
+      '#dx-amz-side a.dx-cta:hover{transform:translateY(-1px)}' +
+      '#dx-amz-side small{display:block;margin-top:6px;font-size:10px;color:rgba(255,255,255,.65);text-align:center}' +
+            '@media (max-height:700px) and (min-width:1541px){#dx-amz-side p,#dx-amz-side .dx-ico{display:none}}' +
+      '@media (max-width:1540px){#dx-amz-side{top:auto;bottom:64px;left:0;right:0;transform:none;width:auto;flex-direction:row;gap:6px;padding:0 6px}' +
+      '#dx-amz-side .dx-ac{flex:1;min-width:0;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px}' +
+      '#dx-amz-side .dx-tag,#dx-amz-side p,#dx-amz-side small{display:none}#dx-amz-side .dx-ico{margin:0;font-size:20px}' +
+      '#dx-amz-side h3{font-size:12px;margin:0 0 4px}#dx-amz-side a.dx-cta{display:inline-block;padding:5px 10px;font-size:11.5px}' +
+      'body{padding-bottom:150px!important}}' +
+      '@media print{#dx-amz-side{display:none}}';
+    document.head.appendChild(css);
+    var box = document.createElement('aside');
+    box.id = 'dx-amz-side';
+    box.setAttribute('aria-label', 'Sponsored: Amazon');
+    box.innerHTML =
+      '<div class="dx-ac dx-ac-amz"><span class="dx-tag">Today&rsquo;s deals</span>' +
+      '<div class="dx-ico" aria-hidden="true">&#128722;</div>' +
+      '<div><h3>Shop <b>Amazon</b> deals today</h3>' +
+      '<p>Fresh daily deals on electronics, home, fashion and more. Grab them before they sell out.</p>' +
+      '<a class="dx-cta" href="' + AMZ + '" target="_blank" rel="sponsored noopener">Shop now on Amazon &rarr;</a>' +
+      '<small>Sponsored</small></div></div>' +
+      (audible ?
+      '<div class="dx-ac dx-ac-aud"><span class="dx-tag">Audible free trial</span>' +
+      '<div class="dx-ico" aria-hidden="true">&#127911;</div>' +
+      '<div><h3>Try <b>Audible</b> free &mdash; start today</h3>' +
+      '<p>Pick your first audiobook free and start listening tonight. Cancel anytime.</p>' +
+      '<a class="dx-cta" href="' + AUD + '" target="_blank" rel="sponsored noopener">Start my free trial &rarr;</a>' +
+      '<small>Sponsored</small></div></div>' : '');
     document.body.appendChild(box);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
