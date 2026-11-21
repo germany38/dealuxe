@@ -809,3 +809,16 @@ pintrk('page');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
+
+// Keep buying guidance and sourcing information reachable from existing site pages.
+(function () {
+  function addEditorialLinks() {
+    var footer = document.querySelector('.site-footer .wrap, body > footer');
+    if (!footer || footer.querySelector('a[href="/about/"]')) return;
+    var links = document.createElement('p');
+    links.innerHTML = '<a href="/guides/">Buying guides &amp; tools</a> · <a href="/about/">About &amp; editorial standards</a>';
+    footer.appendChild(links);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addEditorialLinks);
+  else addEditorialLinks();
+})();
