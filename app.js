@@ -203,6 +203,7 @@
       $('[data-product-brand]').textContent = [money(d[1], d[2]), d[3] && 'by ' + d[3]].filter(Boolean).join(' · ');
       if (d[5]) {
         link.href = d[5];
+        link.setAttribute('rel', 'sponsored noopener');
         link.textContent = 'Buy at ' + (d[3] || 'the store') + ' →';
         return;
       }
