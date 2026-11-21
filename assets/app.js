@@ -354,6 +354,7 @@ pintrk('page');
       if (d[1]) { link.setAttribute('data-value', d[1]); link.setAttribute('data-currency', d[2] || 'USD'); }
       if (d[5]) {
         link.href = d[5];
+        link.setAttribute('rel', 'sponsored noopener');
         link.textContent = 'Buy at ' + (d[3] || 'the store') + ' →';
         return;
       }
