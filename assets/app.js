@@ -707,37 +707,10 @@ pintrk('page');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
 // Static partner sidebar on every page that loads this script: TravelPayouts (marker 699401) and
-// Creative HR Solutions AI automation (am_id smlux6738218502). A fixed right rail on wide screens and
-// a compact fixed bar at the bottom on small screens. It is always shown and has no close button.
+// Creative HR Solutions AI automation. Placed in the static right sidebar below.
 (function () {
   function mount() {
     if (document.getElementById('dx-tp-side')) return;
-    var css = document.createElement('style');
-    css.textContent =
-      '#dx-tp-side{position:fixed;right:8px;top:50%;transform:translateY(-50%);z-index:900;width:136px;' +
-      'display:flex;flex-direction:column;gap:8px;font-family:inherit}' +
-      '#dx-tp-side .dx-sc{border-radius:14px;padding:10px;color:#fff;box-sizing:border-box;' +
-      'box-shadow:0 18px 40px -12px rgba(11,61,145,.55),0 0 0 1px rgba(255,255,255,.08) inset}' +
-      '#dx-tp-side .dx-sc-tp{background:linear-gradient(160deg,#0b3d91 0%,#1565d8 55%,#22b3c8 100%)}' +
-      '#dx-tp-side .dx-sc-hr{background:linear-gradient(160deg,#1e1b4b 0%,#4338ca 55%,#2563eb 100%)}' +
-      '#dx-tp-side .dx-tp-tag{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;' +
-      'background:rgba(255,255,255,.18);padding:3px 8px;border-radius:999px;margin-bottom:5px}' +
-      '#dx-tp-side .dx-tp-ico{font-size:18px;line-height:1;margin-bottom:4px}' +
-      '#dx-tp-side h3{margin:0 0 4px;font-size:13px;line-height:1.25;font-weight:800;color:#fff}' +
-      '#dx-tp-side h3 b{color:#ffd54a}' +
-      '#dx-tp-side p{margin:0 0 8px;font-size:11px;line-height:1.45;color:rgba(255,255,255,.88)}' +
-      '#dx-tp-side a.dx-tp-cta{display:block;text-align:center;background:#ffd54a;color:#0b2a5c;font-weight:800;font-size:13px;' +
-      'padding:9px 10px;border-radius:10px;text-decoration:none;transition:transform .15s,box-shadow .15s}' +
-      '#dx-tp-side a.dx-tp-cta:hover{transform:translateY(-1px);box-shadow:0 8px 18px -6px rgba(0,0,0,.4)}' +
-      '#dx-tp-side small{display:block;margin-top:6px;font-size:10px;color:rgba(255,255,255,.6);text-align:center}' +
-            '@media (max-height:700px) and (min-width:1541px){#dx-tp-side p,#dx-tp-side .dx-tp-ico{display:none}}' +
-      '@media (max-width:1540px){#dx-tp-side{top:auto;bottom:0;left:0;right:0;transform:none;width:auto;flex-direction:row;gap:6px;padding:6px}' +
-      '#dx-tp-side .dx-sc{flex:1;min-width:0;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px}' +
-      '#dx-tp-side .dx-tp-tag,#dx-tp-side p,#dx-tp-side small{display:none}#dx-tp-side .dx-tp-ico{margin:0;font-size:20px}' +
-      '#dx-tp-side h3{font-size:12px;margin:0 0 4px}#dx-tp-side a.dx-tp-cta{display:inline-block;padding:5px 10px;font-size:11.5px}' +
-      'body{padding-bottom:84px!important}}' +
-      '@media print{#dx-tp-side{display:none}}';
-    document.head.appendChild(css);
     var box = document.createElement('aside');
     box.id = 'dx-tp-side';
     box.setAttribute('aria-label', 'Sponsored partners');
@@ -759,36 +732,13 @@ pintrk('page');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 })();
 // Amazon partner rail (tag smlux6738210a-20): Amazon card on every page, plus an Audible free-trial
-// card on Journal, Shop (including tutor listings) and Tickets pages. Fixed left rail on wide
-// screens; on small screens the cards sit just above the bottom partner bar. Always shown.
+// card on Journal, Shop (including tutor listings) and Tickets pages. Placed in the static left sidebar.
 (function () {
   var AMZ = 'https://www.amazon.com?&linkCode=ll2&tag=smlux6738210a-20&linkId=fc2c1dc089167358f0bceafba1fb78d7&language=en_US&ref_=as_li_ss_tl';
   var AUD = 'https://www.amazon.com/hz/audible/arya/mlp?_encoding=UTF8&purchaseType=STANDARD_MTRIAL&SHOPPING_PORTAL_MODE=AUGMENTED&linkCode=ll2&tag=smlux6738210a-20&linkId=e8094007a5ab2170b3d3253482a29fd2&language=en_US&ref_=as_li_ss_tl';
   function mount() {
     if (document.getElementById('dx-amz-side')) return;
     var audible = /^\/(journal|shop|tickets|tutors)(\/|$)/.test(location.pathname);
-    var css = document.createElement('style');
-    css.textContent =
-      '#dx-amz-side{position:fixed;left:8px;top:50%;transform:translateY(-50%);z-index:900;width:136px;display:flex;flex-direction:column;gap:8px;font-family:inherit}' +
-      '#dx-amz-side .dx-ac{border-radius:14px;padding:10px;color:#fff;box-sizing:border-box;box-shadow:0 18px 40px -12px rgba(0,0,0,.5)}' +
-      '#dx-amz-side .dx-ac-amz{background:linear-gradient(160deg,#131921 0%,#232f3e 60%,#37475a 100%)}' +
-      '#dx-amz-side .dx-ac-aud{background:linear-gradient(160deg,#c2410c 0%,#f97316 60%,#fb923c 100%)}' +
-      '#dx-amz-side .dx-tag{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.18);padding:3px 8px;border-radius:999px;margin-bottom:5px}' +
-      '#dx-amz-side .dx-ico{font-size:18px;line-height:1;margin-bottom:4px}' +
-      '#dx-amz-side h3{margin:0 0 4px;font-size:13px;line-height:1.25;font-weight:800;color:#fff}' +
-      '#dx-amz-side h3 b{color:#ffd54a}' +
-      '#dx-amz-side p{margin:0 0 8px;font-size:11px;line-height:1.45;color:rgba(255,255,255,.9)}' +
-      '#dx-amz-side a.dx-cta{display:block;text-align:center;background:#ffd54a;color:#131921;font-weight:800;font-size:11.5px;padding:7px 6px;border-radius:10px;text-decoration:none;transition:transform .15s}' +
-      '#dx-amz-side a.dx-cta:hover{transform:translateY(-1px)}' +
-      '#dx-amz-side small{display:block;margin-top:6px;font-size:10px;color:rgba(255,255,255,.65);text-align:center}' +
-            '@media (max-height:700px) and (min-width:1541px){#dx-amz-side p,#dx-amz-side .dx-ico{display:none}}' +
-      '@media (max-width:1540px){#dx-amz-side{top:auto;bottom:64px;left:0;right:0;transform:none;width:auto;flex-direction:row;gap:6px;padding:0 6px}' +
-      '#dx-amz-side .dx-ac{flex:1;min-width:0;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px}' +
-      '#dx-amz-side .dx-tag,#dx-amz-side p,#dx-amz-side small{display:none}#dx-amz-side .dx-ico{margin:0;font-size:20px}' +
-      '#dx-amz-side h3{font-size:12px;margin:0 0 4px}#dx-amz-side a.dx-cta{display:inline-block;padding:5px 10px;font-size:11.5px}' +
-      'body{padding-bottom:150px!important}}' +
-      '@media print{#dx-amz-side{display:none}}';
-    document.head.appendChild(css);
     var box = document.createElement('aside');
     box.id = 'dx-amz-side';
     box.setAttribute('aria-label', 'Sponsored: Amazon');
@@ -822,4 +772,59 @@ pintrk('page');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addEditorialLinks);
   else addEditorialLinks();
+})();
+
+// Shared static sidebars: normal document flow, with every offer visible without rotation.
+(function () {
+  function mount() {
+    var main = document.querySelector('main');
+    if (!main || document.querySelector('.dx-page-layout')) return;
+    var offers = [
+      ['Amazon', '$100 Amazon Gift Card', 'Put your next find on your wish list. Explore this gift card offer and see how to qualify.', 'Explore Amazon offer', 'afflat3d3.com', '30186', '3861243B15C528E8F34A10BE3001932D', '34147'],
+      ['Walmart', '$100 Walmart Gift Card', 'Make room for everyday essentials. See the steps and requirements for this gift card offer.', 'Explore Walmart offer', 'afflat3d2.com', '30189', '86F35F35B788929BF6AFDF16FC06BB9E', '34150'],
+      ['TryProducts', 'Discover free full-size products', 'TryProducts connects members with free full-size products and samples to test at home. Share honest feedback with brands. No purchase required or hidden fees.', 'Discover TryProducts', 'afflat3e3.com', '24540', '0C4B97540801AA0BEB9C0AB4B1E03AD3', '25608'],
+      ['DeluxeBucks', 'A chance to win $25,000', 'Explore the DeluxeBucks prize opportunity. Check the entry details and eligibility to take your next step.', 'See how to enter', 'afflat3e1.com', '21805', '8846CF58E488CB5BDB3D24CE08338E7D', '22649'],
+      ['DoorDash', '$100 DoorDash Gift Card', 'Your next meal inspiration starts here. Explore the gift card offer and check the qualifying steps.', 'Explore DoorDash offer', 'afflat3d3.com', '23221', 'EA816E5CA2C7C16D5128B3D0BAE313CB', '24219']
+    ];
+    var layout = document.createElement('div');
+    layout.className = 'dx-page-layout';
+    var left = document.createElement('aside');
+    left.className = 'dx-static-side dx-static-left';
+    left.setAttribute('aria-label', 'Sponsored rewards and shopping');
+    var right = document.createElement('aside');
+    right.className = 'dx-static-side dx-static-right';
+    right.setAttribute('aria-label', 'Sponsored products and partners');
+    function card(offer) {
+      var article = document.createElement('article');
+      article.className = 'dx-offer-card';
+      var tag = document.createElement('span');
+      tag.className = 'eyebrow';
+      tag.textContent = 'Sponsored · ' + offer[0];
+      var title = document.createElement('h3');
+      title.textContent = offer[1];
+      var description = document.createElement('p');
+      description.textContent = offer[2];
+      var link = document.createElement('a');
+      link.className = 'dx-offer-cta';
+      link.href = 'https://' + offer[4] + '/trk/lnk/9A3EA7E7-FA32-4B43-A8CD-A5C1C173133F/?o=' + offer[5] + '&c=918277&a=800114&k=' + offer[6] + '&l=' + offer[7];
+      link.target = '_blank';
+      link.rel = 'sponsored noopener';
+      link.textContent = offer[3] + ' →';
+      var terms = document.createElement('small');
+      terms.textContent = offer[0] === 'TryProducts' ? 'Availability and eligibility depend on the provider.' : 'Provider terms and eligibility apply. Rewards are not guaranteed.';
+      article.append(tag, title, description, link, terms);
+      return article;
+    }
+    offers.forEach(function (offer, i) { (i < 2 ? left : right).appendChild(card(offer)); });
+    var amazon = document.getElementById('dx-amz-side');
+    var partners = document.getElementById('dx-tp-side');
+    if (amazon) left.appendChild(amazon);
+    if (partners) right.appendChild(partners);
+    var partnerCards = document.querySelector('.dx-partner-rails');
+    if (partnerCards) left.appendChild(partnerCards);
+    main.parentNode.insertBefore(layout, main);
+    layout.append(left, main, right);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
 })();
