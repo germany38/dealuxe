@@ -774,8 +774,34 @@ pintrk('page');
   else addEditorialLinks();
 })();
 
-// Shared static sidebars: normal document flow, with every offer visible without rotation.
+// Shared sponsored offers stay in the normal document flow.
 (function () {
+  function mountJournalRails(postLayout, left, right) {
+    var leftRail = postLayout.querySelector(':scope > .post-sidebar-left');
+    var rightRail = postLayout.querySelector(':scope > .post-sidebar:not(.post-sidebar-left)');
+    if (!leftRail || !rightRail) return false;
+
+    function compactRail(rail, shared, label) {
+      var featured = shared.firstElementChild;
+      var details = document.createElement('details');
+      var summary = document.createElement('summary');
+      var offers = document.createElement('div');
+      summary.textContent = label;
+      offers.className = 'journal-offer-list';
+      offers.append(...rail.children, ...Array.from(shared.children).slice(1));
+      details.append(summary, offers);
+      rail.classList.add('dx-static-side');
+      rail.setAttribute('aria-label', shared.getAttribute('aria-label'));
+      rail.append(featured, details);
+    }
+
+    compactRail(leftRail, left, 'More shopping offers');
+    compactRail(rightRail, right, 'More partner offers');
+    postLayout.classList.add('journal-post-layout');
+    postLayout.append(leftRail, rightRail);
+    return true;
+  }
+
   function mount() {
     var main = document.querySelector('main');
     if (!main || document.querySelector('.dx-page-layout')) return;
@@ -822,6 +848,9 @@ pintrk('page');
     if (partners) right.appendChild(partners);
     var partnerCards = document.querySelector('.dx-partner-rails');
     if (partnerCards) left.appendChild(partnerCards);
+    var journalLayout = /^\/journal\/[^/]+/.test(location.pathname) &&
+      main.querySelector(':scope > .post-layout-3');
+    if (journalLayout && mountJournalRails(journalLayout, left, right)) return;
     main.parentNode.insertBefore(layout, main);
     layout.append(left, main, right);
   }
