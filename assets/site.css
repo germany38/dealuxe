@@ -229,3 +229,52 @@ a.card:hover { border-color: var(--gold); }
 }
 @media (max-width: 540px) { .dx-static-side { grid-template-columns: minmax(0, 1fr); } }
 @media print { .dx-static-side { display: none; } .dx-page-layout { display: block; } }
+
+.journal-post-layout {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas: "article article" "left right";
+  gap: 1rem;
+  max-width: 50rem;
+  margin-inline: auto;
+}
+.journal-post-layout > .post { grid-area: article; min-width: 0; }
+.journal-post-layout > .post-sidebar-left { grid-area: left; }
+.journal-post-layout > .post-sidebar:not(.post-sidebar-left) { grid-area: right; }
+.journal-post-layout > .post-sidebar { display: flex; gap: .65rem; margin: 0; overflow-wrap: anywhere; }
+.journal-post-layout :is(.promo-card, .dx-offer-card, .dx-ac, .dx-sc, .dx-partner-rails .dx-partner-card) { padding: .75rem; }
+.journal-post-layout .post-sidebar h3 { margin: .35rem 0; font-size: .95rem; line-height: 1.3; }
+.journal-post-layout .post-sidebar p { margin: .25rem 0 .65rem; font-size: .85rem; line-height: 1.45; }
+.journal-post-layout .post-sidebar :is(.btn, .dx-offer-cta, .dx-cta, .dx-tp-cta) { padding: .5rem .55rem; font-size: .8rem; line-height: 1.35; }
+.journal-post-layout .post-sidebar img { max-width: 100%; }
+.journal-post-layout .post-sidebar summary {
+  padding: .55rem .75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--gold-hi);
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.journal-post-layout .post-sidebar summary:hover { border-color: var(--gold); }
+.journal-post-layout .post-sidebar summary:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 2px; }
+.journal-offer-list,
+.journal-offer-list :is(.dx-top-offers, .dx-partner-rails, #dx-amz-side, #dx-tp-side) { display: flex; flex-direction: column; gap: .65rem; }
+.journal-offer-list { margin-top: .65rem; }
+.journal-offer-list .dx-top-offers { margin: 0; }
+@media (min-width: 64rem) {
+  .journal-post-layout {
+    grid-template-columns: clamp(9rem, 14vw, 11rem) minmax(0, 1fr) clamp(9rem, 14vw, 11rem);
+    grid-template-areas: "left article right";
+    gap: clamp(1rem, 2vw, 1.75rem);
+    max-width: none;
+  }
+  .journal-post-layout > .post-sidebar { margin-top: 2rem; }
+}
+@media (max-width: 36rem) {
+  .journal-post-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "article" "left" "right"; }
+}
+@media print {
+  .journal-post-layout { display: block; }
+  .journal-post-layout > .post-sidebar { display: none; }
+}
