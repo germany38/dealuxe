@@ -4,6 +4,8 @@
 // Only /shop/* and /tickets/* reach Functions (see /_routes.json); everything else stays a free static asset.
 // Data comes from the same static shards the browser uses (/data/img/<n>.json).
 
+import { awinDetails, awinAvailability } from '../../assets/awin-product.mjs';
+
 const IMG_SHARDS = 64;
 const RESERVED = new Set(['product', 'brand', 'department', 'type']);
 const RELATED = 12;
@@ -34,7 +36,7 @@ function money(price, currency) {
 function pick(text, key) {
   const needle = JSON.stringify(key) + ':';
   let i = text.indexOf(needle);
-  while (i > 0 && text[i - 1] !== '{' && text[i - 1] !== ',') i = text.indexOf(needle, i + 1);
+  while (i > 0 && !'{,\n'.includes(text[i - 1])) i = text.indexOf(needle, i + 1);
   if (i < 0) return null;
   const start = i + needle.length;
   let depth = 0, inStr = false;
@@ -87,12 +89,17 @@ export async function onRequestGet(context) {
   }
   if (url.pathname.endsWith('/')) return Response.redirect(`${url.origin}/shop/${encodeURIComponent(slug)}`, 301);
 
-  const shard = await asset(env, request, `/data/img/${shardOf(slug)}.json`);
-  const record = shard && pick(shard, slug);
+  const bucket = shardOf(slug);
+  const overlay = slug.startsWith('awin-') ? await asset(env, request, `/data/awin/${bucket}.json`) : null;
+  let record = overlay && pick(overlay, slug);
+  if (!record) {
+    const shard = await asset(env, request, `/data/img/${bucket}.json`);
+    record = shard && pick(shard, slug);
+  }
   if (!record) return notFound(env, request);
-  const [name, price, currency, brand, image, link, description] = record;
+  const [name, price, currency, brand, image, link, description, details] = record;
 
-  const brandSlug = brand ? slugify(brand) : '';
+  const brandSlug = details?.brand_slug || (brand ? slugify(brand) : '');
   const [, brandList] = await Promise.all([
     template ? null : asset(env, request, '/shop/product/').then((t) => (template = t)),
     brandSlug ? asset(env, request, `/data/list/brand-${brandSlug}.json`) : null,
@@ -114,7 +121,7 @@ export async function onRequestGet(context) {
     url: canonical,
     ...(image ? { image } : {}),
     ...(brand ? { brand: { '@type': 'Brand', name: brand } } : {}),
-    ...(price ? { offers: { '@type': 'Offer', price, priceCurrency: currency || 'USD', availability: 'https://schema.org/InStock', url: canonical } } : {}),
+    ...(price ? { offers: { '@type': 'Offer', price, priceCurrency: currency || 'USD', ...awinAvailability(details), url: canonical } } : {}),
   };
   const crumbs = [['Shop', 'https://dealuxapp.com/shop/'], ...(brandUrl ? [[brand, `https://dealuxapp.com${brandUrl}`]] : []), [name, canonical]];
   const breadcrumb = {
@@ -150,7 +157,7 @@ export async function onRequestGet(context) {
       '<p class="muted" data-product-brand></p>',
       () =>
         `<p class="muted" data-product-brand>${esc([priceText, brand && `by ${brand}`].filter(Boolean).join(' · '))}</p>` +
-        (description ? `\n  <p class="product-description">${esc(description)}</p>` : ''),
+        (description ? `\n  <p class="product-description">${esc(description)}</p>` : '') + awinDetails(details, currency),
     )
     .replace('</main>', () => `${relatedHtml}\n</main>`);
   if (link) html = html.replace('<a class="btn btn-gold hidden" data-product-link', () => `<a class="btn btn-gold" href="${esc(link)}" data-product-link`);

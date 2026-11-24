@@ -3,20 +3,15 @@
 
 Usage: python3 scripts/update-counts.py
 
-Rebuilds the brand directory from every brand list (so each brand page is
-linked), refreshes the homepage "Shop by brand" and "Latest from the Journal"
-grids, the Journal counts and the "Search Nk+ products" box on every page, and
-makes sure every site page carries an indexable robots meta tag.
+Rebuilds the brand directory, shop totals, landing pages and journal index.
+Does not rewrite every article and brand page to update a shared search label.
 """
 import datetime, glob, html, json, os, re
+from pathlib import Path
+from journal_index import refresh as refresh_journal
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
-
-
-ROBOTS = '<meta name="robots" content="index, follow, max-image-preview:large">'
-# Error page, form-detection stub, ownership-verification file and an HTML snippet: not real pages.
-NOT_PAGES = {'404.html', '__forms.html', 'temu-banner.html', 'commission-factory-3b4b4b57af08471eb3df5e352a483b9c.html'}
 
 
 def brand_name(slug, known):
@@ -31,8 +26,9 @@ def brand_name(slug, known):
 
 
 def main():
-    products = len({l.strip() for l in open('data/products.txt', encoding='utf-8') if l.strip()})
-    journal = json.load(open('journal.json', encoding='utf-8'))
+    listings = [Path('data/products.txt'), Path('data/awin/products.txt')]
+    products = len({slug for path in listings if path.exists() for slug in path.read_text().splitlines() if slug})
+    journal = refresh_journal()
     articles = len(journal)
 
     # ---- brand directory: every brand with products ----
@@ -63,8 +59,8 @@ def main():
     h = open(p, encoding='utf-8').read()
     h = re.sub(r'<meta name="description" content="Shop [^"]*">',
                f'<meta name="description" content="Shop {products:,}+ products from {nb:,} brands and read our {articles:,} buying guides.">', h, count=1)
-    h = re.sub(r'<p class="muted">[\d,]+\+ products, [\d,]+ brands and [\d,]+ buying guides\.</p>',
-               f'<p class="muted">{products:,}+ products, {nb:,} brands and {articles:,} buying guides.</p>', h, count=1)
+    h = re.sub(r'<p class="muted" data-catalog-summary>.*?</p>',
+               f'<p class="muted" data-catalog-summary>{products:,} products, {nb:,} brands and {articles:,} articles.</p>', h, count=1)
     cards = ''.join(f'<a class="card dept-card" href="/shop/brand/{s}/">{n}<span class="muted">{c:,} products</span></a>' for s, n, c in brands[:24])
     h = re.sub(r'(<h2>Shop by brand.*?<div class="grid dept-grid">).*?(</div>)', lambda mm: mm.group(1) + cards + mm.group(2), h, count=1, flags=re.S)
     img = lambda u: f'<img loading="lazy" src="{html.escape(u, quote=True)}" alt="">' if u else ''
@@ -74,30 +70,13 @@ def main():
     h = re.sub(r'(<h2>Latest from the Journal.*?<div class="grid">).*?(</div>)', lambda mm: mm.group(1) + posts + mm.group(2), h, count=1, flags=re.S)
     open(p, 'w', encoding='utf-8').write(h)
 
-    # ---- journal index ----
-    p = 'journal/index.html'
+    p = 'shop/index.html'
     h = open(p, encoding='utf-8').read()
-    h = re.sub(r'<meta name="description" content="[\d,]+ buying guides and articles\.">',
-               f'<meta name="description" content="{articles:,} buying guides and articles.">', h, count=1)
-    h = re.sub(r'placeholder="Search [\d,]+ articles…"', f'placeholder="Search {articles:,} articles…"', h)
-    h = re.sub(r'data-result-count>[\d,]+ articles<', f'data-result-count>{articles:,} articles<', h)
+    h = re.sub(r'<meta name="description" content="Search and filter [^"]*">', f'<meta name="description" content="Search and filter {products:,} products.">', h, count=1)
+    h = re.sub(r'data-result-count(?: data-catalog-total="[^"]*")?>[^<]*<',
+               f'data-result-count data-catalog-total="{products:,}">{products:,} products · New arrivals first<', h, count=1)
     open(p, 'w', encoding='utf-8').write(h)
-
-    # ---- header search box and robots tag on every page ----
-    label = f'Search {products // 1000}k+ products'
-    changed = 0
-    for f in glob.glob('**/*.html', recursive=True):
-        if f.startswith(('.netlify/', 'node_modules/', 'exclusive-files/', 'data/')) or f in NOT_PAGES:
-            continue
-        s = open(f, encoding='utf-8').read()
-        t = re.sub(r'Search \d+k\+ products', label, s)
-        if '</head>' in t and not re.search(r'<meta name="robots"', t):
-            m = re.search(r'<link rel="canonical"[^>]*>', t)
-            t = t[:m.end()] + '\n' + ROBOTS + t[m.end():] if m else t.replace('</head>', ROBOTS + '\n</head>', 1)
-        if t != s:
-            open(f, 'w', encoding='utf-8').write(t)
-            changed += 1
-    print(f'{products:,} products, {nb:,} brands, {articles:,} articles; search label updated on {changed:,} pages')
+    print(f'{products:,} products, {nb:,} brands, {articles:,} articles')
 
 
 if __name__ == '__main__':

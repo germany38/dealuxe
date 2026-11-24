@@ -5,7 +5,6 @@
   <sitemap><loc>https://dealuxapp.com/sitemap-entradas.xml</loc><lastmod>2026-10-16</lastmod></sitemap>
   <sitemap><loc>https://dealuxapp.com/sitemap-exclusive.xml</loc><lastmod>2026-10-16</lastmod></sitemap>
   <sitemap><loc>https://dealuxapp.com/sitemap-jobs.xml</loc><lastmod>2026-10-27</lastmod></sitemap>
-  <sitemap><loc>https://dealuxapp.com/sitemap-journal.xml</loc><lastmod>2026-11-23</lastmod></sitemap>
   <sitemap><loc>https://dealuxapp.com/sitemap-pages.xml</loc><lastmod>2026-11-21</lastmod></sitemap>
   <sitemap><loc>https://dealuxapp.com/sitemap-shop-products-1.xml</loc><lastmod>2026-10-16</lastmod></sitemap>
   <sitemap><loc>https://dealuxapp.com/sitemap-shop-products-2.xml</loc><lastmod>2026-10-16</lastmod></sitemap>
@@ -40,4 +39,6 @@
 <sitemap><loc>https://dealuxapp.com/sitemap-awin-products-1.xml</loc><lastmod>2026-11-21</lastmod></sitemap>
 <sitemap><loc>https://dealuxapp.com/sitemap-awin-products-2.xml</loc><lastmod>2026-11-21</lastmod></sitemap>
 <sitemap><loc>https://dealuxapp.com/sitemap-awin-products-3.xml</loc><lastmod>2026-11-21</lastmod></sitemap>
+  <sitemap><loc>https://dealuxapp.com/sitemap-awin-products-export-f8a1143e4347.xml</loc></sitemap>
+  <sitemap><loc>https://dealuxapp.com/sitemap-journal.xml</loc></sitemap>
 </sitemapindex>
