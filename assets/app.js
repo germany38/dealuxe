@@ -131,6 +131,9 @@ pintrk('page');
   var titleCase = function (s) { return s.replace(/-+/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); }); };
   var slugify = function (s) { return s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); };
   var params = new URLSearchParams(location.search);
+  document.querySelectorAll('input[aria-label="Search products"]').forEach(function (input) {
+    input.placeholder = 'Search products';
+  });
   var page = document.body.getAttribute('data-page');
 
   // ---- Pinterest conversion events ----
@@ -267,8 +270,13 @@ pintrk('page');
   // Product record: [name, price, currency, brand, image, affiliate link]
   function detailsFor(slug) {
     var n = shardOf(slug);
-    shards[n] = shards[n] || fetch('/data/img/' + n + '.json').then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
-    return shards[n].then(function (map) { return map[slug] || ['', '', '', '', '', '']; });
+    function load(path) {
+      return shards[path] || (shards[path] = fetch('/data/' + path + '.json').then(function (r) {
+        return r.ok ? r.json() : {};
+      }).catch(function () { delete shards[path]; return {}; }));
+    }
+    function legacy() { return load('img/' + n).then(function (map) { return map[slug] || []; }); }
+    return slug.indexOf('awin-') === 0 ? load('awin/' + n).then(function (map) { return map[slug] || legacy(); }) : legacy();
   }
   function money(price, currency) {
     if (!price) return '';
@@ -295,9 +303,23 @@ pintrk('page');
   var tokens = function (q) { return slugify(q || '').split('-').filter(Boolean); };
 
   // ---- Shop: client-side search over the static product index ----
-  var productsPromise;
+  var productsPromise, awinProductsPromise;
+  function readProductList(url) {
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error('Could not load product list');
+      return r.text();
+    }).then(function (t) { return t.split('\n').filter(Boolean); });
+  }
+  function loadAwinProducts() {
+    return awinProductsPromise || (awinProductsPromise = readProductList('/data/awin/products.txt').catch(function (error) {
+      awinProductsPromise = null;
+      throw error;
+    }));
+  }
   function loadProducts() {
-    productsPromise = productsPromise || fetch('/data/products.txt').then(function (r) { return r.text(); }).then(function (t) { return t.split('\n').filter(Boolean); });
+    productsPromise = productsPromise || Promise.all([loadAwinProducts(), readProductList('/data/products.txt')]).then(function (lists) {
+      return Array.from(new Set(lists[0].concat(lists[1])));
+    }).catch(function (error) { productsPromise = null; throw error; });
     return productsPromise;
   }
   var brandsPromise;
@@ -320,18 +342,29 @@ pintrk('page');
     var stateCode = (params.get('state') || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 2);
     var stateRe = stateCode ? new RegExp('-' + stateCode + '-\\d+$') : null;
     document.querySelectorAll('[data-state-chip]').forEach(function (c) { c.classList.toggle('active', c.getAttribute('data-state-chip') === stateCode); });
-    var run = function () {
-      (source || loadProducts()).then(function (all) {
-        var q = tokens(form.q.value);
-        var items = all.filter(function (slug) {
-          var parts = slug.split('-');
-          if (keywords.length && !keywords.some(function (k) { return parts.some(function (p) { return p.indexOf(k) === 0; }); })) return false;
+    var shopCount = $('[data-result-count]'), shopMore = $('[data-load-more]'), searchVersion = 0;
+    var run = function (full) {
+      var version = ++searchVersion;
+      var q = tokens(form.q.value);
+      var recent = !source && !full && !q.length && !keywords.length && !stateRe;
+      shopMore.classList.add('hidden');
+      (source || (recent ? loadAwinProducts() : loadProducts())).then(function (all) {
+        if (version !== searchVersion) return;
+        var items = q.length || keywords.length || stateRe ? all.filter(function (slug) {
+          if (keywords.length && !keywords.some(function (k) { return slug.split('-').some(function (p) { return p.indexOf(k) === 0; }); })) return false;
           if (stateRe && !stateRe.test(slug)) return false;
           return q.every(function (w) { return slug.indexOf(w) !== -1; });
-        });
+        }) : all;
         paginate(items, function (slug) {
           return '<a class="card product-card" href="/shop/' + encodeURIComponent(slug) + '"><span class="product-thumb"><img data-img-slug="' + esc(slug) + '" loading="lazy" referrerpolicy="no-referrer" alt=""></span><h3>' + esc(titleCase(slug)) + '</h3><span class="muted">View product →</span></a>';
-        }, results, $('[data-load-more]'), $('[data-result-count]'), 'products', 60);
+        }, results, shopMore, shopCount, 'products', 24, full ? 48 : 24);
+        if (recent) {
+          shopCount.textContent = shopCount.dataset.catalogTotal + ' products · New arrivals first';
+          shopMore.classList.remove('hidden');
+          shopMore.onclick = function () { run(true); };
+        }
+      }).catch(function () {
+        if (version === searchVersion) shopCount.textContent = 'Could not load the catalog. Try searching again.';
       });
     };
     form.addEventListener('submit', function (e) { e.preventDefault(); run(); });
@@ -399,21 +432,28 @@ pintrk('page');
     var jr = $('[data-results]');
     jf.q.value = params.get('q') || '';
     jf.topic.value = params.get('topic') || '';
-    var posts;
+    var posts, journalVersion = 0;
     var runJournal = function (initial) {
-      (posts ? Promise.resolve(posts) : fetch('/data/journal.json').then(function (r) { return r.json(); })).then(function (list) {
-        posts = list;
+      var version = ++journalVersion;
+      posts = posts || fetch('/data/journal.json').then(function (r) {
+        if (!r.ok) throw new Error('Could not load articles');
+        return r.json();
+      }).catch(function (error) { posts = null; throw error; });
+      posts.then(function (list) {
+        if (version !== journalVersion) return;
         var q = jf.q.value.trim().toLowerCase(), topic = jf.topic.value;
         var items = list.filter(function (p) { return (!topic || p[2] === topic) && (!q || p[1].toLowerCase().indexOf(q) !== -1); });
         paginate(items, function (p) {
           return '<a class="card post-card" href="/journal/' + p[0] + '/">' + (p[4] ? '<img loading="lazy" src="' + esc(p[4]) + '" alt="">' : '') +
-            '<span class="eyebrow">' + esc(titleCase(p[2] || 'journal')) + '</span><h3>' + esc(p[1]) + '</h3></a>';
+            '<span class="eyebrow">' + esc(titleCase(p[2] || 'journal')) + ' · <time datetime="' + esc(p[3]) + '">' + esc(p[3]) + '</time></span><h3>' + esc(p[1]) + '</h3></a>';
         }, jr, $('[data-load-more]'), $('[data-result-count]'), 'articles', 24, initial);
+      }).catch(function () {
+        if (version === journalVersion) $('[data-result-count]').textContent = 'Could not load the article index. Try again.';
       });
     };
     jf.addEventListener('input', function () { clearTimeout(runJournal.t); runJournal.t = setTimeout(function () { runJournal(); }, 150); });
     jf.addEventListener('submit', function (e) { e.preventDefault(); runJournal(); });
-    $('[data-load-more]').onclick = function () { runJournal(48); };
+    $('[data-load-more]').onclick = function () { runJournal(72); };
     if (jf.q.value || jf.topic.value) runJournal();
   }
 })();

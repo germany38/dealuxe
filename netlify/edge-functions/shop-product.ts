@@ -1,4 +1,5 @@
 import type { Config, Context } from "@netlify/edge-functions";
+import { awinDetails, awinAvailability } from "../../assets/awin-product.mjs";
 
 // Server-renders /shop/<slug> product pages so search engines get a real 200 page
 // with the product's title, description, canonical URL and structured data.
@@ -6,7 +7,9 @@ import type { Config, Context } from "@netlify/edge-functions";
 
 const IMG_SHARDS = 64;
 const RESERVED = new Set(["product", "brand", "department", "type"]);
-const shardCache = new Map<number, Promise<Record<string, string[]>>>();
+type RecordDetails = Record<string, string>;
+type Product = [string, string, string, string, string, string, string, RecordDetails?];
+const shardCache = new Map<string, Promise<Record<string, Product>>>();
 let templatePromise: Promise<string> | null = null;
 
 function shardOf(slug: string) {
@@ -28,12 +31,16 @@ function money(price: string, currency: string) {
   }
 }
 
-function loadShard(origin: string, n: number) {
-  if (!shardCache.has(n)) {
-    const p = fetch(`${origin}/data/img/${n}.json`).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
-    shardCache.set(n, p);
+function loadShard(origin: string, path: string) {
+  const key = `${origin}/data/${path}.json`;
+  if (!shardCache.has(key)) {
+    const p = fetch(key).then((r) => {
+      if (!r.ok) throw new Error(`Product shard returned ${r.status}`);
+      return r.json();
+    }).catch(() => { shardCache.delete(key); return {}; });
+    shardCache.set(key, p);
   }
-  return shardCache.get(n)!;
+  return shardCache.get(key)!;
 }
 
 export default async (req: Request, context: Context) => {
@@ -48,11 +55,14 @@ export default async (req: Request, context: Context) => {
 
   const m = url.pathname.match(/^\/shop\/([^\/]+)\/?$/);
   if (!m || RESERVED.has(m[1])) return;
-  const slug = decodeURIComponent(m[1]);
+  const slug = m[1];
+  if (!/^[a-z0-9-]+$/.test(slug)) return context.next();
 
-  const record = (await loadShard(url.origin, shardOf(slug)))[slug];
+  const bucket = shardOf(slug);
+  const published = slug.startsWith('awin-') ? (await loadShard(url.origin, `awin/${bucket}`))[slug] : null;
+  const record = published || (await loadShard(url.origin, `img/${bucket}`))[slug];
   if (!record) return context.next();
-  const [name, price, currency, brand, image, link, description] = record;
+  const [name, price, currency, brand, image, link, description, details] = record;
 
   templatePromise ??= fetch(`${url.origin}/shop/product/index.html`).then((r) => r.text());
   let html = await templatePromise;
@@ -69,7 +79,7 @@ export default async (req: Request, context: Context) => {
     ...(image ? { image } : {}),
     ...(brand ? { brand: { "@type": "Brand", name: brand } } : {}),
     ...(price
-      ? { offers: { "@type": "Offer", price, priceCurrency: currency || "USD", availability: "https://schema.org/InStock", url: canonical } }
+      ? { offers: { "@type": "Offer", price, priceCurrency: currency || "USD", ...awinAvailability(details), url: canonical } }
       : {}),
   };
 
@@ -81,26 +91,26 @@ export default async (req: Request, context: Context) => {
 
   html = html
     .replace(/<meta name="robots"[^>]*>\n?/g, "")
-    .replace(/<title>.*?<\/title>/, `<title>${esc(name)} — Dealux</title>`)
-    .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(desc)}">`)
+    .replace(/<title>.*?<\/title>/, () => `<title>${esc(name)} — Dealux</title>`)
+    .replace(/<meta name="description" content="[^"]*">/, () => `<meta name="description" content="${esc(desc)}">`)
     .replace(
       /<link rel="canonical" href="[^"]*">/,
-      `<link rel="canonical" href="${esc(canonical)}">\n<meta name="robots" content="index, follow">` +
+      () => `<link rel="canonical" href="${esc(canonical)}">\n<meta name="robots" content="index, follow">` +
         `\n<meta property="og:type" content="product"><meta property="og:title" content="${esc(name)}"><meta property="og:url" content="${esc(canonical)}">` +
         (image ? `<meta property="og:image" content="${esc(image)}">` : "") +
         `\n<script type="application/ld+json">${JSON.stringify(structured).replace(/</g, "\\u003c")}</script>`,
     )
-    .replace('<img data-img-slug=""', `<img data-img-slug="${esc(slug)}"${image ? ` src="${esc(image)}"` : ""}`)
-    .replace(/<h1 data-product-name>.*?<\/h1>/, `<h1 data-product-name>${esc(name)}</h1>`)
+    .replace('<img data-img-slug=""', () => `<img data-img-slug="${esc(slug)}"${image ? ` src="${esc(image)}"` : ""}`)
+    .replace(/<h1 data-product-name>.*?<\/h1>/, () => `<h1 data-product-name>${esc(name)}</h1>`)
     .replace(
       /<p class="muted" data-product-brand><\/p>/,
-      `<p class="muted" data-product-brand>${esc([priceText, brand && `by ${brand}`].filter(Boolean).join(" · "))}</p>` +
-        (description ? `\n  <p class="product-description">${esc(description)}</p>` : ""),
+      () => `<p class="muted" data-product-brand>${esc([priceText, brand && `by ${brand}`].filter(Boolean).join(" · "))}</p>` +
+        (description ? `\n  <p class="product-description">${esc(description)}</p>` : "") + awinDetails(details, currency),
     );
   if (link) {
     html = html.replace(
       '<a class="btn btn-gold hidden" data-product-link',
-      `<a class="btn btn-gold" href="${esc(link)}" data-product-link`,
+      () => `<a class="btn btn-gold" href="${esc(link)}" data-product-link`,
     );
   }
 
