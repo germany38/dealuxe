@@ -292,6 +292,13 @@ pintrk('page');
           if (d[0]) $('h3', card).textContent = d[0];
           var meta = $('.muted', card);
           if (meta && (d[1] || d[3])) meta.textContent = [money(d[1], d[2]), d[3]].filter(Boolean).join(' · ');
+          if (d[7] && d[7].power_deal && !$('.power-deal', card)) {
+            var deal = document.createElement('span');
+            deal.className = 'power-deal';
+            deal.innerHTML = '<span class="power-deal-badge">⚡ Power Deal</span> ';
+            deal.appendChild(document.createTextNode(d[7].power_deal));
+            meta ? card.insertBefore(deal, meta) : card.appendChild(deal);
+          }
         }
         if (!d[4]) return;
         img.onerror = function () { img.parentNode.classList.remove('has-img'); img.remove(); };
@@ -304,6 +311,9 @@ pintrk('page');
 
   // ---- Shop: client-side search over the static product index ----
   var productsPromise, awinProductsPromise;
+  // Kept in sync with the catalogue by scripts/update-counts.py.
+  var CATALOG_TOTAL = '281,119';
+  $$('.header-search input[name=q]').forEach(function (input) { input.placeholder = 'Search ' + CATALOG_TOTAL + ' products'; });
   function readProductList(url) {
     return fetch(url).then(function (r) {
       if (!r.ok) throw new Error('Could not load product list');
@@ -350,6 +360,10 @@ pintrk('page');
       shopMore.classList.add('hidden');
       (source || (recent ? loadAwinProducts() : loadProducts())).then(function (all) {
         if (version !== searchVersion) return;
+        if (!form.q.dataset.counted) {
+          form.q.dataset.counted = 1;
+          form.q.placeholder = 'Search ' + (source ? all.length.toLocaleString('en-US') : CATALOG_TOTAL) + ' products by name or brand…';
+        }
         var items = q.length || keywords.length || stateRe ? all.filter(function (slug) {
           if (keywords.length && !keywords.some(function (k) { return slug.split('-').some(function (p) { return p.indexOf(k) === 0; }); })) return false;
           if (stateRe && !stateRe.test(slug)) return false;
@@ -891,6 +905,19 @@ pintrk('page');
     var journalLayout = /^\/journal\/[^/]+/.test(location.pathname) &&
       main.querySelector(':scope > .post-layout-3');
     if (journalLayout && mountJournalRails(journalLayout, left, right)) return;
+    // Shop pages: categories stay on the left; every sponsored box moves into one right-hand column
+    // so the product grid is not squeezed between three sidebars.
+    if (/^\/(shop|brands)(\/|$)/.test(location.pathname)) {
+      var shopSide = main.querySelector('.shop-layout > aside.sidebar');
+      var extras = [];
+      if (shopSide) extras = Array.from(shopSide.children).filter(function (el) { return !el.matches('a.side-link, details'); });
+      main.querySelectorAll('aside.product-flexjobs, aside.product-temu').forEach(function (el) { el.removeAttribute('style'); extras.push(el); });
+      right.prepend.apply(right, extras.concat(Array.from(left.children)));
+      layout.classList.add('dx-shop-page');
+      main.parentNode.insertBefore(layout, main);
+      layout.append(main, right);
+      return;
+    }
     main.parentNode.insertBefore(layout, main);
     layout.append(left, main, right);
   }
