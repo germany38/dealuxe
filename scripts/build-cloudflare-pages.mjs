@@ -24,10 +24,14 @@ const PAID = String(process.env.CF_PAGES_PLAN || '').toLowerCase() === 'paid';
 const MAX_FILES = PAID ? 99000 : 19900; // Plan limits are 100,000 / 20,000; keep headroom.
 
 // Sections served through the forwarder instead of as Cloudflare files (free plan only).
-// Chosen because they hold many files but get the least traffic per file. /jobs/, /videos/ and /ads/
-// are published as static files so they stay up even when the Netlify site is unavailable
-// (e.g. when Netlify credits run out); /ads/<slug>/ pages without a file render via functions/ads/[slug].js.
-const PROXIED = PAID ? [] : ['deals'];
+// The forwarder fetches them from Netlify (functions/[[path]].js), and functions/_middleware.js
+// edge-caches that HTML for an hour so repeat visits don't re-hit Netlify.
+// BASE_PROXIED is always forwarded on the free plan. If the deploy would still exceed the free-plan
+// file limit, the lowest-traffic sections in PROXY_ORDER are forwarded one by one until it fits, so a
+// growing site never fails the build. The Journal, Shop and other content stay as free static files.
+// (/ads/<slug>/ pages without a file render via functions/ads/[slug].js; /deals/ is forwarded too.)
+const BASE_PROXIED = PAID ? [] : ['deals'];
+const PROXY_ORDER = PAID ? [] : ['videos', 'exclusive', 'jobs', 'entradas'];
 
 // Never published on Cloudflare: private, build-only or tooling files.
 const PRIVATE = new Set([
@@ -53,17 +57,31 @@ function countFiles(p) {
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT);
 
-let total = 0;
+// _redirects/_headers are config, not counted as assets.
+const countable = (name) => name !== '_redirects' && name !== '_headers';
+
+// Decide which sections to forward before copying, so the free-plan file limit is never exceeded.
+const entries = fs.readdirSync(ROOT).sort().filter((name) => !name.startsWith('.') && !PRIVATE.has(name));
+const counts = {};
+for (const name of entries) counts[name] = countable(name) ? countFiles(path.join(ROOT, name)) : 0;
+const proxied = new Set(BASE_PROXIED.filter((name) => entries.includes(name)));
+let total = entries.reduce((sum, name) => sum + (proxied.has(name) ? 0 : counts[name]), 0);
+for (const name of PROXY_ORDER) {
+  if (total <= MAX_FILES) break;
+  if (!entries.includes(name) || proxied.has(name)) continue;
+  proxied.add(name);
+  total -= counts[name];
+}
+const PROXIED = [...proxied];
+
 const copied = [];
-for (const name of fs.readdirSync(ROOT).sort()) {
-  if (name.startsWith('.') || PRIVATE.has(name) || PROXIED.includes(name)) continue;
+for (const name of entries) {
+  if (proxied.has(name)) continue;
   fs.cpSync(path.join(ROOT, name), path.join(OUT, name), {
     recursive: true,
     dereference: true,
     filter: (src) => !['.DS_Store', 'node_modules', '.git'].includes(path.basename(src)),
   });
-  // _redirects/_headers are config, not counted as assets.
-  if (name !== '_redirects' && name !== '_headers') total += countFiles(path.join(ROOT, name));
   copied.push(name);
 }
 
