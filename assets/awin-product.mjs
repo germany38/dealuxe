@@ -15,7 +15,9 @@ export function awinDetails(details, currency) {
     const value = details[key] + (['delivery_cost', 'rrp_price'].includes(key) ? ` ${currency}` : '');
     return `<dt>${label}</dt><dd>${escape(value)}</dd>`;
   });
-  return `<p class="muted"><a href="/shop/brand/${escape(details.brand_slug)}/">Browse this brand</a> · ` +
+  const deal = details.power_deal
+    ? `<p class="power-deal"><span class="power-deal-badge">⚡ Power Deal</span> ${escape(details.power_deal)}</p>` : '';
+  return deal + `<p class="muted"><a href="/shop/brand/${escape(details.brand_slug)}/">Browse this brand</a> · ` +
     `<a href="/shop/type/${escape(details.type_slug)}/">Browse this product type</a></p>` +
     `<details class="product-specifications"><summary>Product details</summary><dl>${entries.join('')}</dl></details>`;
 }

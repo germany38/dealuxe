@@ -60,7 +60,8 @@ def main():
     h = re.sub(r'<meta name="description" content="Shop [^"]*">',
                f'<meta name="description" content="Shop {products:,}+ products from {nb:,} brands and read our {articles:,} buying guides.">', h, count=1)
     h = re.sub(r'<p class="muted" data-catalog-summary>.*?</p>',
-               f'<p class="muted" data-catalog-summary>{products:,} products, {nb:,} brands and {articles:,} articles.</p>', h, count=1)
+               f'<p class="muted" data-catalog-summary>{products:,} products, {nb:,} brands and {articles:,} articles — '
+               f'every product page and article is indexable on Google and Bing.</p>', h, count=1)
     cards = ''.join(f'<a class="card dept-card" href="/shop/brand/{s}/">{n}<span class="muted">{c:,} products</span></a>' for s, n, c in brands[:24])
     h = re.sub(r'(<h2>Shop by brand.*?<div class="grid dept-grid">).*?(</div>)', lambda mm: mm.group(1) + cards + mm.group(2), h, count=1, flags=re.S)
     img = lambda u: f'<img loading="lazy" src="{html.escape(u, quote=True)}" alt="">' if u else ''
@@ -75,7 +76,23 @@ def main():
     h = re.sub(r'<meta name="description" content="Search and filter [^"]*">', f'<meta name="description" content="Search and filter {products:,} products.">', h, count=1)
     h = re.sub(r'data-result-count(?: data-catalog-total="[^"]*")?>[^<]*<',
                f'data-result-count data-catalog-total="{products:,}">{products:,} products · New arrivals first<', h, count=1)
+    summary = (f'<p class="muted" data-index-summary>{products:,} products and {articles:,} articles in total · '
+               f'all indexable on Google and Bing via our sitemaps.</p>')
+    if 'data-index-summary' in h:
+        h = re.sub(r'<p class="muted" data-index-summary>.*?</p>', summary, h, count=1)
+    else:
+        h = re.sub(r'(<p class="muted" data-result-count[^>]*>[^<]*</p>)', lambda mm: mm.group(1) + '\n    ' + summary, h, count=1)
     open(p, 'w', encoding='utf-8').write(h)
+    p = 'assets/app.js'
+    h = open(p, encoding='utf-8').read()
+    h = re.sub(r"var CATALOG_TOTAL = '[\d,]+';", f"var CATALOG_TOTAL = '{products:,}';", h, count=1)
+    open(p, 'w', encoding='utf-8').write(h)
+    for p in ('shop/index.html', 'shop/product/index.html', 'index.html'):
+        h = open(p, encoding='utf-8').read()
+        h = re.sub(r'placeholder="Search [\d,k+]+ products"', f'placeholder="Search {products:,} products"', h)
+        h = re.sub(r'placeholder="(?:Filter by name or brand…|Search [\d,]+ products by name or brand…)"',
+                   f'placeholder="Search {products:,} products by name or brand…"', h)
+        open(p, 'w', encoding='utf-8').write(h)
     print(f'{products:,} products, {nb:,} brands, {articles:,} articles')
 
 
