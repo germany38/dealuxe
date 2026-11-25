@@ -147,7 +147,7 @@ idx_path = os.path.join(DEALS, 'index.html')
 idx = open(idx_path, encoding='utf-8').read()
 idx = re.sub(r'<p class="promo-link">.*?</p>\n', '', idx)
 idx = idx.replace('<form class="filter-bar" data-deal-filter>',
-                  f'<p class="promo-link"><a class="btn btn-gold" href="/deals/promotions/">Browse {len(promos):,} more store promotions &amp; vouchers →</a></p>\n'
+                  f'<p class="promo-link"><a class="btn btn-gold" href="/deals/">Browse all deals &amp; vouchers →</a></p>\n'
                   '<form class="filter-bar" data-deal-filter>', 1)
 write(idx_path, idx)
 
