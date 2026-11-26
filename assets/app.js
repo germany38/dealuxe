@@ -312,7 +312,7 @@ pintrk('page');
   // ---- Shop: client-side search over the static product index ----
   var productsPromise, awinProductsPromise;
   // Kept in sync with the catalogue by scripts/update-counts.py.
-  var CATALOG_TOTAL = '354k+';
+  var CATALOG_TOTAL = '362k+';
   $$('.header-search input[name=q]').forEach(function (input) { input.placeholder = 'Search ' + CATALOG_TOTAL + ' products'; });
   function readProductList(url) {
     return fetch(url).then(function (r) {

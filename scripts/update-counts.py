@@ -89,16 +89,9 @@ def main():
     h = open(p, encoding='utf-8').read()
     h = re.sub(r"var CATALOG_TOTAL = '[^']*';", f"var CATALOG_TOTAL = '{k_label}';", h, count=1)
     open(p, 'w', encoding='utf-8').write(h)
-    # The shared script refreshes the header search label at runtime, but the
-    # static markup on every page should carry the same "###k+" product count.
-    search_re = re.compile(r'placeholder="Search [\d,]+k?\+? products')
-    for path in Path('.').rglob('*.html'):
-        if path.parts[0].startswith('.'):
-            continue
-        h = path.read_text(encoding='utf-8')
-        h2 = search_re.sub(f'placeholder="Search {k_label} products', h)
-        if h2 != h:
-            path.write_text(h2, encoding='utf-8')
+    # The header search label is refreshed at runtime from CATALOG_TOTAL (see
+    # assets/app.js), so updating the static placeholder on every page would
+    # only add ~15k no-op file changes to each import commit. Left to runtime.
     print(f'{products:,} products, {nb:,} brands, {articles:,} articles')
 
 
