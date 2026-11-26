@@ -9,3 +9,11 @@ node_modules/
 # Python bytecode caches (keep pull requests small)
 __pycache__/
 *.pyc
+
+# Legacy duplicate slug list; data/products.txt is the single source of truth
+/products.txt
+
+# A previous run copied the whole site into .github/, which doubled the repo and
+# stalled GitHub pushes. Only .github/workflows belongs here.
+.github/*
+!.github/workflows/
