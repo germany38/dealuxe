@@ -48,6 +48,7 @@ def main():
                   f'<span class="muted">{c:,} product{"s" if c != 1 else ""}</span></li>' for s, n, c in brands)
     nb = len(brands)
     h = h[:m.start(1)] + lis + h[m.end(1):]
+    h = re.sub(r'<title>All [\d,]+ brands — Dealux</title>', f'<title>All {nb:,} brands — Dealux</title>', h)
     h = re.sub(r'placeholder="Search [\d,]+ brands…"', f'placeholder="Search {nb:,} brands…"', h)
     h = re.sub(r'data-result-count>[\d,]+ brands<', f'data-result-count>{nb:,} brands<', h)
     h = re.sub(r'<meta name="description" content="[^"]*">',
@@ -83,16 +84,21 @@ def main():
     else:
         h = re.sub(r'(<p class="muted" data-result-count[^>]*>[^<]*</p>)', lambda mm: mm.group(1) + '\n    ' + summary, h, count=1)
     open(p, 'w', encoding='utf-8').write(h)
+    k_label = f'{products // 1000}k+'
     p = 'assets/app.js'
     h = open(p, encoding='utf-8').read()
-    h = re.sub(r"var CATALOG_TOTAL = '[\d,]+';", f"var CATALOG_TOTAL = '{products:,}';", h, count=1)
+    h = re.sub(r"var CATALOG_TOTAL = '[^']*';", f"var CATALOG_TOTAL = '{k_label}';", h, count=1)
     open(p, 'w', encoding='utf-8').write(h)
-    for p in ('shop/index.html', 'shop/product/index.html', 'index.html'):
-        h = open(p, encoding='utf-8').read()
-        h = re.sub(r'placeholder="Search [\d,k+]+ products"', f'placeholder="Search {products:,} products"', h)
-        h = re.sub(r'placeholder="(?:Filter by name or brand…|Search [\d,]+ products by name or brand…)"',
-                   f'placeholder="Search {products:,} products by name or brand…"', h)
-        open(p, 'w', encoding='utf-8').write(h)
+    # The shared script refreshes the header search label at runtime, but the
+    # static markup on every page should carry the same "###k+" product count.
+    search_re = re.compile(r'placeholder="Search [\d,]+k?\+? products')
+    for path in Path('.').rglob('*.html'):
+        if path.parts[0].startswith('.'):
+            continue
+        h = path.read_text(encoding='utf-8')
+        h2 = search_re.sub(f'placeholder="Search {k_label} products', h)
+        if h2 != h:
+            path.write_text(h2, encoding='utf-8')
     print(f'{products:,} products, {nb:,} brands, {articles:,} articles')
 
 
