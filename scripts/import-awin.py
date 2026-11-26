@@ -119,9 +119,8 @@ def main(path):
         with open('netlify/database/migrations/'+migration,'x') as f: f.write(body)
     for s,i in items.items(): shards[cj.shard_of(s)][s]=i['rec']
     for n,data in shards.items(): cj.write_json(f'data/img/{n}.json',data)
-    slugs = list(dict.fromkeys(open('data/products.txt').read().splitlines() + open('products.txt').read().splitlines() + list(items)))
-    for p in ['products.txt','data/products.txt']:
-        open(p,'w').write('\n'.join(slugs)+'\n')
+    slugs = list(dict.fromkeys(open('data/products.txt').read().splitlines() + list(items)))
+    open('data/products.txt','w').write('\n'.join(slugs)+'\n')
     lists = collections.defaultdict(list); names={}; links={}
     for s,i in items.items():
         b=cj.slugify(i['brand']); names[b]=i['brand'];links.setdefault(b,i['rec'][5])

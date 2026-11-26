@@ -138,12 +138,12 @@ def build_maps():
     return shop_slugs, names, host_map, merchant_map
 
 
-def resolve(article, art_slug, shop_slugs, names, host_map, merchant_map):
+def resolve(article, art_slug, shop_slugs, names, host_map, merchant_map, label_hint='', affiliate_hint=''):
     links = article_links(article)
     match = (re.search(r'article-cta">.*?<a\b[^>]*href="([^"]+)"', article, re.S)
              or re.search(r'<p class="cta">.*?<a\b[^>]*href="([^"]+)"', article, re.S))
-    affiliate = html.unescape(match.group(1)) if match else (links[0] if links else '')
-    label = cta_label(article)
+    affiliate = affiliate_hint or (html.unescape(match.group(1)) if match else (links[0] if links else ''))
+    label = label_hint or cta_label(article)
     brand_slug = slugify(label) if label and slugify(label) in shop_slugs else None
     if not brand_slug and affiliate:
         for candidate in (host_map.get(dest_host(affiliate)), merchant_map.get(awin_merchant(affiliate))):
@@ -184,8 +184,23 @@ def enrich(html_text, art_slug, shop_slugs, names, host_map, merchant_map):
     if start < 0:
         return html_text, False
     end = html_text.find('</article>', start)
-    article = strip_previous(html_text[start:end])
-    affiliate, brand_slug, brand_name = resolve(article, art_slug, shop_slugs, names, host_map, merchant_map)
+    original = html_text[start:end]
+    # Already carries both the affiliate and shop-directory buttons: leave as is.
+    top = re.search(r'<!-- dx-cta-top -->.*?<!-- /dx-cta-top -->', original, re.S)
+    if top and 'btn btn-gold' in top.group(0) and 'btn btn-dark' in top.group(0):
+        return html_text, False
+    # Reuse the article's own existing call-to-action instead of re-deriving a
+    # brand from link-host maps, which can pick the wrong merchant on a re-run.
+    label_hint = cta_label(original)
+    affiliate_hint = ''
+    gold = GOLD_RE.search(original)
+    if gold:
+        href = re.search(r'href="([^"]+)"', gold.group(0))
+        if href:
+            affiliate_hint = html.unescape(href.group(1))
+    article = strip_previous(original)
+    affiliate, brand_slug, brand_name = resolve(article, art_slug, shop_slugs, names, host_map, merchant_map,
+                                                label_hint, affiliate_hint)
     if not affiliate and not brand_name:
         return html_text, False
     gold, black = buttons(affiliate, brand_slug, brand_name)

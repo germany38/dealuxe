@@ -31,13 +31,3 @@
   status = 404
   force = true
 
-# Merchant creative archives provide promotional assets rather than editorial articles.
-[[headers]]
-  for = "/ads/*"
-  [headers.values]
-    X-Robots-Tag = "noindex, follow"
-
-[[headers]]
-  for = "/videos/*"
-  [headers.values]
-    X-Robots-Tag = "noindex, follow"
