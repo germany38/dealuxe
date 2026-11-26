@@ -2,9 +2,10 @@
 # (netlify.toml also forces a 404 for these on Netlify; this rule covers hosts that read _redirects only.)
 /exclusive-files/*  /exclusive/  302
 
-# Ad banners now load straight from Impact's image host (no proxy, so no bandwidth or function use
-# on Netlify or Cloudflare). Old /ad-img/ links redirect there instead of 404ing on Cloudflare.
-/ad-img/*  https://a.impactradius-go.com/display-ad/:splat  301
+# The /ads/ merchant-creative archive and the /videos/ section were retired to keep the repo
+# small. Send old or already-indexed URLs to the closest live section instead of 404ing.
+/ads/*     /deals/    301
+/videos/*  /journal/  301
 
 # Product and ticket pages have no file per item. dealuxapp.com is currently served by a host
 # that ignores netlify.toml and edge functions, so rewrite them to the shared pages here

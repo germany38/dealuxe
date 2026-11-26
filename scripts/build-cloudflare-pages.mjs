@@ -29,9 +29,9 @@ const MAX_FILES = PAID ? 99000 : 19900; // Plan limits are 100,000 / 20,000; kee
 // BASE_PROXIED is always forwarded on the free plan. If the deploy would still exceed the free-plan
 // file limit, the lowest-traffic sections in PROXY_ORDER are forwarded one by one until it fits, so a
 // growing site never fails the build. The Journal, Shop and other content stay as free static files.
-// (/ads/<slug>/ pages without a file render via functions/ads/[slug].js; /deals/ is forwarded too.)
+// (/deals/ is forwarded on the free plan.)
 const BASE_PROXIED = PAID ? [] : ['deals'];
-const PROXY_ORDER = PAID ? [] : ['videos', 'exclusive', 'jobs', 'entradas'];
+const PROXY_ORDER = PAID ? [] : ['exclusive', 'jobs', 'entradas'];
 
 // Never published on Cloudflare: private, build-only or tooling files.
 const PRIVATE = new Set([
@@ -93,9 +93,8 @@ const routes = {
     ...PROXIED.flatMap((d) => [`/${d}`, `/${d}/*`]),
     '/shop/*',
     '/tickets/*',
-    '/ads/*',
   ],
-  exclude: ['/ads/', '/ads/page/*', '/shop/', '/shop/brand/*', '/shop/department/*', '/shop/type/*', '/tickets/', '/tickets/show/*'],
+  exclude: ['/shop/', '/shop/brand/*', '/shop/department/*', '/shop/type/*', '/tickets/', '/tickets/show/*'],
 };
 fs.writeFileSync(path.join(OUT, '_routes.json'), JSON.stringify(routes, null, 2) + '\n');
 

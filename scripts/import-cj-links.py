@@ -199,9 +199,8 @@ def main(csv_path):
         shards[shard_of(it['slug'])][it['slug']] = it['rec']
     for n, data in shards.items():
         write_json(f'data/img/{n}.json', data)
-    for path in ('data/products.txt', 'products.txt'):
-        with open(path, 'a', encoding='utf-8') as f:
-            f.write(''.join(i['slug'] + '\n' for i in items))
+    with open('data/products.txt', 'a', encoding='utf-8') as f:
+        f.write(''.join(i['slug'] + '\n' for i in items))
 
     # ---- lists ----
     def add_to_list(name, slugs):
