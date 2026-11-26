@@ -23,6 +23,12 @@ input[type=search], select { width: 100%; background: var(--panel); color: var(-
 input[type=search]:focus, select:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
 .btn { display: inline-block; border: 1px solid transparent; border-radius: 10px; padding: .6rem 1rem; font: inherit; font-weight: 600; cursor: pointer; }
 .btn-gold { background: linear-gradient(90deg, var(--color-gold-600, #b8862b), var(--gold)); color: #17130a; }
+.btn-dark { background: #000; color: #fff; border-color: #000; }
+.btn-dark:hover { background: #1c1b22; color: #fff; }
+.dx-brand-cta { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin: .4rem 0; }
+.dx-cta-top { margin: 1.1rem 0 1.4rem; }
+.dx-cta-bottom { margin: 1.6rem 0 .6rem; }
+.dx-brand-cta .btn, .post-body a.btn { text-decoration: none; }
 .btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
 .btn-ghost:hover { border-color: var(--gold); }
 .see-all { font-size: .9rem; color: var(--gold); font-weight: 500; }
