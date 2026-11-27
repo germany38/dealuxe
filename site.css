@@ -111,3 +111,19 @@ a.card:hover { border-color: var(--gold); }
   .tpt-side strong { margin: 0; }
   .tpt-side p { flex: 1 1 220px; margin: 0; }
 }
+
+/* Compact site-wide partner sidebar (injected by app.js on every page). */
+.dx-promo-side { display: flex; flex-direction: column; gap: .6rem; }
+.dx-promo-side .dx-promo { padding: .7rem .8rem; font-size: .82rem; line-height: 1.4; gap: .2rem; }
+.dx-promo-side .dx-promo h3 { font-size: .88rem; margin: .15rem 0; }
+.dx-promo-side .dx-promo .muted { font-size: .78rem; }
+.dx-promo-side .dx-promo .btn { display: block; text-align: center; padding: .4rem .55rem; font-size: .78rem; }
+.dx-promo-side .dx-promo-travel { padding: .6rem; text-align: center; }
+.dx-promo-side .dx-promo-travel a { font-size: .8rem !important; }
+@media (min-width: 1660px) {
+  .dx-promo-side { position: fixed; top: 84px; right: 12px; z-index: 15; width: 190px; max-height: calc(100vh - 100px); overflow-y: auto; }
+}
+@media (max-width: 1659px) {
+  .dx-promo-side { flex-direction: row; flex-wrap: wrap; margin: .75rem 1.25rem 0; }
+  .dx-promo-side .dx-promo { flex: 1 1 220px; }
+}
