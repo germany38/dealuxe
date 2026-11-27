@@ -924,3 +924,56 @@ pintrk('page');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
   else mount();
 })();
+
+// AppSumo creator promo — "Publish your product, earn $50". Pinned into the sidebar on every
+// AppSumo item page (and the AppSumo brand page) so shoppers are enticed to list their own
+// product, and shown site-wide where a sidebar exists. Also installs the Awin publisher
+// click-tracking tag so AppSumo/Awin links are attributed. Loaded from the shared script so it
+// runs on every page, whether answered by Netlify or by the Cloudflare Pages copy.
+(function () {
+  'use strict';
+
+  // Awin publisher click-tracking tag (publisher 2893129).
+  if (!document.querySelector('script[src*="dwin2.com/pub.2893129"]')) {
+    var tracking = document.createElement('script');
+    tracking.src = 'https://www.dwin2.com/pub.2893129.min.js';
+    tracking.async = true;
+    tracking.setAttribute('data-cfasync', 'false');
+    document.head.appendChild(tracking);
+  }
+
+  function mount() {
+    if (document.querySelector('.dx-appsumo-promo')) return;
+    var css = document.createElement('style');
+    css.textContent = '.dx-appsumo-side{margin:0 0 1rem}' +
+      '.dx-appsumo-side.dx-appsumo-site{margin:.75rem 1.25rem 0}' +
+      '.dx-appsumo-promo .btn{display:block;text-align:center}';
+    document.head.appendChild(css);
+
+    var card = document.createElement('div');
+    card.className = 'card promo-card dx-appsumo-promo';
+    card.innerHTML =
+      '<span class="eyebrow">AppSumo · Creators</span>' +
+      '<h3>Publish your product, earn $50</h3>' +
+      '<p class="muted">List your software on AppSumo and get paid to reach a ready-to-buy audience.</p>' +
+      '<a class="btn btn-gold" href="https://appsumo.8odi.net/POy3aj" target="_blank" rel="sponsored noopener">Start on AppSumo →</a>';
+
+    // Every AppSumo item page ships the product sidebar; the AppSumo brand page and the main
+    // shop use the shop sidebar; Journal articles use the post sidebar. Pin the card to the top
+    // of whichever is present so it is the first thing a visitor sees.
+    var side = document.querySelector('aside.product-flexjobs') ||
+      document.querySelector('.shop-layout > aside.sidebar') ||
+      document.querySelector('.post-sidebar:not(.post-sidebar-left)');
+    if (side) { side.insertBefore(card, side.firstChild); return; }
+
+    var box = document.createElement('aside');
+    box.className = 'dx-appsumo-side dx-appsumo-site';
+    box.setAttribute('aria-label', 'AppSumo creator program');
+    box.appendChild(card);
+    var anchor = document.querySelector('.partner-strip');
+    if (anchor) anchor.insertAdjacentElement('afterend', box);
+    else (document.querySelector('main') || document.body).appendChild(box);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
+})();
