@@ -4,7 +4,7 @@ const escape = (value) => String(value).replace(/[&<>"']/g, (char) => ({
 
 const labels = {
   merchant: 'Merchant', category: 'Category', merchant_category: 'Merchant category',
-  product_type: 'Product type', colour: 'Colour', condition: 'Condition', stock_status: 'Stock',
+  product_brand: 'Brand', product_type: 'Product type', colour: 'Colour', condition: 'Condition', stock_status: 'Stock',
   delivery_cost: 'Delivery cost', rrp_price: 'Recommended retail price', ean: 'EAN', mpn: 'MPN',
   merchant_product_category_path: 'Merchant category path',
 };
