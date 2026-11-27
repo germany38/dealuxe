@@ -328,3 +328,62 @@
     };
 })();
 // === END OF ZYNTENT MONETIZATION PIPELINE ===
+
+// === DEALUX SITE-WIDE PROMO SIDEBAR + AWIN TRACKING ===
+// One shared script keeps this on every page without editing thousands of HTML
+// files (which is what made earlier changes too large to review). The sidebar
+// renders as a fixed compact column on wide screens and as an inline block on
+// narrow ones, mirroring the Teachers Pay Teachers card above.
+(function () {
+  'use strict';
+
+  // Awin publisher click-tracking tag (publisher 2893129).
+  if (!document.querySelector('script[src*="dwin2.com/pub.2893129"]')) {
+    var tracking = document.createElement('script');
+    tracking.src = 'https://www.dwin2.com/pub.2893129.min.js';
+    tracking.async = true;
+    tracking.setAttribute('data-cfasync', 'false');
+    document.head.appendChild(tracking);
+  }
+
+  // Promo cards shown in the compact sidebar on every page.
+  var PROMOS = [
+    '<div class="card promo-card side-banner dx-promo dx-promo-travel">' +
+      '<a href="https://atlas.hellosafe.com/r/bhwb33c6" style="display:inline-block;padding:12px 22px;background:#563bff;color:#ffffff;border-radius:10px;text-decoration:none;font-weight:600;font-family:sans-serif">' +
+      '\u2708\ufe0f Travel insurance: find the best cover at the best price (free quote)</a></div>',
+    '<div class="card promo-card side-banner dx-promo">' +
+      '<span class="eyebrow">AppSumo \u00b7 Creators</span>' +
+      '<h3>Publish your product, earn $50</h3>' +
+      '<p class="muted">List your software on AppSumo and get paid to reach a ready-to-buy audience.</p>' +
+      '<a class="btn btn-gold" href="https://appsumo.8odi.net/POy3aj" target="_blank" rel="sponsored noopener">Start on AppSumo \u2192</a></div>',
+    '<div class="card promo-card side-banner dx-promo">' +
+      '<span class="eyebrow">Brilliant \u00b7 Learn</span>' +
+      '<h3>Brilliant \u2014 Learning App Free Trial</h3>' +
+      '<p class="muted">Sharpen your maths, data and computer-science skills with short interactive lessons.</p>' +
+      '<a class="btn btn-gold" href="https://brilliant.sjv.io/EEoe5P" target="_blank" rel="sponsored noopener">Try Brilliant free \u2192</a></div>',
+    '<div class="card promo-card side-banner dx-promo">' +
+      '<span class="eyebrow">Freecash \u00b7 Rewards</span>' +
+      '<h3>Get a $5 welcome gift</h3>' +
+      '<p class="muted">Play games and complete offers to earn cash and gift cards with Freecash.</p>' +
+      '<a class="btn btn-gold" href="https://freecash.pxf.io/QjYkW6" target="_blank" rel="sponsored noopener">Claim $5 on Freecash \u2192</a></div>',
+    '<div class="card promo-card side-banner dx-promo">' +
+      '<span class="eyebrow">Klover \u00b7 Cash perks</span>' +
+      '<h3>Connect your bank to unlock your bonus</h3>' +
+      '<p class="muted">Link your bank account to access the cash rewards and perks Klover offers.</p>' +
+      '<a class="btn btn-gold" href="https://klover.pxf.io/xLoQG1" target="_blank" rel="sponsored noopener">Get your Klover bonus \u2192</a></div>'
+  ];
+
+  var aside = document.createElement('aside');
+  aside.className = 'dx-promo-side';
+  aside.setAttribute('aria-label', 'Partner offers');
+  aside.innerHTML = PROMOS.join('');
+
+  var anchor = document.querySelector('.partner-strip');
+  if (anchor) anchor.insertAdjacentElement('afterend', aside);
+  else {
+    var header = document.querySelector('.site-header');
+    if (header) header.insertAdjacentElement('afterend', aside);
+    else document.body.insertBefore(aside, document.body.firstChild);
+  }
+})();
+// === END OF DEALUX SITE-WIDE PROMO SIDEBAR ===
