@@ -30,6 +30,80 @@ CTA_VERBS = ('Visit', 'Bekijk', 'Besuch', 'Besuchen', 'Bezoek', 'Bezoeken', 'Vis
 CTA_LABEL_PREFIXES = re.compile(r'^(?:' + '|'.join(re.escape(v) for v in CTA_VERBS) + r')\s+', re.I)
 CTA_LABEL_SUFFIXES = re.compile(r'\s+(?:' + '|'.join(re.escape(v) for v in CTA_VERBS) + r')$', re.I)
 
+# Journal topic -> (Exclusive category slug, short label). A third "PDF" button links the
+# article's topic to the matching paid printable in /exclusive/. Topics without a good match
+# get no button, so we never send readers to an empty category.
+EXCLUSIVE_CTA = {
+    'Gifts': ('deals-and-smart-shopping', 'Deals'),
+    'Travel': ('travel-and-connectivity', 'Travel'),
+    'Technology': ('electronics', 'Tech'),
+    'Finance': ('deals-and-smart-shopping', 'Deals'),
+    'Beauty': ('hair-and-beauty', 'Beauty'),
+    'Home': ('home-decor', 'Home'),
+    'Education': ('education-and-classroom', 'Education'),
+    'Creative': ('social-media', 'Social Media'),
+    'Fashion': ('clothing', 'Fashion'),
+    'Entertainment': ('tickets-and-experiences', 'Experiences'),
+    'Food Drink': ('food-and-snacks', 'Food'),
+    'Sports': ('sports-and-outdoors', 'Sports'),
+    'Automotive': ('automotive', 'Automotive'),
+    'Business Services B2B': ('deals-and-smart-shopping', 'Deals'),
+    'Amazon': ('deals-and-smart-shopping', 'Deals'),
+    'Pets': ('toys-costumes-and-pets', 'Pets & Toys'),
+    'Jewelry': ('jewelry', 'Jewelry'),
+    'Education Training': ('education-and-classroom', 'Education'),
+    'Health': ('wellness-and-massage', 'Wellness'),
+    'Software Downloads': ('gaming-and-software', 'Software'),
+    'Books': ('education-and-classroom', 'Education'),
+    'Mobile Pay As You Go': ('travel-and-connectivity', 'Travel'),
+    'Tourism': ('travel-and-connectivity', 'Travel'),
+    'Department Stores': ('deals-and-smart-shopping', 'Deals'),
+    'Travel Agencies': ('travel-and-connectivity', 'Travel'),
+    'Hotels': ('travel-and-connectivity', 'Travel'),
+    'Pc': ('electronics', 'Tech'),
+    'Computers': ('electronics', 'Tech'),
+    'Insurance': ('deals-and-smart-shopping', 'Deals'),
+    'Clothing': ('clothing', 'Fashion'),
+    'Internet Service Provider': ('travel-and-connectivity', 'Travel'),
+    'Electronic Accessories': ('electronics', 'Tech'),
+    'Web Hosting': ('gaming-and-software', 'Software'),
+    'Toys': ('toys-costumes-and-pets', 'Pets & Toys'),
+    'Mobile Broadband': ('travel-and-connectivity', 'Travel'),
+    'Clothing Accessories': ('shoes-bags-and-accessories', 'Accessories'),
+    'Airport Parking': ('travel-and-connectivity', 'Travel'),
+    'Tickets': ('tickets-and-experiences', 'Experiences'),
+    'Entertainment Downloads': ('gaming-and-software', 'Software'),
+    'Diy': ('home-decor', 'Home'),
+    'Sports Equipment': ('sports-and-outdoors', 'Sports'),
+    'Mobile Downloads': ('gaming-and-software', 'Software'),
+    'Digital Tv': ('electronics', 'Tech'),
+    'White Goods': ('appliances', 'Appliances'),
+    'Jewellery': ('jewelry', 'Jewelry'),
+    'Fmcg': ('food-and-snacks', 'Food'),
+    'Savings': ('deals-and-smart-shopping', 'Deals'),
+    'Sportswear': ('clothing', 'Fashion'),
+    'Photography': ('cameras-and-photo', 'Photography'),
+    'Online Gaming': ('gaming-and-software', 'Software'),
+    'Electronic Superstore': ('electronics', 'Tech'),
+    'Womenswear': ('clothing', 'Fashion'),
+    'Loans': ('deals-and-smart-shopping', 'Deals'),
+    'Office Supplies': ('home-office', 'Office'),
+    'Entertainment Superstore': ('tickets-and-experiences', 'Experiences'),
+    'Group Buying': ('deals-and-smart-shopping', 'Deals'),
+    'Gambling': ('gaming-and-software', 'Software'),
+    'Audio Visual': ('electronics', 'Tech'),
+    'Network Operators': ('travel-and-connectivity', 'Travel'),
+    'Music': ('tickets-and-experiences', 'Experiences'),
+    'B2B Telecommunications Services': ('deals-and-smart-shopping', 'Deals'),
+    'Pharmaceuticals': ('wellness-and-massage', 'Wellness'),
+    'Shoes': ('shoes-bags-and-accessories', 'Accessories'),
+    'Baby': ('toys-costumes-and-pets', 'Pets & Toys'),
+    'Gadgets': ('electronics', 'Tech'),
+    'Mortgages': ('deals-and-smart-shopping', 'Deals'),
+    'Mobile Contract': ('travel-and-connectivity', 'Travel'),
+    'Food & Drink': ('food-and-snacks', 'Food'),
+}
+
 
 def slugify(s):
     s = unicodedata.normalize('NFKD', s or '').encode('ascii', 'ignore').decode().lower()
@@ -100,6 +174,12 @@ def cta_label(article):
     return ''
 
 
+def article_category(article):
+    """The topic shown in the article's eyebrow (e.g. 'Creative · 7 min read')."""
+    match = re.search(r'<span class="eyebrow">([^<·]+)·', article)
+    return html.unescape(match.group(1)).strip() if match else ''
+
+
 def build_maps():
     shop_slugs = {entry.name for entry in Path('shop/brand').iterdir() if entry.is_dir()}
     names = {}
@@ -161,14 +241,18 @@ def resolve(article, art_slug, shop_slugs, names, host_map, merchant_map):
     return affiliate, brand_slug, brand_name
 
 
-def buttons(affiliate, brand_slug, brand_name):
+def buttons(affiliate, brand_slug, brand_name, pdf=None):
     gold_label = f'Visit {brand_name}' if brand_name else 'Visit site'
     black_label = f'Shop for {brand_name}' if brand_name else 'Shop similar deals'
     shop_dir = f'/shop/brand/{brand_slug}/' if brand_slug else '/shop/'
     gold = (f'<a class="btn btn-gold" href="{esc(affiliate)}" target="_blank" rel="sponsored nofollow noopener">'
             f'{esc(gold_label)} →</a>')
     black = f'<a class="btn btn-dark" href="{esc(shop_dir)}">{esc(black_label)} →</a>'
-    return gold, black
+    pdf_html = ''
+    if pdf:
+        slug, label = pdf
+        pdf_html = f'<a class="btn btn-gold" href="/exclusive/?category={esc(slug)}">Get the {esc(label)} PDF →</a>'
+    return gold, black, pdf_html
 
 
 def strip_previous(article):
@@ -188,20 +272,21 @@ def enrich(html_text, art_slug, shop_slugs, names, host_map, merchant_map):
     affiliate, brand_slug, brand_name = resolve(article, art_slug, shop_slugs, names, host_map, merchant_map)
     if not affiliate and not brand_name:
         return html_text, False
-    gold, black = buttons(affiliate, brand_slug, brand_name)
+    pdf = EXCLUSIVE_CTA.get(article_category(article))
+    gold, black, pdf_html = buttons(affiliate, brand_slug, brand_name, pdf)
 
     # Bottom: reuse an existing call-to-action when the article has one, adding
     # the shop button beside it; otherwise add a fresh bottom block.
     existing = GOLD_RE.search(article)
     if existing:
-        pair = f'<span class="dx-brand-cta">{existing.group(0)}{black}</span>'
+        pair = f'<span class="dx-brand-cta">{existing.group(0)}{black}{pdf_html}</span>'
         article = article[:existing.start()] + pair + article[existing.end():]
     else:
         bottom = (f'<!-- dx-cta-bottom -->\n<div class="dx-brand-cta dx-cta-bottom">'
-                  f'{gold if affiliate else ""}{black}</div>\n<!-- /dx-cta-bottom -->')
+                  f'{gold if affiliate else ""}{black}{pdf_html}</div>\n<!-- /dx-cta-bottom -->')
         article = article + bottom + '\n'
 
-    top_buttons = (gold if affiliate else '') + black
+    top_buttons = (gold if affiliate else '') + black + pdf_html
     top = f'<!-- dx-cta-top -->\n<div class="dx-brand-cta dx-cta-top">{top_buttons}</div>\n<!-- /dx-cta-top -->'
     article = article.replace('</h1>', '</h1>\n' + top, 1)
 

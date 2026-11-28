@@ -7,6 +7,7 @@
   var cat = '';
   var params = new URLSearchParams(location.search);
   if (params.get('q')) q.value = params.get('q');
+  if (params.get('category')) cat = params.get('category');
 
   function apply() {
     var term = q.value.trim().toLowerCase();
@@ -19,6 +20,7 @@
     count.textContent = shown.toLocaleString() + ' resources';
   }
   chips.forEach(function (b) {
+    if (b.dataset.filter === cat) b.classList.add('active');
     b.addEventListener('click', function () {
       chips.forEach(function (x) { x.classList.remove('active'); });
       b.classList.add('active');

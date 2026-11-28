@@ -1,12 +1,12 @@
 // Rebuilds .cloudflare-pages/, the folder Cloudflare Pages publishes for dealuxapp.com (see wrangler.toml).
 //
-// Cloudflare's free plan allows 20,000 files per deploy, and the site has more than that. So:
-//  - Every section NOT listed in PROXIED is copied in as real files, and Cloudflare serves them itself.
-//    (Real copies, not symlinks: Cloudflare's build doesn't follow symlinks, so they failed the deploy.)
+// Cloudflare's free plan allows 20,000 files per deploy. The site now fits under that, so every
+// section is copied in as a real file and Cloudflare serves it itself:
+//  - Real copies, not symlinks: Cloudflare's build doesn't follow symlinks, so they failed the deploy.
 //    Static files are free and unlimited, so they don't count toward the 100,000 requests/day limit.
-//  - PROXIED sections are left out, and _routes.json sends them to functions/[[path]].js, which
-//    fetches them from the Netlify site. Only these requests (plus /shop/<product> and
-//    /tickets/<event> pages and Netlify API calls) count toward the daily limit.
+//  - The PROXIED mechanism below is kept for headroom: if the site grows past the limit, the
+//    lowest-traffic sections in PROXY_ORDER are forwarded to Netlify (functions/[[path]].js) one by
+//    one until it fits, so a growing site never fails the build.
 //
 // Cloudflare runs `node scripts/build-cloudflare-pages.mjs` as its build command on every push.
 // The output folder is generated, so it is git-ignored and not committed.
@@ -29,9 +29,12 @@ const MAX_FILES = PAID ? 99000 : 19900; // Plan limits are 100,000 / 20,000; kee
 // BASE_PROXIED is always forwarded on the free plan. If the deploy would still exceed the free-plan
 // file limit, the lowest-traffic sections in PROXY_ORDER are forwarded one by one until it fits, so a
 // growing site never fails the build. The Journal, Shop and other content stay as free static files.
-// (/ads/<slug>/ pages without a file render via functions/ads/[slug].js; /deals/ is forwarded too.)
-const BASE_PROXIED = PAID ? [] : ['deals'];
-const PROXY_ORDER = PAID ? [] : ['videos', 'exclusive', 'jobs', 'entradas'];
+// /exclusive/, /deals/ and /videos/ are no longer forwarded: their detail pages live in data
+// shards and are rendered by Cloudflare Functions (functions/exclusive/[slug].js,
+// functions/deals/[slug].js, functions/deals/promotions/[store].js, functions/videos/[slug].js),
+// so they stay up even when the Netlify origin is down.
+const BASE_PROXIED = PAID ? [] : [];
+const PROXY_ORDER = PAID ? [] : ['jobs', 'entradas'];
 
 // Never published on Cloudflare: private, build-only or tooling files.
 const PRIVATE = new Set([
@@ -94,8 +97,19 @@ const routes = {
     '/shop/*',
     '/tickets/*',
     '/ads/*',
+    '/exclusive/*',
+    '/deals/*',
+    '/videos/*',
   ],
-  exclude: ['/ads/', '/ads/page/*', '/shop/', '/shop/brand/*', '/shop/department/*', '/shop/type/*', '/tickets/', '/tickets/show/*'],
+  exclude: [
+    '/ads/', '/ads/page/*',
+    '/shop/', '/shop/brand/*', '/shop/department/*', '/shop/type/*',
+    '/tickets/', '/tickets/show/*',
+    '/exclusive/', '/exclusive/previews/*', '/exclusive/success/*',
+    '/exclusive/exclusive.css', '/exclusive/exclusive.js', '/exclusive/success.js',
+    '/deals/', '/deals/promotions/',
+    '/videos/',
+  ],
 };
 fs.writeFileSync(path.join(OUT, '_routes.json'), JSON.stringify(routes, null, 2) + '\n');
 
