@@ -26,6 +26,21 @@ CTA = {  # (button label, lead-in)
 e = lambda s: html.escape(s or '', quote=True)
 
 
+def sponsor(m):
+    """Mark an external anchor as an affiliate link without duplicating attributes."""
+    tag = m.group(0)
+    url = e(html.unescape(re.search(r'href="([^"]*)"', tag).group(1)))
+    existing = re.search(r'\brel="([^"]*)"', tag)
+    tokens = existing.group(1).split() if existing else []
+    for token in ('sponsored', 'nofollow', 'noopener'):
+        if token not in tokens:
+            tokens.append(token)
+    tag = re.sub(r'\s*\brel="[^"]*"', '', tag)
+    tag = re.sub(r'\s*\btarget="[^"]*"', '', tag)
+    tag = re.sub(r'href="[^"]*"', f'href="{url}"', tag, count=1)
+    return re.sub(r'^<a\b', f'<a rel="{" ".join(tokens)}" target="_blank"', tag)
+
+
 def slugify(s):
     s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode().lower()
     return re.sub(r'[^a-z0-9]+', '-', s).strip('-')
@@ -62,7 +77,7 @@ for slug, r in records.items():
     url = r['displayUrl']
     cta = (f'\n<div class="card promo-card article-cta"><p><strong>{e(lead)}</strong></p>'
            f'<a class="btn btn-gold" href="{e(url)}" target="_blank" rel="sponsored nofollow noopener">{e(label.format(b=brand))} →</a></div>\n')
-    body = re.sub(r'<a href="(https?://[^"]+)"', lambda m: f'<a rel="sponsored nofollow noopener" target="_blank" href="{e(html.unescape(m.group(1)))}"', body)
+    body = re.sub(r'<a\b[^>]*\bhref="https?://[^"]*"[^>]*>', sponsor, body)
     content = body + cta + disclosure
     topic = slugify(sector.get(r['advertiserId'], '') .split('&')[0]) or 'journal'
     canonical = f'{SITE}/journal/{slug}/'
